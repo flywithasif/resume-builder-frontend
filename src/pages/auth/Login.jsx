@@ -1,74 +1,223 @@
-import { Link } from "react-router-dom";
-
-import Card from "../../components/ui/Card";
-import Input from "../../components/ui/Input";
-import Button from "../../components/ui/Button";
+import { Eye, EyeOff, LockKeyhole, Mail, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 function Login() {
+  const navigate = useNavigate();
+
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+    remember: false,
+  });
+
+  const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const updateField = (field, value) => {
+    setForm((current) => ({ ...current, [field]: value }));
+    setErrors((current) => ({ ...current, [field]: "" }));
+  };
+
+  const validate = () => {
+    const nextErrors = {};
+
+    if (!form.email.trim()) {
+      nextErrors.email = "Email is required.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      nextErrors.email = "Enter a valid email address.";
+    }
+
+    if (!form.password) {
+      nextErrors.password = "Password is required.";
+    }
+
+    return nextErrors;
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    const nextErrors = validate();
+
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      return;
+    }
+
+    setLoading(true);
+
+    window.setTimeout(() => {
+      setLoading(false);
+      navigate("/dashboard");
+    }, 700);
+  };
+
   return (
-    <div className="page-container flex min-h-[calc(100vh-72px)] items-center justify-center py-12">
-      <Card className="w-full max-w-md" padding="p-7 sm:p-8">
-        <div className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#987542]">
-            Welcome back
-          </p>
+    <div className="min-h-[calc(100vh-72px)] bg-[#f8f8f6]">
+      <div className="mx-auto grid min-h-[calc(100vh-72px)] max-w-[1440px] lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="hidden flex-col justify-between border-r border-stone-200 bg-zinc-950 p-10 text-white lg:flex xl:p-14">
+          <Link to="/" className="flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-sm font-bold text-zinc-950">
+              R
+            </span>
+            <span className="text-lg font-semibold tracking-tight">
+              Resume<span className="text-[#c6a36c]">ly</span>
+            </span>
+          </Link>
 
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-950">
-            Sign in to your account
-          </h1>
+          <div className="max-w-lg">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#c6a36c]">
+              Welcome back
+            </p>
+            <h1 className="mt-5 text-5xl font-semibold leading-[1.02] tracking-[-0.05em] xl:text-6xl">
+              Continue building a resume you&apos;re proud to send.
+            </h1>
+            <p className="mt-6 max-w-md text-sm leading-7 text-zinc-400">
+              Return to your workspace, continue an existing resume or start
+              preparing a new version for your next opportunity.
+            </p>
 
-          <p className="mt-2 text-sm text-zinc-500">
-            Continue building your professional resume.
-          </p>
-        </div>
-
-        <div className="space-y-5">
-          <Input
-            id="email"
-            type="email"
-            label="Email"
-            placeholder="you@example.com"
-          />
-
-          <Input
-            id="password"
-            type="password"
-            label="Password"
-            placeholder="Enter your password"
-          />
-
-          <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 text-sm text-zinc-600">
-              <input
-                type="checkbox"
-                className="h-4 w-4 rounded border-stone-300"
-              />
-              Remember me
-            </label>
-
-            <Link
-              to="/forgot-password"
-              className="text-sm font-medium text-zinc-800 hover:text-[#987542]"
-            >
-              Forgot password?
-            </Link>
+            <div className="mt-8 space-y-3">
+              {[
+                "Live resume editing",
+                "Professional templates",
+                "Multiple resume versions",
+              ].map((item) => (
+                <div key={item} className="flex items-center gap-2.5 text-sm text-zinc-300">
+                  <CheckCircle2 size={16} className="text-[#c6a36c]" />
+                  {item}
+                </div>
+              ))}
+            </div>
           </div>
 
-          <Button className="w-full" size="lg">
-            Sign In
-          </Button>
+          <p className="text-xs text-zinc-600">
+            Build clearly. Apply confidently.
+          </p>
         </div>
 
-        <p className="mt-7 text-center text-sm text-zinc-500">
-          Don't have an account?{" "}
-          <Link
-            to="/register"
-            className="font-medium text-zinc-900 hover:text-[#987542]"
-          >
-            Create one
-          </Link>
-        </p>
-      </Card>
+        <div className="flex items-center justify-center px-5 py-12 sm:px-8">
+          <div className="w-full max-w-[440px]">
+            <div className="mb-8 lg:hidden">
+              <Link to="/" className="flex items-center gap-3">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-950 text-sm font-bold text-white">
+                  R
+                </span>
+                <span className="text-lg font-semibold tracking-tight">
+                  Resume<span className="text-[#b08d57]">ly</span>
+                </span>
+              </Link>
+            </div>
+
+            <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-[0_20px_60px_rgba(24,24,27,0.07)] sm:p-8">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#987542]">
+                Account
+              </p>
+
+              <h2 className="mt-2 text-2xl font-semibold tracking-[-0.035em] text-zinc-950">
+                Sign in to your account
+              </h2>
+
+              <p className="mt-2 text-sm leading-6 text-zinc-500">
+                Continue building your professional resume.
+              </p>
+
+              <form onSubmit={handleSubmit} className="mt-7 space-y-5" noValidate>
+                <div>
+                  <label htmlFor="login-email" className="mb-1.5 block text-xs font-medium text-zinc-600">
+                    Email
+                  </label>
+                  <div className="relative">
+                    <Mail size={16} className="absolute left-3 top-3 text-zinc-400" />
+                    <input
+                      id="login-email"
+                      type="email"
+                      value={form.email}
+                      onChange={(event) => updateField("email", event.target.value)}
+                      placeholder="you@example.com"
+                      autoComplete="email"
+                      className={`h-11 w-full rounded-xl border bg-white pl-10 pr-3 text-sm text-zinc-900 outline-none transition focus:ring-2 focus:ring-zinc-900/5 ${
+                        errors.email
+                          ? "border-red-300 focus:border-red-500"
+                          : "border-stone-200 focus:border-zinc-900"
+                      }`}
+                    />
+                  </div>
+                  {errors.email && <p className="mt-1.5 text-xs text-red-600">{errors.email}</p>}
+                </div>
+
+                <div>
+                  <label htmlFor="login-password" className="mb-1.5 block text-xs font-medium text-zinc-600">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <LockKeyhole size={16} className="absolute left-3 top-3 text-zinc-400" />
+                    <input
+                      id="login-password"
+                      type={showPassword ? "text" : "password"}
+                      value={form.password}
+                      onChange={(event) => updateField("password", event.target.value)}
+                      placeholder="Enter your password"
+                      autoComplete="current-password"
+                      className={`h-11 w-full rounded-xl border bg-white pl-10 pr-11 text-sm text-zinc-900 outline-none transition focus:ring-2 focus:ring-zinc-900/5 ${
+                        errors.password
+                          ? "border-red-300 focus:border-red-500"
+                          : "border-stone-200 focus:border-zinc-900"
+                      }`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((current) => !current)}
+                      className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center text-zinc-400 hover:text-zinc-900"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                  {errors.password && <p className="mt-1.5 text-xs text-red-600">{errors.password}</p>}
+                </div>
+
+                <div className="flex items-center justify-between gap-4">
+                  <label className="flex cursor-pointer items-center gap-2 text-xs text-zinc-600">
+                    <input
+                      type="checkbox"
+                      checked={form.remember}
+                      onChange={(event) => updateField("remember", event.target.checked)}
+                      className="h-4 w-4 rounded border-stone-300 accent-zinc-950"
+                    />
+                    Remember me
+                  </label>
+
+                  <Link
+                    to="/forgot-password"
+                    className="text-xs font-semibold text-zinc-700 hover:text-[#987542]"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-zinc-950 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {loading ? "Signing in..." : "Sign In"}
+                  {!loading && <ArrowRight size={16} />}
+                </button>
+              </form>
+
+              <p className="mt-7 text-center text-sm text-zinc-500">
+                Don&apos;t have an account?{" "}
+                <Link to="/register" className="font-semibold text-zinc-900 hover:text-[#987542]">
+                  Create one
+                </Link>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -45,21 +45,37 @@ function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* =====================================================
+            PUBLIC ROUTES
+        ====================================================== */}
+
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
 
-          <Route path="/templates" element={<Templates />} />
+          <Route
+            path="/templates"
+            element={<Templates />}
+          />
 
           <Route
             path="/templates/:templateId"
             element={<TemplateDetails />}
           />
 
-          <Route path="/pricing" element={<Pricing />} />
+          <Route
+            path="/pricing"
+            element={<Pricing />}
+          />
 
-          <Route path="/login" element={<Login />} />
+          <Route
+            path="/login"
+            element={<Login />}
+          />
 
-          <Route path="/register" element={<Register />} />
+          <Route
+            path="/register"
+            element={<Register />}
+          />
 
           <Route
             path="/forgot-password"
@@ -71,6 +87,10 @@ function AppRoutes() {
             element={<ResetPassword />}
           />
         </Route>
+
+        {/* =====================================================
+            PROTECTED ROUTES
+        ====================================================== */}
 
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
@@ -89,6 +109,13 @@ function AppRoutes() {
               element={<Profile />}
             />
 
+            {/* Builder without resume ID */}
+            <Route
+              path="/builder"
+              element={<Builder />}
+            />
+
+            {/* Builder with resume ID */}
             <Route
               path="/builder/:resumeId"
               element={<Builder />}
@@ -96,7 +123,14 @@ function AppRoutes() {
           </Route>
         </Route>
 
-        <Route path="*" element={<NotFound />} />
+        {/* =====================================================
+            404
+        ====================================================== */}
+
+        <Route
+          path="*"
+          element={<NotFound />}
+        />
       </Routes>
     </BrowserRouter>
   );
