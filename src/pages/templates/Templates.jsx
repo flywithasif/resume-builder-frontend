@@ -122,7 +122,7 @@ function Templates() {
   const chooseTemplate = (template) => {
     localStorage.setItem("resumely_template", template.id);
     localStorage.setItem("resumely_template_name", template.name);
-    navigate("/builder");
+    navigate("/builder?new=1");
   };
 
   const previewTemplate = (template) => {

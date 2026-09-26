@@ -128,7 +128,7 @@ function TemplateDetails() {
   const useTemplate = () => {
     localStorage.setItem("resumely_template", templateId);
     localStorage.setItem("resumely_template_name", template.name);
-    navigate("/builder");
+    navigate("/builder?new=1");
   };
 
   return (

@@ -25,7 +25,15 @@ import {
 } from "lucide-react";
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import {
+  calculateResumeProgress,
+  createResumeRecord,
+  getResumeById,
+  getResumes,
+  saveResumes,
+  makeResumeTitle,
+} from "../../utils/resumeStorage";
+import { Link, useSearchParams } from "react-router-dom";
 
 const initialResume = {
   personal: {
@@ -335,8 +343,8 @@ function ResumePreview({ resume, template = "executive" }) {
   );
 
   return (
-    <div className="mx-auto w-full max-w-[760px]">
-      <div className="overflow-hidden bg-white shadow-[0_20px_70px_rgba(24,24,27,0.12)]">
+    <div id="resume-print-area" className="resume-print-area mx-auto w-full max-w-[760px]">
+      <div className="overflow-hidden bg-white shadow-[0_12px_45px_rgba(24,24,27,0.10)] sm:shadow-[0_20px_70px_rgba(24,24,27,0.12)]">
         <div className={`min-h-[1060px] p-[8%] ${style.page}`}>
           <header className={style.header}>
             {template === "creative" && (
@@ -480,7 +488,7 @@ function ResumePreview({ resume, template = "executive" }) {
               <div className="mt-3 space-y-4">
                 {resume.projects.map((item) => (
                   <div key={item.id}>
-                    <div className="flex items-center gap-2">
+                    <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
                       <h3 className="text-[10px] font-bold">{item.name}</h3>
                       {item.link && (
                         <span className="text-[8px] text-zinc-400">
@@ -550,8 +558,28 @@ function ResumePreview({ resume, template = "executive" }) {
 }
 
 function Builder() {
+  const [searchParams] = useSearchParams();
+
+  const requestedResumeId = searchParams.get("id");
+  const isNewResume = searchParams.get("new") === "1";
+
+  const [activeResumeId, setActiveResumeId] = useState(
+    () => (!isNewResume ? requestedResumeId : null),
+  );
+
   const [resume, setResume] = useState(() => {
     try {
+      if (!isNewResume && requestedResumeId) {
+        const stored = getResumeById(requestedResumeId);
+        if (stored?.data) return stored.data;
+      }
+
+      if (!isNewResume) {
+        const activeId = localStorage.getItem("resumely_active_resume_id");
+        const stored = activeId ? getResumeById(activeId) : null;
+        if (stored?.data) return stored.data;
+      }
+
       const savedDraft = localStorage.getItem("resume_builder_draft");
       return savedDraft ? JSON.parse(savedDraft) : initialResume;
     } catch {
@@ -559,9 +587,18 @@ function Builder() {
     }
   });
 
-  const [selectedTemplate, setSelectedTemplate] = useState(
-    () => localStorage.getItem("resumely_template") || "executive",
-  );
+  const [selectedTemplate, setSelectedTemplate] = useState(() => {
+    try {
+      if (!isNewResume && requestedResumeId) {
+        const stored = getResumeById(requestedResumeId);
+        if (stored?.template) return stored.template;
+      }
+
+      return localStorage.getItem("resumely_template") || "executive";
+    } catch {
+      return "executive";
+    }
+  });
 
   const [activeSection, setActiveSection] =
     useState("personal");
@@ -570,6 +607,10 @@ function Builder() {
     useState(false);
 
   const [saved, setSaved] = useState(false);
+
+  const handleDownload = () => {
+    window.print();
+  };
 
   const updatePersonal = (field, value) => {
     setResume((current) => ({
@@ -857,9 +898,49 @@ function Builder() {
   };
 
   const handleSave = () => {
+    const now = new Date().toISOString();
+    const existing = getResumes();
+
+    let recordId = activeResumeId;
+
+    if (recordId) {
+      const next = existing.map((item) =>
+        String(item.id) === String(recordId)
+          ? {
+              ...item,
+              title: makeResumeTitle(resume),
+              template: selectedTemplate,
+              progress: calculateResumeProgress(resume),
+              updatedAt: now,
+              data: resume,
+            }
+          : item,
+      );
+
+      saveResumes(next);
+    } else {
+      const record = createResumeRecord({
+        data: resume,
+        template: selectedTemplate,
+      });
+
+      recordId = record.id;
+      setActiveResumeId(record.id);
+      saveResumes([record, ...existing]);
+    }
+
     localStorage.setItem(
       "resume_builder_draft",
       JSON.stringify(resume),
+    );
+    localStorage.setItem(
+      "resumely_active_resume_id",
+      String(recordId),
+    );
+    localStorage.setItem("resumely_template", selectedTemplate);
+    localStorage.setItem(
+      "resumely_template_name",
+      selectedTemplate.charAt(0).toUpperCase() + selectedTemplate.slice(1),
     );
 
     setSaved(true);
@@ -870,14 +951,89 @@ function Builder() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f3f3f0] text-zinc-950">
+    <>
+      <style>{`
+        html {
+          overflow-x: hidden;
+        }
+
+        body {
+          overflow-x: hidden;
+        }
+
+        button,
+        input,
+        textarea,
+        select {
+          -webkit-tap-highlight-color: transparent;
+        }
+
+        @media (max-width: 639px) {
+          #resume-print-area {
+            transform-origin: top center;
+          }
+        }
+
+        @media print {
+          @page {
+            size: A4 portrait;
+            margin: 0;
+          }
+
+          html,
+          body {
+            width: 210mm;
+            min-width: 210mm;
+            background: #fff !important;
+          }
+
+          body {
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+
+          body * {
+            visibility: hidden !important;
+          }
+
+          .resume-print-area,
+          .resume-print-area * {
+            visibility: visible !important;
+          }
+
+          .resume-print-area {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 210mm !important;
+            max-width: 210mm !important;
+            min-height: 297mm !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+          }
+
+          .resume-print-area > div {
+            width: 210mm !important;
+            min-height: 297mm !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+          }
+
+          .resume-print-area * {
+            print-color-adjust: exact !important;
+            -webkit-print-color-adjust: exact !important;
+          }
+        }
+      `}</style>
+
+      <div className="min-h-screen bg-[#f3f3f0] text-zinc-950">
       {/* =====================================================
           TOP BAR
       ====================================================== */}
 
       <header className="sticky top-0 z-50 border-b border-stone-200 bg-white/95 backdrop-blur">
-        <div className="flex h-[68px] items-center justify-between px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3">
+        <div className="flex min-h-[68px] items-center justify-between gap-2 px-3 py-2.5 sm:px-6 lg:px-8">
+          <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
             <Link
               to="/dashboard/resumes"
               className="flex h-9 w-9 items-center justify-center rounded-lg border border-stone-200 text-zinc-600 transition hover:bg-stone-100"
@@ -895,8 +1051,8 @@ function Builder() {
                   className="text-[#987542]"
                 />
 
-                <span className="text-sm font-semibold text-zinc-900">
-                  Alex Morgan — Resume
+                <span className="max-w-[260px] truncate text-sm font-semibold text-zinc-900">
+                  {makeResumeTitle(resume)}
                 </span>
               </div>
 
@@ -937,6 +1093,7 @@ function Builder() {
 
             <button
               type="button"
+              onClick={handleDownload}
               className="flex h-9 items-center gap-2 rounded-lg bg-zinc-950 px-3 text-xs font-medium text-white transition hover:bg-zinc-800"
             >
               <Download size={15} />
@@ -958,10 +1115,33 @@ function Builder() {
       </header>
 
       {/* =====================================================
+          MOBILE BUILDER SWITCH
+      ====================================================== */}
+      <div className="sticky top-[68px] z-40 flex items-center gap-2 border-b border-stone-200 bg-white px-3 py-2 lg:hidden">
+        <button
+          type="button"
+          onClick={() => setMobileEditorOpen(true)}
+          className="flex min-h-10 flex-1 items-center justify-center rounded-lg bg-zinc-950 px-3 text-xs font-semibold text-white transition hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-950/20"
+        >
+          Edit Resume
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setMobileEditorOpen(false);
+            window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+          }}
+          className="flex min-h-10 flex-1 items-center justify-center rounded-lg border border-stone-200 bg-white px-3 text-xs font-semibold text-zinc-700 transition hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-zinc-950/10"
+        >
+          Preview
+        </button>
+      </div>
+
+      {/* =====================================================
           BUILDER BODY
       ====================================================== */}
 
-      <div className="flex min-h-[calc(100vh-68px)]">
+      <div className="flex min-h-[calc(100vh-68px)] min-w-0 flex-col lg:flex-row">
         {/* ===================================================
             DESKTOP EDITOR
         ==================================================== */}
@@ -1026,7 +1206,7 @@ function Builder() {
               className="fixed inset-0 z-[60] bg-zinc-950/30 lg:hidden"
             />
 
-            <aside className="fixed bottom-0 left-0 top-0 z-[70] w-[92%] max-w-[390px] overflow-y-auto bg-white shadow-2xl lg:hidden">
+            <aside className="fixed bottom-0 left-0 top-0 z-[70] w-[min(92vw,390px)] max-w-[390px] overflow-y-auto overscroll-contain bg-white shadow-2xl lg:hidden">
               <div className="sticky top-0 z-10 flex h-[68px] items-center justify-between border-b border-stone-200 bg-white px-5">
                 <div>
                   <h2 className="text-sm font-semibold">
@@ -1080,7 +1260,7 @@ function Builder() {
         ==================================================== */}
 
         <main className="min-w-0 flex-1 overflow-y-auto">
-          <div className="min-h-full px-4 py-7 sm:px-8 lg:px-10 lg:py-10">
+          <div className="min-h-full min-w-0 overflow-x-hidden px-2.5 py-5 sm:px-6 sm:py-7 lg:px-10 lg:py-10">
             <div className="mx-auto mb-5 flex max-w-[760px] items-center justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#987542]">
@@ -1092,7 +1272,7 @@ function Builder() {
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 rounded-lg border border-stone-200 bg-white px-3 py-2 text-xs text-zinc-500 shadow-sm">
+              <div className="hidden items-center gap-2 rounded-lg border border-stone-200 bg-white px-3 py-2 text-xs text-zinc-500 shadow-sm sm:flex">
                 <Eye size={14} />
                 A4 Preview
               </div>
@@ -1105,7 +1285,8 @@ function Builder() {
           </div>
         </main>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 
