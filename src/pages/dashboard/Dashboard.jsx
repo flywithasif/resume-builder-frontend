@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useMemo, useState } from "react";
+
 import {
   calculateResumeProgress,
   formatUpdatedAt,
@@ -53,6 +54,9 @@ function Dashboard() {
 
   return (
     <div className="mx-auto max-w-[1400px]">
+      {/* =====================================================
+          HERO
+      ====================================================== */}
       <section className="relative overflow-hidden rounded-2xl bg-zinc-950 px-6 py-8 text-white sm:px-8 sm:py-10">
         <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-[#987542]/20 blur-3xl" />
 
@@ -73,16 +77,64 @@ function Dashboard() {
             </p>
           </div>
 
+          {/* =================================================
+              CREATE NEW RESUME
+              BLACK → GOLD ON HOVER / ACTIVE
+          ================================================== */}
           <Link
             to="/builder?new=1"
-            className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-5 text-sm font-semibold text-zinc-950 transition hover:bg-stone-100"
+            className="
+              group
+              inline-flex
+              h-11
+              shrink-0
+              items-center
+              justify-center
+              gap-2
+              rounded-xl
+              bg-zinc-950
+              px-5
+              text-sm
+              font-semibold
+              text-white
+              ring-1
+              ring-white/20
+              shadow-[0_8px_25px_rgba(0,0,0,0.25)]
+              transition-all
+              duration-200
+              ease-out
+              hover:bg-[#ae8954]
+              hover:text-white
+              hover:ring-[#c6a36c]
+              hover:shadow-[0_10px_30px_rgba(174,137,84,0.30)]
+              active:scale-[0.98]
+              active:bg-[#987542]
+              focus:outline-none
+              focus:ring-2
+              focus:ring-[#c6a36c]
+              focus:ring-offset-2
+              focus:ring-offset-zinc-950
+            "
           >
-            <Plus size={17} />
+            <Plus
+              size={17}
+              strokeWidth={2}
+              className="
+                text-white
+                transition-transform
+                duration-200
+                group-hover:rotate-90
+              "
+            />
+
             Create New Resume
           </Link>
         </div>
       </section>
 
+      {/* =====================================================
+          STATS
+      ====================================================== */}
       <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[
           ["Total Resumes", resumes.length, FileText],
@@ -95,11 +147,15 @@ function Dashboard() {
             className="rounded-2xl border border-stone-200 bg-white p-5"
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-zinc-500">{label}</span>
+              <span className="text-xs font-medium text-zinc-500">
+                {label}
+              </span>
+
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-stone-100 text-zinc-700">
                 <Icon size={16} />
               </div>
             </div>
+
             <p className="mt-5 text-2xl font-semibold tracking-tight text-zinc-950">
               {value}
             </p>
@@ -107,12 +163,16 @@ function Dashboard() {
         ))}
       </section>
 
+      {/* =====================================================
+          YOUR RESUMES
+      ====================================================== */}
       <section className="mt-8 rounded-2xl border border-stone-200 bg-white p-5 sm:p-6">
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div>
             <h2 className="text-base font-semibold text-zinc-950">
               Your resumes
             </h2>
+
             <p className="mt-1 text-xs text-zinc-500">
               Your saved resume versions appear here automatically.
             </p>
@@ -123,41 +183,102 @@ function Dashboard() {
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search resumes..."
-              className="h-10 w-full rounded-xl border border-stone-200 bg-stone-50 px-3 text-xs outline-none focus:border-zinc-900"
+              className="
+                h-10
+                w-full
+                rounded-xl
+                border
+                border-stone-200
+                bg-stone-50
+                px-3
+                text-xs
+                outline-none
+                transition
+                focus:border-zinc-900
+              "
             />
           </div>
         </div>
 
+        {/* =================================================
+            EMPTY STATE
+        ================================================== */}
         {filteredResumes.length === 0 ? (
           <div className="mt-6 rounded-xl border border-dashed border-stone-200 bg-stone-50 px-6 py-10 text-center">
-            <FileText className="mx-auto text-zinc-300" size={28} />
+            <FileText
+              className="mx-auto text-zinc-300"
+              size={28}
+            />
+
             <p className="mt-3 text-sm font-medium text-zinc-800">
-              {resumes.length ? "No matching resumes" : "No saved resumes yet"}
+              {resumes.length
+                ? "No matching resumes"
+                : "No saved resumes yet"}
             </p>
+
             <p className="mt-1 text-xs text-zinc-500">
               {resumes.length
                 ? "Try another search."
                 : "Create a resume and press Save in the builder."}
             </p>
+
             {!resumes.length && (
               <Link
                 to="/builder?new=1"
-                className="mt-5 inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-950 px-4 text-xs font-semibold text-white hover:bg-[#987542]"
+                className="
+                  group
+                  mt-5
+                  inline-flex
+                  h-9
+                  items-center
+                  gap-2
+                  rounded-lg
+                  bg-zinc-950
+                  px-4
+                  text-xs
+                  font-semibold
+                  text-white
+                  transition-all
+                  duration-200
+                  hover:bg-[#ae8954]
+                  hover:text-white
+                  active:scale-[0.98]
+                  active:bg-[#987542]
+                "
               >
-                <Plus size={14} />
+                <Plus
+                  size={14}
+                  className="transition-transform duration-200 group-hover:rotate-90"
+                />
+
                 Create Resume
               </Link>
             )}
           </div>
         ) : (
+          /* =================================================
+             RESUME LIST
+          ================================================== */
           <div className="mt-6 divide-y divide-stone-100">
             {filteredResumes.slice(0, 6).map((resume) => {
-              const progress = resume.progress || calculateResumeProgress(resume.data);
+              const progress =
+                resume.progress ||
+                calculateResumeProgress(resume.data);
 
               return (
                 <div
                   key={resume.id}
-                  className="flex flex-col gap-4 py-4 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between"
+                  className="
+                    flex
+                    flex-col
+                    gap-4
+                    py-4
+                    first:pt-0
+                    last:pb-0
+                    sm:flex-row
+                    sm:items-center
+                    sm:justify-between
+                  "
                 >
                   <div className="flex min-w-0 items-center gap-3">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-100 text-zinc-600">
@@ -168,12 +289,16 @@ function Dashboard() {
                       <p className="truncate text-sm font-semibold text-zinc-900">
                         {resume.title}
                       </p>
+
                       <p className="mt-1 flex items-center gap-2 text-[11px] text-zinc-400">
                         <span className="capitalize">
                           {resume.template || "Executive"}
                         </span>
+
                         <span>·</span>
+
                         <Clock3 size={11} />
+
                         {formatUpdatedAt(resume.updatedAt)}
                       </p>
                     </div>
@@ -183,16 +308,34 @@ function Dashboard() {
                     <div className="min-w-0 flex-1">
                       <div className="mb-1.5 flex justify-between text-[10px] text-zinc-400">
                         <span>Progress</span>
+
                         <span className="font-semibold text-zinc-700">
                           {progress}%
                         </span>
                       </div>
+
                       <ProgressBar value={progress} />
                     </div>
 
                     <Link
                       to={`/builder?id=${encodeURIComponent(resume.id)}`}
-                      className="flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-stone-200 px-3 text-xs font-semibold text-zinc-700 hover:border-zinc-900"
+                      className="
+                        flex
+                        h-9
+                        shrink-0
+                        items-center
+                        gap-1.5
+                        rounded-lg
+                        border
+                        border-stone-200
+                        px-3
+                        text-xs
+                        font-semibold
+                        text-zinc-700
+                        transition
+                        hover:border-[#ae8954]
+                        hover:text-[#987542]
+                      "
                     >
                       Open
                       <ArrowRight size={13} />
@@ -204,10 +347,27 @@ function Dashboard() {
           </div>
         )}
 
+        {/* =================================================
+            VIEW ALL
+        ================================================== */}
         {resumes.length > 6 && (
           <Link
             to="/dashboard/resumes"
-            className="mt-6 flex items-center justify-center gap-2 border-t border-stone-100 pt-5 text-xs font-semibold text-zinc-600 hover:text-zinc-950"
+            className="
+              mt-6
+              flex
+              items-center
+              justify-center
+              gap-2
+              border-t
+              border-stone-100
+              pt-5
+              text-xs
+              font-semibold
+              text-zinc-600
+              transition
+              hover:text-[#987542]
+            "
           >
             View all resumes
             <ArrowRight size={14} />

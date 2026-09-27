@@ -7,7 +7,6 @@ import {
   FileText,
   Globe2,
   Layers3,
-  Menu,
   MousePointer2,
   Palette,
   Play,
@@ -613,194 +612,10 @@ function FAQItem({ item, isOpen, onToggle }) {
 }
 
 function Home() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState(0);
-
-  const closeMobileMenu = () => {
-    setMobileMenuOpen(false);
-  };
 
   return (
     <div className="overflow-hidden bg-[#f8f8f6] text-zinc-950">
-      {/* =========================================================
-          MOBILE NAV
-      ========================================================= */}
-
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <>
-            <motion.button
-              type="button"
-              aria-label="Close menu"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={closeMobileMenu}
-              className="fixed inset-0 z-[70] bg-zinc-950/30 backdrop-blur-sm lg:hidden"
-            />
-
-            <motion.div
-              initial={{
-                opacity: 0,
-                y: -20,
-              }}
-              animate={{
-                opacity: 1,
-                y: 0,
-              }}
-              exit={{
-                opacity: 0,
-                y: -20,
-              }}
-              className="fixed left-4 right-4 top-4 z-[80] rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_25px_80px_rgba(24,24,27,0.18)] lg:hidden"
-            >
-              <div className="flex items-center justify-between">
-                <Link
-                  to="/"
-                  onClick={closeMobileMenu}
-                  className="flex items-center gap-3"
-                >
-                  <span className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-zinc-950 text-sm font-bold text-white">
-                    R
-                  </span>
-
-                  <span className="text-[17px] font-semibold tracking-tight">
-                    Resume<span className="text-[#b08d57]">ly</span>
-                  </span>
-                </Link>
-
-                <button
-                  type="button"
-                  onClick={closeMobileMenu}
-                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-stone-100 text-zinc-600"
-                  aria-label="Close menu"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-
-              <nav className="mt-6 space-y-1">
-                {[
-                  ["Templates", "/templates"],
-                  ["Features", "#features"],
-                  ["How it works", "#how-it-works"],
-                  ["Pricing", "#pricing"],
-                  ["FAQ", "#faq"],
-                ].map(([label, href]) => (
-                  <a
-                    key={label}
-                    href={href}
-                    onClick={closeMobileMenu}
-                    className="flex h-11 items-center rounded-xl px-3 text-sm font-medium text-zinc-700 hover:bg-stone-100"
-                  >
-                    {label}
-                  </a>
-                ))}
-              </nav>
-
-              <div className="mt-5 grid grid-cols-2 gap-2 border-t border-stone-200 pt-5">
-                <Link
-                  to="/login"
-                  onClick={closeMobileMenu}
-                  className="flex h-11 items-center justify-center rounded-xl border border-stone-200 text-sm font-medium"
-                >
-                  Login
-                </Link>
-
-                <Link
-                  to="/register"
-                  onClick={closeMobileMenu}
-                  className="flex h-11 items-center justify-center rounded-xl bg-zinc-950 text-sm font-medium text-white"
-                >
-                  Create Resume
-                </Link>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* =========================================================
-          NAVBAR
-      ========================================================= */}
-
-      <header className="sticky top-0 z-50 border-b border-stone-200/70 bg-[#f8f8f6]/90 backdrop-blur-xl">
-        <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
-          <div className="flex h-[72px] items-center justify-between">
-            <Link
-              to="/"
-              className="focus-ring inline-flex items-center gap-3"
-            >
-              <span className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-zinc-950 text-sm font-bold text-white">
-                R
-              </span>
-
-              <span className="text-[17px] font-semibold tracking-[-0.02em] text-zinc-950">
-                Resume<span className="text-[#b08d57]">ly</span>
-              </span>
-            </Link>
-
-            <nav
-              className="hidden items-center gap-8 lg:flex"
-              aria-label="Landing navigation"
-            >
-              <a
-                href="#templates"
-                className="focus-ring text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-950"
-              >
-                Templates
-              </a>
-
-              <a
-                href="#features"
-                className="focus-ring text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-950"
-              >
-                Features
-              </a>
-
-              <a
-                href="#how-it-works"
-                className="focus-ring text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-950"
-              >
-                How it works
-              </a>
-
-              <a
-                href="#pricing"
-                className="focus-ring text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-950"
-              >
-                Pricing
-              </a>
-            </nav>
-
-            <div className="hidden items-center gap-3 sm:flex">
-              <Link
-                to="/login"
-                className="focus-ring rounded-xl px-4 py-2.5 text-sm font-medium text-zinc-700 transition-colors hover:text-zinc-950"
-              >
-                Login
-              </Link>
-
-              <Link to="/register">
-                <Button>
-                  Create Resume
-                  <ArrowRight size={15} />
-                </Button>
-              </Link>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(true)}
-              className="focus-ring flex h-10 w-10 items-center justify-center rounded-xl text-zinc-700 hover:bg-stone-100 sm:hidden"
-              aria-label="Open menu"
-            >
-              <Menu size={21} />
-            </button>
-          </div>
-        </div>
-      </header>
-
       {/* =========================================================
           HERO
       ========================================================= */}
@@ -855,7 +670,7 @@ function Home() {
                   </Button>
                 </Link>
 
-                <a href="#templates">
+                <Link to="/templates">
                   <Button
                     variant="secondary"
                     size="xl"
@@ -863,7 +678,7 @@ function Home() {
                   >
                     Explore Templates
                   </Button>
-                </a>
+                </Link>
               </div>
 
               <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 text-xs text-zinc-500">

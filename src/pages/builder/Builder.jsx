@@ -34,6 +34,7 @@ import {
   makeResumeTitle,
 } from "../../utils/resumeStorage";
 import { Link, useSearchParams } from "react-router-dom";
+import { ResumeRenderer as TemplateRenderer } from "../templates/resumeTemplates";
 
 const initialResume = {
   personal: {
@@ -344,7 +345,7 @@ function ResumePreview({ resume, template = "executive" }) {
 
   return (
     <div id="resume-print-area" className="resume-print-area mx-auto w-full max-w-[760px]">
-      <div className="overflow-hidden bg-white shadow-[0_12px_45px_rgba(24,24,27,0.10)] sm:shadow-[0_20px_70px_rgba(24,24,27,0.12)]">
+      <div className="overflow-hidden bg-white shadow-[0_20px_70px_rgba(24,24,27,0.12)]">
         <div className={`min-h-[1060px] p-[8%] ${style.page}`}>
           <header className={style.header}>
             {template === "creative" && (
@@ -488,7 +489,7 @@ function ResumePreview({ resume, template = "executive" }) {
               <div className="mt-3 space-y-4">
                 {resume.projects.map((item) => (
                   <div key={item.id}>
-                    <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
+                    <div className="flex items-center gap-2">
                       <h3 className="text-[10px] font-bold">{item.name}</h3>
                       {item.link && (
                         <span className="text-[8px] text-zinc-400">
@@ -953,27 +954,6 @@ function Builder() {
   return (
     <>
       <style>{`
-        html {
-          overflow-x: hidden;
-        }
-
-        body {
-          overflow-x: hidden;
-        }
-
-        button,
-        input,
-        textarea,
-        select {
-          -webkit-tap-highlight-color: transparent;
-        }
-
-        @media (max-width: 639px) {
-          #resume-print-area {
-            transform-origin: top center;
-          }
-        }
-
         @media print {
           @page {
             size: A4 portrait;
@@ -1032,8 +1012,8 @@ function Builder() {
       ====================================================== */}
 
       <header className="sticky top-0 z-50 border-b border-stone-200 bg-white/95 backdrop-blur">
-        <div className="flex min-h-[68px] items-center justify-between gap-2 px-3 py-2.5 sm:px-6 lg:px-8">
-          <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+        <div className="flex h-[68px] items-center justify-between px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3">
             <Link
               to="/dashboard/resumes"
               className="flex h-9 w-9 items-center justify-center rounded-lg border border-stone-200 text-zinc-600 transition hover:bg-stone-100"
@@ -1115,33 +1095,10 @@ function Builder() {
       </header>
 
       {/* =====================================================
-          MOBILE BUILDER SWITCH
-      ====================================================== */}
-      <div className="sticky top-[68px] z-40 flex items-center gap-2 border-b border-stone-200 bg-white px-3 py-2 lg:hidden">
-        <button
-          type="button"
-          onClick={() => setMobileEditorOpen(true)}
-          className="flex min-h-10 flex-1 items-center justify-center rounded-lg bg-zinc-950 px-3 text-xs font-semibold text-white transition hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-950/20"
-        >
-          Edit Resume
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setMobileEditorOpen(false);
-            window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
-          }}
-          className="flex min-h-10 flex-1 items-center justify-center rounded-lg border border-stone-200 bg-white px-3 text-xs font-semibold text-zinc-700 transition hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-zinc-950/10"
-        >
-          Preview
-        </button>
-      </div>
-
-      {/* =====================================================
           BUILDER BODY
       ====================================================== */}
 
-      <div className="flex min-h-[calc(100vh-68px)] min-w-0 flex-col lg:flex-row">
+      <div className="flex min-h-[calc(100vh-68px)]">
         {/* ===================================================
             DESKTOP EDITOR
         ==================================================== */}
@@ -1206,7 +1163,7 @@ function Builder() {
               className="fixed inset-0 z-[60] bg-zinc-950/30 lg:hidden"
             />
 
-            <aside className="fixed bottom-0 left-0 top-0 z-[70] w-[min(92vw,390px)] max-w-[390px] overflow-y-auto overscroll-contain bg-white shadow-2xl lg:hidden">
+            <aside className="fixed bottom-0 left-0 top-0 z-[70] w-[92%] max-w-[390px] overflow-y-auto bg-white shadow-2xl lg:hidden">
               <div className="sticky top-0 z-10 flex h-[68px] items-center justify-between border-b border-stone-200 bg-white px-5">
                 <div>
                   <h2 className="text-sm font-semibold">
@@ -1260,7 +1217,7 @@ function Builder() {
         ==================================================== */}
 
         <main className="min-w-0 flex-1 overflow-y-auto">
-          <div className="min-h-full min-w-0 overflow-x-hidden px-2.5 py-5 sm:px-6 sm:py-7 lg:px-10 lg:py-10">
+          <div className="min-h-full px-4 py-7 sm:px-8 lg:px-10 lg:py-10">
             <div className="mx-auto mb-5 flex max-w-[760px] items-center justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#987542]">
@@ -1272,13 +1229,13 @@ function Builder() {
                 </p>
               </div>
 
-              <div className="hidden items-center gap-2 rounded-lg border border-stone-200 bg-white px-3 py-2 text-xs text-zinc-500 shadow-sm sm:flex">
+              <div className="flex items-center gap-2 rounded-lg border border-stone-200 bg-white px-3 py-2 text-xs text-zinc-500 shadow-sm">
                 <Eye size={14} />
                 A4 Preview
               </div>
             </div>
 
-            <ResumePreview
+            <TemplateRenderer
               resume={resume}
               template={selectedTemplate}
             />

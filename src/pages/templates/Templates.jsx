@@ -1,211 +1,260 @@
-import { useNavigate } from "react-router-dom";
-import Card from "../../components/ui/Card";
-import Badge from "../../components/ui/Badge";
+import {
+  ArrowRight,
+  Check,
+  Eye,
+  FileText,
+  Sparkles,
+} from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 
-const templates = [
-  {
-    id: "executive",
-    name: "Executive",
-    description: "A polished, structured layout for experienced professionals and leadership roles.",
-    accent: "bg-zinc-900",
-    lines: ["bg-zinc-900", "bg-zinc-300", "bg-zinc-200"],
-  },
-  {
-    id: "modern",
-    name: "Modern",
-    description: "A clean contemporary layout with strong hierarchy and generous spacing.",
-    accent: "bg-[#987542]",
-    lines: ["bg-[#987542]", "bg-zinc-300", "bg-zinc-200"],
-  },
-  {
-    id: "minimal",
-    name: "Minimal",
-    description: "A simple, distraction-free resume focused on content and readability.",
-    accent: "bg-zinc-700",
-    lines: ["bg-zinc-700", "bg-zinc-200", "bg-zinc-200"],
-  },
-  {
-    id: "corporate",
-    name: "Corporate",
-    description: "A professional business-focused design suited to corporate applications.",
-    accent: "bg-slate-800",
-    lines: ["bg-slate-800", "bg-slate-300", "bg-slate-200"],
-  },
-  {
-    id: "creative",
-    name: "Creative",
-    description: "A distinctive layout for designers, marketers and creative professionals.",
-    accent: "bg-[#987542]",
-    lines: ["bg-[#987542]", "bg-zinc-400", "bg-zinc-200"],
-  },
-  {
-    id: "ats",
-    name: "ATS",
-    description: "A straightforward, parser-friendly structure designed for ATS readability.",
-    accent: "bg-zinc-900",
-    lines: ["bg-zinc-900", "bg-zinc-300", "bg-zinc-200"],
-  },
-  {
-    id: "tech",
-    name: "Tech",
-    description: "A crisp technical layout for developers, engineers and technology roles.",
-    accent: "bg-slate-700",
-    lines: ["bg-slate-700", "bg-slate-300", "bg-zinc-200"],
-  },
-  {
-    id: "elegant",
-    name: "Elegant",
-    description: "A refined premium style with subtle visual details and strong typography.",
-    accent: "bg-[#987542]",
-    lines: ["bg-[#987542]", "bg-zinc-300", "bg-zinc-200"],
-  },
-];
+import {
+  ResumeRenderer,
+  TEMPLATE_META,
+  TEMPLATE_SAMPLE_RESUME,
+} from "./resumeTemplates";
 
-function TemplatePreview({ template, large = false }) {
-  const width = large ? "p-8 sm:p-10" : "p-5";
-  const titleWidth =
-    template.id === "creative"
-      ? "w-3/4"
-      : template.id === "minimal"
-        ? "w-1/2"
-        : "w-2/3";
+/* =========================================================
+   RESUME PREVIEW
+========================================================= */
 
+function ResumeThumbnail({ template }) {
   return (
-    <div className={`aspect-[0.707] overflow-hidden bg-stone-100 ${width}`}>
-      <div className="relative h-full overflow-hidden bg-white p-5 shadow-[0_12px_35px_rgba(0,0,0,0.08)] sm:p-7">
-        {template.id === "creative" && (
-          <div className="absolute right-0 top-0 h-20 w-20 rounded-bl-[32px] bg-[#987542]/10" />
-        )}
-
-        {template.id === "tech" && (
-          <div className="absolute left-0 top-0 h-full w-1 bg-slate-700" />
-        )}
-
-        <div className={`h-3 ${titleWidth} rounded-sm ${template.accent}`} />
-        <div className="mt-2 h-1.5 w-1/2 rounded-sm bg-zinc-200" />
-
-        <div className="mt-6 grid grid-cols-[1fr_2.1fr] gap-4">
-          <div className="space-y-2">
-            <div className="h-1.5 w-3/4 rounded bg-zinc-800" />
-            <div className="h-1.5 w-full rounded bg-zinc-200" />
-            <div className="h-1.5 w-5/6 rounded bg-zinc-200" />
-            <div className="mt-4 h-1.5 w-2/3 rounded bg-zinc-800" />
-            <div className="h-1.5 w-full rounded bg-zinc-200" />
-            <div className="h-1.5 w-4/5 rounded bg-zinc-200" />
-          </div>
-
-          <div className="space-y-2">
-            <div className="h-1.5 w-1/3 rounded bg-zinc-800" />
-            <div className="h-1.5 w-full rounded bg-zinc-200" />
-            <div className="h-1.5 w-11/12 rounded bg-zinc-200" />
-            <div className="h-1.5 w-4/5 rounded bg-zinc-200" />
-
-            <div className="mt-5 h-1.5 w-2/5 rounded bg-zinc-800" />
-            <div className="h-1.5 w-full rounded bg-zinc-200" />
-            <div className="h-1.5 w-10/12 rounded bg-zinc-200" />
-            <div className="h-1.5 w-3/4 rounded bg-zinc-200" />
-
-            <div className="mt-5 h-1.5 w-1/3 rounded bg-zinc-800" />
-            <div className="h-1.5 w-full rounded bg-zinc-200" />
-            <div className="h-1.5 w-5/6 rounded bg-zinc-200" />
-          </div>
+    <div className="relative h-[390px] w-full overflow-hidden bg-[#efede8]">
+      {/* A4 resume */}
+      <div
+        className="absolute left-1/2 top-4"
+        style={{
+          width: "760px",
+          transform: "translateX(-50%)",
+        }}
+      >
+        <div
+          style={{
+            width: "760px",
+            transform: "scale(0.42)",
+            transformOrigin: "top center",
+          }}
+        >
+          <ResumeRenderer
+            resume={TEMPLATE_SAMPLE_RESUME}
+            template={template.id}
+          />
         </div>
       </div>
+
+      {/* Very subtle bottom fade */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-[#efede8] to-transparent" />
     </div>
   );
 }
 
+/* =========================================================
+   TEMPLATES PAGE
+========================================================= */
+
 function Templates() {
   const navigate = useNavigate();
-  const selectedTemplate = localStorage.getItem("resumely_template");
 
-  const chooseTemplate = (template) => {
-    localStorage.setItem("resumely_template", template.id);
-    localStorage.setItem("resumely_template_name", template.name);
+  const useTemplate = (id) => {
+    localStorage.setItem(
+      "resumely_selected_template",
+      id
+    );
+
+    localStorage.setItem(
+      "resumely_template",
+      id
+    );
+
+    const template = TEMPLATE_META.find(
+      (item) => item.id === id
+    );
+
+    if (template) {
+      localStorage.setItem(
+        "resumely_template_name",
+        template.name
+      );
+    }
+
     navigate("/builder?new=1");
   };
 
-  const previewTemplate = (template) => {
-    navigate(`/templates/${template.id}`);
-  };
-
   return (
-    <div className="min-h-screen bg-[#faf9f7]">
-      <div className="page-container py-12 sm:py-16 lg:py-20">
-        <div className="mx-auto max-w-3xl text-center">
-          <Badge variant="accent">Resume Templates</Badge>
+    <div className="pb-12">
+      {/* =====================================================
+          HERO
+      ====================================================== */}
 
-          <h1 className="mt-5 text-4xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-5xl lg:text-6xl">
-            Choose a design that
-            <span className="block text-[#987542]">fits your career.</span>
-          </h1>
+      <section className="relative overflow-hidden rounded-[26px] bg-[#111111] px-7 py-10 text-white sm:px-10 lg:px-12">
+        <div className="absolute -right-24 -top-28 h-80 w-80 rounded-full bg-[#ae8954]/10 blur-3xl" />
 
-          <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-zinc-500 sm:text-base">
-            Start with a professionally designed foundation, then build your
-            resume with your own experience, skills and achievements.
-          </p>
-        </div>
+        <div className="absolute -bottom-32 left-1/3 h-72 w-72 rounded-full bg-white/[0.03] blur-3xl" />
 
-        {selectedTemplate && (
-          <div className="mx-auto mt-8 flex max-w-xl items-center justify-center gap-2 rounded-full border border-[#987542]/20 bg-white px-4 py-2 text-xs text-zinc-600 shadow-sm">
-            <span className="h-2 w-2 rounded-full bg-[#987542]" />
-            Current template:{" "}
-            <span className="font-semibold capitalize text-zinc-900">
-              {selectedTemplate}
-            </span>
+        <div className="relative grid gap-8 lg:grid-cols-[1fr_285px] lg:items-end">
+          <div>
+            <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#d2b078]">
+              <Sparkles size={13} />
+
+              Resume templates
+            </div>
+
+            <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.055em] sm:text-5xl">
+              Choose a design that
+
+              <span className="block text-[#d2b078]">
+                fits your career.
+              </span>
+            </h1>
+
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-zinc-400">
+              Twenty professionally structured resume designs,
+              each with its own visual system, hierarchy and
+              presentation style.
+            </p>
           </div>
-        )}
 
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {templates.map((template, index) => (
-            <Card
-              key={template.id}
-              className="group overflow-hidden border border-zinc-200/80 bg-white p-0 shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-300 hover:-translate-y-1 hover:border-[#987542]/30 hover:shadow-[0_18px_45px_rgba(0,0,0,0.08)]"
-            >
-              <button
-                type="button"
-                onClick={() => previewTemplate(template)}
-                className="block w-full text-left"
-                aria-label={`Preview ${template.name} template`}
-              >
-                <TemplatePreview template={template} />
-              </button>
+          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+            <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+              Included
+            </p>
 
-              <div className="border-t border-zinc-100 p-5">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-base font-semibold text-zinc-950">
-                      {template.name}
-                    </p>
-                    <p className="mt-1 text-xs leading-5 text-zinc-500">
-                      {template.description}
-                    </p>
-                  </div>
-                  <span className="shrink-0 text-[10px] font-semibold tracking-[0.16em] text-zinc-300">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
+            <div className="mt-4 space-y-3">
+              {[
+                "20 distinct resume designs",
+                "Real live template previews",
+                "A4-ready layouts",
+                "Live builder preview",
+              ].map((item) => (
+                <div
+                  key={item}
+                  className="flex items-center gap-2 text-xs text-zinc-300"
+                >
+                  <Check
+                    size={13}
+                    className="shrink-0 text-[#d2b078]"
+                  />
+
+                  {item}
                 </div>
-
-                <div className="mt-5 flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => previewTemplate(template)}
-                    className="flex-1 rounded-xl border border-zinc-200 px-3 py-2.5 text-xs font-semibold text-zinc-700 transition hover:border-zinc-300 hover:bg-zinc-50"
-                  >
-                    Preview
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => chooseTemplate(template)}
-                    className="flex-1 rounded-xl bg-zinc-950 px-3 py-2.5 text-xs font-semibold text-white transition hover:bg-[#987542]"
-                  >
-                    Use Template
-                  </button>
-                </div>
-              </div>
-            </Card>
-          ))}
+              ))}
+            </div>
+          </div>
         </div>
+      </section>
+
+      {/* =====================================================
+          LIBRARY BAR
+      ====================================================== */}
+
+      <div className="mt-5 flex h-14 items-center justify-between rounded-2xl border border-[#e5dfd5] bg-white px-5">
+        <div className="flex items-center gap-2 text-xs text-zinc-500">
+          <span className="h-2 w-2 rounded-full bg-[#ae8954]" />
+
+          Your template library
+        </div>
+
+        <span className="text-xs font-semibold text-zinc-900">
+          {TEMPLATE_META.length} designs
+        </span>
+      </div>
+
+      {/* =====================================================
+          TEMPLATE GRID
+      ====================================================== */}
+
+      <div className="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+        {TEMPLATE_META.map((template, index) => (
+          <article
+            key={template.id}
+            className="group overflow-hidden rounded-[22px] border border-[#e4ded5] bg-white transition-all duration-300 hover:-translate-y-1 hover:border-[#d2bea0] hover:shadow-[0_20px_50px_rgba(17,17,17,0.09)]"
+          >
+            {/* =================================================
+                PREVIEW
+            ================================================== */}
+
+            <div className="relative overflow-hidden">
+              <ResumeThumbnail template={template} />
+
+              {/* Category */}
+              <div className="absolute left-4 top-4 rounded-full border border-[#e6e1d9] bg-white/95 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-zinc-600 shadow-[0_3px_12px_rgba(0,0,0,0.07)] backdrop-blur">
+                {template.category}
+              </div>
+
+              {/* Hover preview */}
+              <Link
+                to={`/templates/${template.id}`}
+                className="absolute bottom-4 left-1/2 flex -translate-x-1/2 translate-y-2 items-center gap-2 rounded-full border border-white/80 bg-white/95 px-4 py-2 text-[10px] font-semibold text-zinc-900 opacity-0 shadow-[0_8px_25px_rgba(0,0,0,0.12)] backdrop-blur transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100"
+              >
+                <Eye size={13} />
+
+                Preview design
+              </Link>
+            </div>
+
+            {/* =================================================
+                CONTENT
+            ================================================== */}
+
+            <div className="p-4.5 px-5 pb-5">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <h2 className="truncate text-[16px] font-semibold tracking-[-0.025em] text-zinc-950">
+                    {template.name}
+                  </h2>
+
+                  <p className="mt-1.5 line-clamp-2 min-h-[34px] text-[11px] leading-[17px] text-zinc-500">
+                    {template.description}
+                  </p>
+                </div>
+
+                <span className="flex h-7 min-w-7 shrink-0 items-center justify-center rounded-full bg-[#f6f1e9] px-2 text-[9px] font-bold text-[#ae8954]">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+              </div>
+
+              {/* =================================================
+                  ACTIONS — COMPACT
+              ================================================== */}
+
+              <div className="mt-4 flex items-center gap-2">
+                {/* Preview */}
+                <Link
+                  to={`/templates/${template.id}`}
+                  className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-full border border-[#e2ddd5] bg-white px-3.5 text-[10px] font-semibold text-zinc-700 transition-all duration-200 hover:border-[#ae8954] hover:bg-[#faf6ef] hover:text-[#987542]"
+                >
+                  <Eye size={13} />
+
+                  Preview
+                </Link>
+
+                {/* Use Template */}
+                <button
+                  type="button"
+                  onClick={() => useTemplate(template.id)}
+                  className="inline-flex h-9 min-w-0 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-[#111111] px-3 text-[10px] font-semibold text-white transition-all duration-200 hover:bg-[#ae8954] active:scale-[0.98]"
+                >
+                  <span>Use Template</span>
+
+                  <ArrowRight
+                    size={13}
+                    className="shrink-0"
+                  />
+                </button>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      {/* =====================================================
+          FOOTER
+      ====================================================== */}
+
+      <div className="mt-8 flex items-center justify-center gap-2 text-[11px] text-zinc-400">
+        <FileText size={13} />
+
+        Resume content stays separate from the template design.
       </div>
     </div>
   );
