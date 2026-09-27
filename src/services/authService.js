@@ -1,33 +1,52 @@
-const authService = {
-  async login() {
-    throw new Error(
-      "Authentication API is not connected yet.",
-    );
-  },
+import { apiRequest } from "./api";
 
-  async register() {
-    throw new Error(
-      "Authentication API is not connected yet.",
-    );
-  },
+export async function registerUser(payload) {
+  const result = await apiRequest("/auth/register", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
 
-  async forgotPassword() {
-    throw new Error(
-      "Authentication API is not connected yet.",
-    );
-  },
+  if (result?.token) {
+    localStorage.setItem("resumely_token", result.token);
 
-  async resetPassword() {
-    throw new Error(
-      "Authentication API is not connected yet.",
-    );
-  },
+    if (result.user) {
+      localStorage.setItem(
+        "resumely_user",
+        JSON.stringify(result.user),
+      );
+    }
+  }
 
-  async getCurrentUser() {
-    throw new Error(
-      "Authentication API is not connected yet.",
-    );
-  },
-};
+  return result;
+}
 
-export default authService;
+export async function loginUser(payload) {
+  const result = await apiRequest("/auth/login", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+  if (result?.token) {
+    localStorage.setItem("resumely_token", result.token);
+
+    if (result.user) {
+      localStorage.setItem(
+        "resumely_user",
+        JSON.stringify(result.user),
+      );
+    }
+  }
+
+  return result;
+}
+
+export async function getCurrentUser() {
+  return apiRequest("/auth/me", {
+    method: "GET",
+  });
+}
+
+export function logoutUser() {
+  localStorage.removeItem("resumely_token");
+  localStorage.removeItem("resumely_user");
+}
