@@ -498,34 +498,35 @@ function Dashboard() {
 
             {!resumes.length && (
               <Link
-                to="/builder?new=1"
-                className="
-                  group
-                  mt-5
-                  inline-flex
-                  h-9
-                  items-center
-                  gap-2
-                  rounded-lg
-                  bg-zinc-950
-                  px-4
-                  text-xs
-                  font-semibold
-                  text-white
-                  transition-all
-                  duration-200
-                  hover:bg-[#ae8954]
-                  active:scale-[0.98]
-                "
-              >
-                <Plus
-                  size={14}
-                  strokeWidth={2.3}
-                  className="transition-transform duration-200 group-hover:rotate-90"
-                />
+  to="/builder?new=1"
+  className="
+    group
+    mt-5
+    inline-flex
+    h-9
+    items-center
+    gap-2
+    rounded-lg
+    bg-black
+    px-4
+    text-xs
+    font-semibold
+    text-white
+    transition-all
+    duration-200
+    hover:bg-[#ae8954]
+    hover:text-white
+    active:scale-[0.98]
+  "
+>
+  <Plus
+    size={14}
+    strokeWidth={2.3}
+    className="transition-transform duration-200 group-hover:rotate-90"
+  />
 
-                <span>Create Resume</span>
-              </Link>
+  <span>Create Resume</span>
+</Link>
             )}
 
           </div>
