@@ -5,6 +5,8 @@ import {
 } from "react-router-dom";
 
 import PublicLayout from "../layouts/PublicLayout";
+import Footer from "../layouts/Footer";
+
 import DashboardLayout from "../layouts/DashboardLayout";
 import ProtectedRoute from "./ProtectedRoute";
 
@@ -55,7 +57,7 @@ import TemplateDetails from "../pages/templates/TemplateDetails";
 
 function NotFound() {
   return (
-    <div className="flex min-h-[70vh] items-center justify-center px-6 text-center">
+    <div className="flex min-h-[70vh] items-center justify-center bg-[#f7f7f5] px-6 text-center">
       <div>
         <p className="text-sm font-semibold text-[#ae8954]">
           404
@@ -73,6 +75,10 @@ function NotFound() {
   );
 }
 
+/* =========================================================
+   APP ROUTES
+========================================================= */
+
 function AppRoutes() {
   return (
     <BrowserRouter>
@@ -82,51 +88,59 @@ function AppRoutes() {
             PUBLIC WEBSITE
         ====================================================== */}
 
-        <Route element={<PublicLayout />}>
-
-          {/* Home */}
+        <Route
+          element={
+            <PublicLayout>
+              <Footer />
+            </PublicLayout>
+          }
+        >
+          {/* HOME */}
           <Route
             path="/"
             element={<Home />}
           />
 
-          {/* Public Templates */}
+          {/* TEMPLATES */}
           <Route
             path="/templates"
             element={<Templates />}
           />
 
-          {/* Public Template Details */}
+          {/* TEMPLATE DETAILS */}
           <Route
             path="/templates/:templateId"
             element={<TemplateDetails />}
           />
 
-          {/* Cover Letter */}
+          {/* COVER LETTER */}
           <Route
             path="/cover-letter"
             element={<CoverLetter />}
           />
 
-          {/* About */}
+          {/* ABOUT */}
           <Route
             path="/about"
             element={<About />}
           />
 
-          {/* How it works */}
+          {/* HOW IT WORKS */}
           <Route
             path="/how-it-works"
             element={<HowItWorks />}
           />
 
-          {/* Pricing */}
+          {/* PRICING */}
           <Route
             path="/pricing"
             element={<Pricing />}
           />
 
-          {/* Auth */}
+          {/* =================================================
+              AUTH
+          ================================================= */}
+
           <Route
             path="/login"
             element={<Login />}
@@ -146,7 +160,6 @@ function AppRoutes() {
             path="/reset-password"
             element={<ResetPassword />}
           />
-
         </Route>
 
 
@@ -158,21 +171,25 @@ function AppRoutes() {
 
           <Route element={<DashboardLayout />}>
 
+            {/* DASHBOARD */}
             <Route
               path="/dashboard"
               element={<Dashboard />}
             />
 
+            {/* RESUMES */}
             <Route
               path="/dashboard/resumes"
               element={<Resumes />}
             />
 
+            {/* PROFILE */}
             <Route
               path="/dashboard/profile"
               element={<Profile />}
             />
 
+            {/* SETTINGS */}
             <Route
               path="/dashboard/settings"
               element={<Settings />}
