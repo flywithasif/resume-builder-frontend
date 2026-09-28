@@ -5,51 +5,41 @@ import {
 } from "react-router-dom";
 
 import PublicLayout from "../layouts/PublicLayout";
-import Footer from "../layouts/Footer";
-
 import DashboardLayout from "../layouts/DashboardLayout";
+
 import ProtectedRoute from "./ProtectedRoute";
+import TemplateRouteLayout from "./TemplateRouteLayout";
 
-/* =========================================================
-   LANDING
-========================================================= */
-
+/* LANDING */
 import Home from "../pages/landing/Home";
 import Pricing from "../pages/landing/Pricing";
 import About from "../pages/landing/About";
 import HowItWorks from "../pages/landing/HowItWorks";
 import CoverLetter from "../pages/landing/CoverLetter";
 
-/* =========================================================
-   AUTH
-========================================================= */
-
+/* AUTH */
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import ForgotPassword from "../pages/auth/ForgotPassword";
 import ResetPassword from "../pages/auth/ResetPassword";
 
-/* =========================================================
-   DASHBOARD
-========================================================= */
-
+/* DASHBOARD */
 import Dashboard from "../pages/dashboard/Dashboard";
 import Resumes from "../pages/dashboard/Resumes";
+import CoverLetters from "../pages/dashboard/CoverLetters";
 import Profile from "../pages/dashboard/Profile";
 import Settings from "../pages/dashboard/Settings";
 
-/* =========================================================
-   BUILDER
-========================================================= */
-
+/* RESUME BUILDER */
 import Builder from "../pages/builder/Builder";
 
-/* =========================================================
-   TEMPLATES
-========================================================= */
-
+/* RESUME TEMPLATES */
 import Templates from "../pages/templates/Templates";
 import TemplateDetails from "../pages/templates/TemplateDetails";
+
+/* COVER LETTER */
+import CoverLetterTemplates from "../pages/templates/CoverLetterTemplates";
+import CoverLetterBuilder from "../pages/coverLetters/CoverLetterBuilder";
 
 /* =========================================================
    404
@@ -88,58 +78,31 @@ function AppRoutes() {
             PUBLIC WEBSITE
         ====================================================== */}
 
-        <Route
-          element={
-            <PublicLayout>
-              <Footer />
-            </PublicLayout>
-          }
-        >
-          {/* HOME */}
-          <Route
-            path="/"
-            element={<Home />}
-          />
+        <Route element={<PublicLayout />}>
 
-          {/* TEMPLATES */}
-          <Route
-            path="/templates"
-            element={<Templates />}
-          />
+          <Route path="/" element={<Home />} />
 
-          {/* TEMPLATE DETAILS */}
-          <Route
-            path="/templates/:templateId"
-            element={<TemplateDetails />}
-          />
-
-          {/* COVER LETTER */}
           <Route
             path="/cover-letter"
             element={<CoverLetter />}
           />
 
-          {/* ABOUT */}
           <Route
             path="/about"
             element={<About />}
           />
 
-          {/* HOW IT WORKS */}
           <Route
             path="/how-it-works"
             element={<HowItWorks />}
           />
 
-          {/* PRICING */}
           <Route
             path="/pricing"
             element={<Pricing />}
           />
 
-          {/* =================================================
-              AUTH
-          ================================================= */}
+          {/* AUTH */}
 
           <Route
             path="/login"
@@ -160,8 +123,44 @@ function AppRoutes() {
             path="/reset-password"
             element={<ResetPassword />}
           />
+
         </Route>
 
+        {/* =====================================================
+            SMART PUBLIC TEMPLATE PAGES
+
+            Guest:
+              Public Navbar
+
+            Logged in:
+              Dashboard Sidebar + Topbar
+
+            IMPORTANT:
+              NO LOGIN REQUIRED TO VIEW TEMPLATES
+        ====================================================== */}
+
+        <Route element={<TemplateRouteLayout />}>
+
+          {/* RESUME TEMPLATES */}
+
+          <Route
+            path="/templates"
+            element={<Templates />}
+          />
+
+          <Route
+            path="/templates/:templateId"
+            element={<TemplateDetails />}
+          />
+
+          {/* COVER LETTER TEMPLATES */}
+
+          <Route
+            path="/cover-letter-templates"
+            element={<CoverLetterTemplates />}
+          />
+
+        </Route>
 
         {/* =====================================================
             PROTECTED APPLICATION
@@ -169,27 +168,32 @@ function AppRoutes() {
 
         <Route element={<ProtectedRoute />}>
 
+          {/* =================================================
+              DASHBOARD
+          ================================================= */}
+
           <Route element={<DashboardLayout />}>
 
-            {/* DASHBOARD */}
             <Route
               path="/dashboard"
               element={<Dashboard />}
             />
 
-            {/* RESUMES */}
             <Route
               path="/dashboard/resumes"
               element={<Resumes />}
             />
 
-            {/* PROFILE */}
+            <Route
+              path="/dashboard/cover-letters"
+              element={<CoverLetters />}
+            />
+
             <Route
               path="/dashboard/profile"
               element={<Profile />}
             />
 
-            {/* SETTINGS */}
             <Route
               path="/dashboard/settings"
               element={<Settings />}
@@ -197,9 +201,8 @@ function AppRoutes() {
 
           </Route>
 
-
           {/* =================================================
-              FULLSCREEN BUILDER
+              RESUME BUILDER
           ================================================= */}
 
           <Route
@@ -212,12 +215,19 @@ function AppRoutes() {
             element={<Builder />}
           />
 
+          {/* =================================================
+              COVER LETTER BUILDER
+              LOGIN REQUIRED
+          ================================================= */}
+
+          <Route
+            path="/cover-letter-builder"
+            element={<CoverLetterBuilder />}
+          />
+
         </Route>
 
-
-        {/* =====================================================
-            404
-        ====================================================== */}
+        {/* 404 */}
 
         <Route
           path="*"

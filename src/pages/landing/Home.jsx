@@ -25,6 +25,10 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 
 import Button from "../../components/ui/Button";
+import {
+  ResumeRenderer,
+  TEMPLATE_SAMPLE_RESUME,
+} from "../templates/resumeTemplates";
 
 const templates = [
   {
@@ -74,6 +78,51 @@ const templates = [
     category: "Premium",
     accent: "#8a6938",
     layout: "elegant",
+  },
+];
+
+const coverLetterTemplates = [
+  {
+    id: "modern",
+    name: "Modern",
+    category: "Professional",
+    accent: "#987542",
+    layout: "modern",
+  },
+  {
+    id: "professional",
+    name: "Professional",
+    category: "Business",
+    accent: "#334155",
+    layout: "professional",
+  },
+  {
+    id: "minimal",
+    name: "Minimal",
+    category: "Clean",
+    accent: "#18181b",
+    layout: "minimal",
+  },
+  {
+    id: "executive",
+    name: "Executive",
+    category: "Leadership",
+    accent: "#111111",
+    layout: "executive",
+  },
+  {
+    id: "elegant",
+    name: "Elegant",
+    category: "Premium",
+    accent: "#8a6938",
+    layout: "elegant",
+  },
+  {
+    id: "classic",
+    name: "Classic",
+    category: "Traditional",
+    accent: "#374151",
+    layout: "classic",
   },
 ];
 
@@ -204,101 +253,190 @@ function SectionLabel({ children }) {
 }
 
 function ResumeMiniPreview({
-  variant = "default",
+  variant = "executive",
   className = "",
 }) {
-  const isModern = variant === "modern";
-  const isCreative = variant === "creative";
-  const isTech = variant === "tech";
+  const templateId =
+    variant === "default" ? "executive" : variant;
 
   return (
     <div
       className={[
-        "relative aspect-[0.707] w-full overflow-hidden bg-white",
+        "relative aspect-[0.707] w-full overflow-hidden bg-[#efede8]",
         "border border-stone-200 shadow-[0_18px_50px_rgba(24,24,27,0.10)]",
         className,
       ].join(" ")}
     >
-      {isModern && (
-        <div className="absolute inset-y-0 left-0 w-[24%] bg-zinc-950" />
-      )}
-
-      {isCreative && (
-        <div className="absolute left-0 top-0 h-2 w-full bg-[#8b5e3c]" />
-      )}
-
-      {isTech && (
-        <div className="absolute left-0 top-0 h-full w-1 bg-[#155e75]" />
-      )}
-
       <div
-        className={[
-          "relative h-full p-[9%]",
-          isModern ? "pl-[31%]" : "",
-        ].join(" ")}
+        className="absolute left-0 top-0 origin-top-left"
+        style={{
+          width: "760px",
+          transform: "scale(0.39)",
+        }}
       >
-        <div
-          className={[
-            "h-[4%] w-[53%]",
-            isModern ? "bg-white" : "bg-zinc-900",
-          ].join(" ")}
+        <ResumeRenderer
+          resume={TEMPLATE_SAMPLE_RESUME}
+          template={templateId}
         />
+      </div>
+    </div>
+  );
+}
 
-        <div
-          className={[
-            "mt-[3%] h-[2%] w-[36%]",
-            isModern ? "bg-zinc-400" : "bg-zinc-300",
-          ].join(" ")}
-        />
 
-        <div className="mt-[11%] space-y-[4%]">
-          <div
-            className={[
-              "h-[2%] w-[26%]",
-              isCreative
-                ? "bg-[#8b5e3c]"
-                : isTech
-                  ? "bg-[#155e75]"
-                  : "bg-zinc-800",
-            ].join(" ")}
-          />
+function CoverLetterMiniPreview({ template }) {
+  const isDark = template.layout === "executive";
+  const isMinimal = template.layout === "minimal";
+  const isClassic = template.layout === "classic";
+  const isElegant = template.layout === "elegant";
+  const isProfessional = template.layout === "professional";
 
-          <div className="h-[1.5%] w-full bg-zinc-200" />
-          <div className="h-[1.5%] w-[91%] bg-zinc-200" />
-          <div className="h-[1.5%] w-[84%] bg-zinc-200" />
-        </div>
+  return (
+    <div className="relative aspect-[0.707] w-full overflow-hidden bg-[#efede8] border border-stone-200 shadow-[0_18px_50px_rgba(24,24,27,0.10)]">
+      <div
+        className="absolute left-0 top-0 origin-top-left"
+        style={{
+          width: "794px",
+          transform: "scale(0.575)",
+        }}
+      >
+        <div className="relative min-h-[1123px] w-[794px] overflow-hidden bg-white text-zinc-900 shadow-[0_18px_45px_rgba(24,24,27,0.12)]">
+          {isDark && (
+            <div className="absolute inset-x-0 top-0 h-[185px] bg-zinc-950" />
+          )}
 
-        <div className="mt-[9%] grid grid-cols-[1fr_1fr] gap-[9%]">
-          <div>
-            <div className="h-[2%] w-[38%] bg-zinc-800" />
+          {!isMinimal && !isDark && (
+            <div
+              className="absolute left-0 top-0 h-[9px] w-full"
+              style={{ backgroundColor: template.accent }}
+            />
+          )}
 
-            <div className="mt-[7%] space-y-[6%]">
-              <div className="h-[1.5%] w-full bg-zinc-200" />
-              <div className="h-[1.5%] w-[88%] bg-zinc-200" />
-              <div className="h-[1.5%] w-[94%] bg-zinc-200" />
-              <div className="h-[1.5%] w-[75%] bg-zinc-200" />
-            </div>
-          </div>
+          {isProfessional && (
+            <div
+              className="absolute left-0 top-[9px] h-full w-[12px]"
+              style={{ backgroundColor: template.accent }}
+            />
+          )}
 
-          <div>
-            <div className="h-[2%] w-[38%] bg-zinc-800" />
+          <div className="relative px-[72px] py-[68px]">
+            <header
+              className={[
+                "border-b pb-8",
+                isDark ? "border-white/15" : "border-zinc-200",
+                isElegant ? "text-center" : "",
+              ].join(" ")}
+            >
+              <h3
+                className={[
+                  "text-[34px] font-bold tracking-[-0.045em]",
+                  isClassic || isElegant ? "font-serif" : "",
+                  isDark ? "text-white" : "text-zinc-950",
+                ].join(" ")}
+              >
+                Alex Morgan
+              </h3>
 
-            <div className="mt-[7%] space-y-[6%]">
-              <div className="h-[1.5%] w-full bg-zinc-200" />
-              <div className="h-[1.5%] w-[81%] bg-zinc-200" />
-              <div className="h-[1.5%] w-[93%] bg-zinc-200" />
-            </div>
-          </div>
-        </div>
+              <p
+                className={[
+                  "mt-2 text-[14px] font-medium",
+                  isDark ? "text-[#d8c09b]" : "text-zinc-500",
+                ].join(" ")}
+              >
+                Senior Product Manager
+              </p>
 
-        <div className="mt-[9%]">
-          <div className="h-[2%] w-[29%] bg-zinc-800" />
+              <div
+                className={[
+                  "mt-5 flex flex-wrap gap-x-7 gap-y-2 text-[11px]",
+                  isElegant ? "justify-center" : "",
+                  isDark ? "text-zinc-400" : "text-zinc-500",
+                ].join(" ")}
+              >
+                <span>alex.morgan@email.com</span>
+                <span>+1 415 555 0198</span>
+                <span>San Francisco, CA</span>
+              </div>
+            </header>
 
-          <div className="mt-[6%] flex flex-wrap gap-[3%]">
-            <span className="h-[4%] w-[18%] rounded-full bg-zinc-100" />
-            <span className="h-[4%] w-[22%] rounded-full bg-zinc-100" />
-            <span className="h-[4%] w-[17%] rounded-full bg-zinc-100" />
-            <span className="h-[4%] w-[20%] rounded-full bg-zinc-100" />
+            <main
+              className={[
+                "mt-10 text-[13px] leading-[1.85]",
+                isDark ? "text-zinc-300" : "text-zinc-600",
+              ].join(" ")}
+            >
+              <div className="flex items-start justify-between gap-10">
+                <div>
+                  <p className={isDark ? "font-semibold text-white" : "font-semibold text-zinc-950"}>
+                    Hiring Manager
+                  </p>
+                  <p>Northstar Technologies</p>
+                  <p>San Francisco, CA</p>
+                </div>
+                <p className={isDark ? "text-zinc-500" : "text-zinc-400"}>
+                  October 12, 2026
+                </p>
+              </div>
+
+              <p
+                className="mt-9 text-[14px] font-bold"
+                style={{ color: template.accent }}
+              >
+                Application for Senior Product Manager
+              </p>
+
+              <p className={["mt-9", isDark ? "text-white" : "text-zinc-950"].join(" ")}>
+                Dear Hiring Manager,
+              </p>
+
+              <p className="mt-6">
+                I am writing to express my interest in the Senior Product Manager
+                position at Northstar Technologies. My experience building digital
+                products and leading cross-functional teams aligns closely with
+                this opportunity.
+              </p>
+
+              <p className="mt-6">
+                Throughout my career, I have translated customer problems into
+                measurable product outcomes while partnering closely with design,
+                engineering and business teams.
+              </p>
+
+              <p className="mt-6">
+                I would welcome the opportunity to bring this experience to your
+                team and contribute to meaningful product growth.
+              </p>
+
+              <p className="mt-6">
+                Thank you for your time and consideration. I look forward to
+                discussing the opportunity with you.
+              </p>
+
+              <div className="mt-10">
+                <p>Sincerely,</p>
+                <p
+                  className={[
+                    "mt-7 text-[20px] font-semibold",
+                    isClassic || isElegant ? "font-serif" : "",
+                  ].join(" ")}
+                  style={{ color: template.accent }}
+                >
+                  Alex Morgan
+                </p>
+              </div>
+            </main>
+
+            <footer
+              className={[
+                "absolute bottom-8 left-[72px] right-[72px] border-t pt-4 text-[9px] uppercase tracking-[0.16em]",
+                isDark ? "border-white/10 text-zinc-500" : "border-zinc-100 text-zinc-400",
+              ].join(" ")}
+            >
+              <div className="flex items-center justify-between">
+                <span>Alex Morgan</span>
+                <span>{template.name}</span>
+              </div>
+            </footer>
           </div>
         </div>
       </div>
@@ -497,14 +635,14 @@ function BuilderPreview() {
 
 function TemplateCard({ template, index }) {
   const variants = {
-    executive: "default",
+    executive: "executive",
     modern: "modern",
-    minimal: "default",
-    corporate: "default",
+    minimal: "minimal",
+    corporate: "corporate",
     creative: "creative",
-    ats: "default",
+    ats: "ats",
     tech: "tech",
-    elegant: "creative",
+    elegant: "elegant",
   };
 
   return (
@@ -881,6 +1019,93 @@ function Home() {
                 template={template}
                 index={index}
               />
+            ))}
+          </div>
+        </div>
+      </section>
+
+
+      {/* =========================================================
+          COVER LETTER TEMPLATES
+      ========================================================= */}
+      <section
+        id="cover-letter-templates"
+        className="border-y border-stone-200 bg-white py-20 sm:py-24 lg:py-32"
+      >
+        <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
+          <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
+            <div className="max-w-2xl">
+              <SectionLabel>
+                Cover letter collection
+              </SectionLabel>
+
+              <h2 className="mt-5 text-balance text-4xl font-semibold tracking-[-0.045em] text-zinc-950 sm:text-5xl">
+                Match your cover letter
+                <br />
+                to your resume.
+              </h2>
+
+              <p className="mt-5 max-w-xl text-base leading-7 text-zinc-500">
+                Professional cover letter layouts with real typography,
+                spacing and content structure — designed to work alongside
+                your resume.
+              </p>
+            </div>
+
+            <Link
+              to="/cover-letter-templates"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-900 hover:text-[#8a6938]"
+            >
+              View all cover letter templates
+              <ArrowRight size={15} />
+            </Link>
+          </div>
+
+          <div className="mt-12 grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            {coverLetterTemplates.map((template, index) => (
+              <motion.div
+                key={template.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{
+                  duration: 0.45,
+                  delay: Math.min(index * 0.05, 0.2),
+                }}
+                className="group"
+              >
+                <Link
+                  to={`/cover-letter-templates`}
+                  className="block"
+                >
+                  <div className="relative overflow-hidden rounded-2xl border border-stone-200 bg-stone-100 p-4 transition-all duration-300 group-hover:-translate-y-1 group-hover:border-stone-300 group-hover:shadow-[0_18px_45px_rgba(24,24,27,0.10)] sm:p-5">
+                    <CoverLetterMiniPreview template={template} />
+
+                    <div className="pointer-events-none absolute inset-x-4 bottom-4 flex translate-y-2 items-center justify-between rounded-xl border border-white/70 bg-white/95 px-3 py-2.5 opacity-0 shadow-lg backdrop-blur transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 sm:inset-x-5 sm:bottom-5">
+                      <span className="text-xs font-semibold text-zinc-900">
+                        Use template
+                      </span>
+                      <ArrowRight size={14} />
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex items-start justify-between gap-4">
+                    <div>
+                      <h3 className="text-sm font-semibold text-zinc-900">
+                        {template.name}
+                      </h3>
+                      <p className="mt-1 text-xs text-zinc-500">
+                        {template.category}
+                      </p>
+                    </div>
+
+                    <span
+                      className="mt-0.5 h-2.5 w-2.5 rounded-full border border-white shadow-sm"
+                      style={{ backgroundColor: template.accent }}
+                    />
+                  </div>
+                </Link>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -1351,12 +1576,47 @@ function Home() {
                 </div>
 
                 <Link
-                  to="/register"
-                  className="mt-8 flex h-12 items-center justify-center gap-2 rounded-xl bg-white text-sm font-semibold text-zinc-950 transition-colors hover:bg-stone-100"
-                >
-                  Create your resume
-                  <ArrowRight size={15} />
-                </Link>
+  to="/register"
+  className="
+    group
+    mt-8
+    flex
+    h-12
+    items-center
+    justify-center
+    gap-2
+    rounded-xl
+    border
+    border-white/25
+    bg-black
+    text-sm
+    font-semibold
+    !text-white
+    shadow-[0_10px_30px_rgba(0,0,0,0.18)]
+    transition-all
+    duration-200
+    hover:border-[#ae8954]
+    hover:bg-[#ae8954]
+    hover:!text-white
+    active:scale-[0.98]
+  "
+>
+  <span className="!text-white">
+    Create Your Resume
+  </span>
+
+  <ArrowRight
+    size={15}
+    strokeWidth={2}
+    className="
+      shrink-0
+      !text-white
+      transition-transform
+      duration-200
+      group-hover:translate-x-1
+    "
+  />
+</Link>
 
                 <p className="mt-4 text-center text-[11px] text-zinc-600">
                   No payment functionality is connected in this frontend stage.

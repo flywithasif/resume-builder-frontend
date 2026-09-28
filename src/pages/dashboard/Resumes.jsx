@@ -10,11 +10,14 @@ import {
   Download,
   Clock3,
 } from "lucide-react";
+
 import { Link } from "react-router-dom";
+
 import {
   ResumeRenderer as TemplateRenderer,
   TEMPLATE_SAMPLE_RESUME,
 } from "../templates/resumeTemplates";
+
 import { useMemo, useState } from "react";
 
 import {
@@ -23,6 +26,10 @@ import {
   getResumes,
   saveResumes,
 } from "../../utils/resumeStorage";
+
+/* =========================================================
+   RESUME PREVIEW
+========================================================= */
 
 function ResumePreview({ template = "executive" }) {
   return (
@@ -42,10 +49,18 @@ function ResumePreview({ template = "executive" }) {
   );
 }
 
+/* =========================================================
+   MY RESUMES
+========================================================= */
+
 function Resumes() {
   const [resumes, setResumes] = useState(() => getResumes());
   const [search, setSearch] = useState("");
   const [menuId, setMenuId] = useState(null);
+
+  /* =======================================================
+     SEARCH
+  ======================================================= */
 
   const filteredResumes = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -57,9 +72,13 @@ function Resumes() {
     return resumes.filter(
       (resume) =>
         resume.title?.toLowerCase().includes(query) ||
-        resume.template?.toLowerCase().includes(query),
+        resume.template?.toLowerCase().includes(query)
     );
   }, [resumes, search]);
+
+  /* =======================================================
+     DUPLICATE
+  ======================================================= */
 
   const duplicateResume = (resume) => {
     const copy = duplicateResumeRecord(resume);
@@ -70,15 +89,19 @@ function Resumes() {
     setMenuId(null);
   };
 
+  /* =======================================================
+     DELETE
+  ======================================================= */
+
   const deleteResume = (id) => {
     const confirmed = window.confirm(
-      "Delete this resume? This action cannot be undone.",
+      "Delete this resume? This action cannot be undone."
     );
 
     if (!confirmed) return;
 
     const next = resumes.filter(
-      (resume) => String(resume.id) !== String(id),
+      (resume) => String(resume.id) !== String(id)
     );
 
     saveResumes(next);
@@ -86,7 +109,7 @@ function Resumes() {
     setMenuId(null);
 
     const activeId = localStorage.getItem(
-      "resumely_active_resume_id",
+      "resumely_active_resume_id"
     );
 
     if (String(activeId) === String(id)) {
@@ -94,26 +117,33 @@ function Resumes() {
     }
   };
 
+  /* =======================================================
+     PREVIEW / PRINT
+  ======================================================= */
+
   const downloadResume = (resume) => {
     localStorage.setItem(
       "resumely_active_resume_id",
-      String(resume.id),
+      String(resume.id)
     );
 
     localStorage.setItem(
       "resumely_template",
-      resume.template || "executive",
+      resume.template || "executive"
     );
 
     window.open(
       `/builder/${encodeURIComponent(resume.id)}`,
-      "_blank",
+      "_blank"
     );
   };
 
   return (
     <div>
-      {/* Header */}
+      {/* =====================================================
+          HEADER
+      ====================================================== */}
+
       <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#ae8954]">
@@ -130,16 +160,30 @@ function Resumes() {
           </p>
         </div>
 
+        {/* ===================================================
+            CREATE NEW RESUME
+        ==================================================== */}
+
         <Link
-  to="/builder?new=1"
-  className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-zinc-950 bg-zinc-950 px-5 text-sm font-semibold text-white transition-all duration-200 ease-out hover:border-[#987542] hover:bg-[#987542] hover:text-white active:scale-[0.98]"
+  to="/templates"
+  className="group inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-zinc-950 px-5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#987542] hover:text-white hover:shadow-md active:scale-[0.98]"
 >
-  <Plus size={17} />
-  Create New Resume
+  <Plus
+    size={17}
+    strokeWidth={2.3}
+    className="text-white transition-transform duration-200 group-hover:rotate-90"
+  />
+
+  <span className="text-white">
+    Create New Resume
+  </span>
 </Link>
       </div>
 
-      {/* Toolbar */}
+      {/* =====================================================
+          TOOLBAR
+      ====================================================== */}
+
       <div className="mt-7 rounded-2xl border border-[#e7e2d9] bg-white p-3 sm:p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2 px-1">
@@ -164,13 +208,16 @@ function Resumes() {
                 setSearch(event.target.value)
               }
               placeholder="Search resumes..."
-              className="h-10 w-full rounded-xl border border-[#e5e0d8] bg-[#fbfaf8] pl-10 pr-3 text-xs outline-none transition focus:border-[#111111]"
+              className="h-10 w-full rounded-xl border border-[#e5e0d8] bg-[#fbfaf8] pl-10 pr-3 text-xs outline-none transition focus:border-zinc-900"
             />
           </div>
         </div>
       </div>
 
-      {/* List */}
+      {/* =====================================================
+          RESUME LIST
+      ====================================================== */}
+
       {filteredResumes.length > 0 ? (
         <div className="mt-5 space-y-3">
           {filteredResumes.map((resume) => {
@@ -182,31 +229,42 @@ function Resumes() {
                 className="group relative overflow-visible rounded-2xl border border-[#e7e2d9] bg-white transition hover:border-[#d7d0c5] hover:shadow-[0_12px_35px_rgba(0,0,0,0.05)]"
               >
                 <div className="flex flex-col gap-5 p-4 sm:flex-row sm:items-center sm:p-5">
-                  {/* Preview */}
+                  {/* =================================================
+                      PREVIEW
+                  ================================================== */}
+
                   <div className="h-[155px] w-full shrink-0 overflow-hidden rounded-xl border border-[#e5e0d8] bg-[#f0eee9] sm:h-[150px] sm:w-[115px]">
                     <ResumePreview
                       template={resume.template}
                     />
                   </div>
 
-                  {/* Content */}
+                  {/* =================================================
+                      CONTENT
+                  ================================================== */}
+
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-4">
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
                           <h2 className="truncate text-base font-semibold text-zinc-950">
-                            {resume.title || "Untitled Resume"}
+                            {resume.title ||
+                              "Untitled Resume"}
                           </h2>
 
                           <span className="rounded-full bg-[#f3f0ea] px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.08em] text-[#987542]">
-                            {resume.template || "Executive"}
+                            {resume.template ||
+                              "Executive"}
                           </span>
                         </div>
 
                         <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-zinc-400">
                           <span className="flex items-center gap-1.5">
                             <Clock3 size={12} />
-                            {formatUpdatedAt(resume.updatedAt)}
+
+                            {formatUpdatedAt(
+                              resume.updatedAt
+                            )}
                           </span>
 
                           <span>
@@ -215,7 +273,10 @@ function Resumes() {
                         </div>
                       </div>
 
-                      {/* Menu */}
+                      {/* =================================================
+                          MORE MENU
+                      ================================================== */}
+
                       <div className="relative shrink-0">
                         <button
                           type="button"
@@ -223,7 +284,7 @@ function Resumes() {
                             setMenuId(
                               menuId === resume.id
                                 ? null
-                                : resume.id,
+                                : resume.id
                             )
                           }
                           className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-400 transition hover:bg-[#f3f0ea] hover:text-zinc-900"
@@ -243,6 +304,8 @@ function Resumes() {
                             />
 
                             <div className="absolute right-0 top-10 z-20 w-44 rounded-xl border border-[#e5e0d8] bg-white p-1.5 shadow-[0_18px_50px_rgba(0,0,0,0.10)]">
+                              {/* EDIT */}
+
                               <Link
                                 to={`/builder/${resume.id}`}
                                 onClick={() =>
@@ -254,10 +317,15 @@ function Resumes() {
                                 Edit resume
                               </Link>
 
+
+                              {/* PREVIEW */}
+
                               <button
                                 type="button"
                                 onClick={() => {
-                                  downloadResume(resume);
+                                  downloadResume(
+                                    resume
+                                  );
                                   setMenuId(null);
                                 }}
                                 className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-zinc-600 hover:bg-[#f6f3ee] hover:text-zinc-950"
@@ -266,10 +334,14 @@ function Resumes() {
                                 Preview / Print
                               </button>
 
+                              {/* DUPLICATE */}
+
                               <button
                                 type="button"
                                 onClick={() =>
-                                  duplicateResume(resume)
+                                  duplicateResume(
+                                    resume
+                                  )
                                 }
                                 className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-zinc-600 hover:bg-[#f6f3ee] hover:text-zinc-950"
                               >
@@ -279,10 +351,14 @@ function Resumes() {
 
                               <div className="my-1 h-px bg-[#eeeae3]" />
 
+                              {/* DELETE */}
+
                               <button
                                 type="button"
                                 onClick={() =>
-                                  deleteResume(resume.id)
+                                  deleteResume(
+                                    resume.id
+                                  )
                                 }
                                 className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-red-500 hover:bg-red-50"
                               >
@@ -295,7 +371,10 @@ function Resumes() {
                       </div>
                     </div>
 
-                    {/* Progress */}
+                    {/* =================================================
+                        PROGRESS
+                    ================================================== */}
+
                     <div className="mt-7 max-w-xl">
                       <div className="flex items-center justify-between">
                         <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-zinc-400">
@@ -309,7 +388,7 @@ function Resumes() {
 
                       <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#eeeae3]">
                         <div
-                          className="h-full rounded-full bg-[#111111] transition-all"
+                          className="h-full rounded-full bg-zinc-950 transition-all"
                           style={{
                             width: `${progress}%`,
                           }}
@@ -317,15 +396,30 @@ function Resumes() {
                       </div>
                     </div>
 
-                    {/* Actions */}
+                    {/* =================================================
+                        ACTIONS
+                    ================================================== */}
+
                     <div className="mt-5 flex flex-wrap items-center gap-2">
-                      <Link
-                        to={`/builder/${resume.id}`}
-                        className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#111111] px-3.5 text-[11px] font-semibold text-white transition hover:bg-[#ae8954]"
-                      >
-                        <Pencil size={13} />
-                        Edit
-                      </Link>
+                     <Link
+  to={`/builder/${resume.id}`}
+  className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3.5 text-[11px] font-semibold transition-all duration-200"
+  style={{
+    backgroundColor: "#000000",
+    color: "#ffffff",
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.backgroundColor = "#987542";
+    e.currentTarget.style.color = "#ffffff";
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.backgroundColor = "#000000";
+    e.currentTarget.style.color = "#ffffff";
+  }}
+>
+  <Pencil size={13} />
+  Edit
+</Link>
 
                       <button
                         type="button"
@@ -345,12 +439,16 @@ function Resumes() {
           })}
         </div>
       ) : (
+        /* =====================================================
+           EMPTY STATE
+        ====================================================== */
+
         <div className="mt-5 rounded-2xl border border-dashed border-[#dcd6cd] bg-white px-6 py-20 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f3f0ea] text-zinc-500">
             <FileText size={23} />
           </div>
 
-          <h2 className="mt-5 text-base font-semibold">
+          <h2 className="mt-5 text-base font-semibold text-zinc-950">
             {resumes.length
               ? "No matching resumes"
               : "Your workspace is empty"}
@@ -364,12 +462,19 @@ function Resumes() {
 
           {!resumes.length && (
             <Link
-              to="/builder?new=1"
-              className="mt-5 inline-flex h-10 items-center gap-2 rounded-lg bg-[#111111] px-4 text-xs font-semibold text-white hover:bg-[#ae8954]"
-            >
-              <Plus size={14} />
-              Create Resume
-            </Link>
+  to="/templates"
+  className="group mt-5 inline-flex h-10 items-center gap-2 rounded-lg bg-zinc-950 px-4 text-xs font-semibold text-white transition-all duration-200 hover:bg-[#ae8954] hover:text-white active:scale-[0.98]"
+>
+  <Plus
+    size={14}
+    strokeWidth={2.3}
+    className="text-white transition-transform duration-200 group-hover:rotate-90"
+  />
+
+  <span className="text-white">
+    Create Resume
+  </span>
+</Link>
           )}
         </div>
       )}

@@ -212,15 +212,52 @@ function HowItWorks() {
 
               <div className="mt-9 flex flex-wrap gap-3">
                 <Link
-                  to="/templates"
-                  className="group inline-flex items-center gap-3 rounded-xl bg-zinc-950 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(0,0,0,.14)] transition hover:-translate-y-0.5 hover:bg-zinc-800"
-                >
-                  Start with a template
-                  <ArrowRight
-                    size={16}
-                    className="transition-transform group-hover:translate-x-1"
-                  />
-                </Link>
+  to="/templates"
+  className="
+    group
+    inline-flex
+    w-fit
+    shrink-0
+    items-center
+    justify-center
+    gap-3
+    rounded-xl
+    border
+    border-white/25
+    bg-black
+    px-6
+    py-3.5
+    text-sm
+    font-semibold
+    !text-white
+    leading-none
+    whitespace-nowrap
+    shadow-[0_18px_40px_rgba(0,0,0,0.14)]
+    transition-all
+    duration-200
+    hover:-translate-y-0.5
+    hover:border-[#ae8954]
+    hover:bg-[#ae8954]
+    hover:!text-white
+    active:scale-[0.98]
+  "
+>
+  <span className="!text-white">
+    Start with a Template
+  </span>
+
+  <ArrowRight
+    size={16}
+    strokeWidth={2}
+    className="
+      shrink-0
+      !text-white
+      transition-transform
+      duration-200
+      group-hover:translate-x-1
+    "
+  />
+</Link>
 
                 <Link
                   to="/register"
@@ -536,15 +573,52 @@ function HowItWorks() {
 
               <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
                 <Link
-                  to="/templates"
-                  className="group inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-950 px-6 py-3.5 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-zinc-800"
-                >
-                  Browse templates
-                  <ArrowRight
-                    size={16}
-                    className="transition-transform group-hover:translate-x-1"
-                  />
-                </Link>
+  to="/templates"
+  className="
+    group
+    inline-flex
+    w-fit
+    shrink-0
+    items-center
+    justify-center
+    gap-2
+    rounded-xl
+    border
+    border-white/25
+    bg-black
+    px-6
+    py-3.5
+    text-sm
+    font-semibold
+    !text-white
+    leading-none
+    whitespace-nowrap
+    shadow-[0_10px_30px_rgba(0,0,0,0.18)]
+    transition-all
+    duration-200
+    hover:-translate-y-0.5
+    hover:border-[#ae8954]
+    hover:bg-[#ae8954]
+    hover:!text-white
+    active:scale-[0.98]
+  "
+>
+  <span className="!text-white">
+    Browse Templates
+  </span>
+
+  <ArrowRight
+    size={16}
+    strokeWidth={2}
+    className="
+      shrink-0
+      !text-white
+      transition-transform
+      duration-200
+      group-hover:translate-x-1
+    "
+  />
+</Link>
 
                 <Link
                   to="/register"

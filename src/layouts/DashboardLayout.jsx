@@ -29,8 +29,18 @@ const navigation = [
     icon: FileText,
   },
   {
-    label: "Templates",
+    label: "My Cover Letters",
+    path: "/dashboard/cover-letters",
+    icon: FileText,
+  },
+  {
+    label: "Resume Templates",
     path: "/templates",
+    icon: Layers3,
+  },
+  {
+    label: "Cover Letter Templates",
+    path: "/cover-letter-templates",
     icon: Layers3,
   },
 ];
@@ -57,9 +67,17 @@ const pageMeta = {
     eyebrow: "Workspace",
     title: "My Resumes",
   },
+  "/dashboard/cover-letters": {
+    eyebrow: "Workspace",
+    title: "My Cover Letters",
+  },
   "/templates": {
     eyebrow: "Workspace",
-    title: "Templates",
+    title: "Resume Templates",
+  },
+  "/cover-letter-templates": {
+    eyebrow: "Workspace",
+    title: "Cover Letter Templates",
   },
   "/dashboard/profile": {
     eyebrow: "Account",

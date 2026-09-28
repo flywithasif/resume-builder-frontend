@@ -4,6 +4,7 @@ import {
   Clock3,
   Download,
   FileText,
+  Mail,
   Plus,
   Sparkles,
   TrendingUp,
@@ -17,6 +18,32 @@ import {
   getResumes,
 } from "../../utils/resumeStorage";
 
+/* =========================================================
+   COVER LETTER STORAGE
+========================================================= */
+
+const COVER_LETTER_STORAGE_KEY = "resumely_cover_letters";
+
+function getCoverLetters() {
+  try {
+    const saved = localStorage.getItem(
+      COVER_LETTER_STORAGE_KEY
+    );
+
+    if (!saved) return [];
+
+    const parsed = JSON.parse(saved);
+
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+/* =========================================================
+   PROGRESS BAR
+========================================================= */
+
 function ProgressBar({ value }) {
   return (
     <div className="h-1.5 overflow-hidden rounded-full bg-stone-100">
@@ -28,9 +55,147 @@ function ProgressBar({ value }) {
   );
 }
 
+/* =========================================================
+   COVER LETTER TEMPLATE COLOR
+========================================================= */
+
+function getCoverLetterAccent(template) {
+  const accents = {
+    modern: "#987542",
+    professional: "#1f2937",
+    minimal: "#111111",
+    executive: "#7c5c2e",
+    elegant: "#8b6b4a",
+    classic: "#374151",
+    corporate: "#334155",
+    creative: "#9a6b42",
+    clean: "#52525b",
+    bold: "#18181b",
+    ats: "#222222",
+    formal: "#3f3f46",
+    simple: "#4b5563",
+    contemporary: "#80613d",
+    premium: "#987542",
+    compact: "#374151",
+    traditional: "#44403c",
+    startup: "#80613d",
+    designer: "#6b5b4b",
+    academic: "#374151",
+  };
+
+  return accents[template] || "#987542";
+}
+
+/* =========================================================
+   COVER LETTER THUMBNAIL
+========================================================= */
+
+function CoverLetterThumbnail({ letter }) {
+  const accent = getCoverLetterAccent(
+    letter.template
+  );
+
+  return (
+    <div className="flex h-[150px] w-[110px] shrink-0 items-center justify-center overflow-hidden rounded-lg bg-stone-100">
+      <div className="relative h-[136px] w-[96px] overflow-hidden bg-white shadow-[0_5px_18px_rgba(0,0,0,0.10)]">
+
+        {/* TOP ACCENT */}
+
+        <div
+          className="absolute left-0 right-0 top-0 h-[3px]"
+          style={{
+            backgroundColor: accent,
+          }}
+        />
+
+        <div className="px-3.5 py-4">
+
+          {/* NAME */}
+
+          <div
+            className="h-2 w-[48px] rounded-sm"
+            style={{
+              backgroundColor: accent,
+            }}
+          />
+
+          <div className="mt-1.5 h-[3px] w-[32px] rounded-sm bg-zinc-300" />
+
+          {/* CONTACT */}
+
+          <div className="mt-4 flex gap-1">
+            <div className="h-[2px] w-[27px] rounded bg-zinc-200" />
+            <div className="h-[2px] w-[22px] rounded bg-zinc-200" />
+            <div className="h-[2px] w-[20px] rounded bg-zinc-200" />
+          </div>
+
+          {/* RECIPIENT */}
+
+          <div className="mt-5">
+            <div className="h-[3px] w-[28px] rounded bg-zinc-700" />
+
+            <div className="mt-1.5 h-[2px] w-[38px] rounded bg-zinc-200" />
+
+            <div className="mt-1 h-[2px] w-[31px] rounded bg-zinc-200" />
+          </div>
+
+          {/* SUBJECT */}
+
+          <div
+            className="mt-4 h-[3px] w-[45px] rounded"
+            style={{
+              backgroundColor: accent,
+            }}
+          />
+
+          {/* PARAGRAPHS */}
+
+          <div className="mt-3 space-y-1">
+            <div className="h-[2px] w-full rounded bg-zinc-200" />
+            <div className="h-[2px] w-[94%] rounded bg-zinc-200" />
+            <div className="h-[2px] w-[87%] rounded bg-zinc-200" />
+            <div className="h-[2px] w-[72%] rounded bg-zinc-200" />
+          </div>
+
+          <div className="mt-3 space-y-1">
+            <div className="h-[2px] w-full rounded bg-zinc-200" />
+            <div className="h-[2px] w-[92%] rounded bg-zinc-200" />
+            <div className="h-[2px] w-[81%] rounded bg-zinc-200" />
+          </div>
+
+          {/* SIGNATURE */}
+
+          <div className="mt-4">
+            <div className="h-[2px] w-[25px] rounded bg-zinc-300" />
+
+            <div
+              className="mt-2 h-[3px] w-[34px] rounded"
+              style={{
+                backgroundColor: accent,
+              }}
+            />
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
 function Dashboard() {
   const [search, setSearch] = useState("");
+
   const resumes = getResumes();
+
+  const coverLetters = getCoverLetters();
+
+  /* =======================================================
+     RESUME SEARCH
+  ======================================================== */
 
   const filteredResumes = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -39,31 +204,72 @@ function Dashboard() {
 
     return resumes.filter(
       (resume) =>
-        resume.title.toLowerCase().includes(query) ||
-        resume.template?.toLowerCase().includes(query),
+        resume.title
+          .toLowerCase()
+          .includes(query) ||
+        resume.template
+          ?.toLowerCase()
+          .includes(query)
     );
   }, [search, resumes]);
 
+  /* =======================================================
+     RESUME STATS
+  ======================================================== */
+
   const completed = resumes.filter(
-    (resume) => (resume.progress || 0) >= 80,
+    (resume) => (resume.progress || 0) >= 80
   ).length;
 
   const inProgress = resumes.filter(
-    (resume) => (resume.progress || 0) < 80,
+    (resume) => (resume.progress || 0) < 80
   ).length;
+
+  /* =======================================================
+     COVER LETTER SEARCH
+  ======================================================== */
+
+  const filteredCoverLetters = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
+    if (!query) return coverLetters;
+
+    return coverLetters.filter((letter) => {
+      return (
+        letter.title
+          ?.toLowerCase()
+          .includes(query) ||
+        letter.company
+          ?.toLowerCase()
+          .includes(query) ||
+        letter.position
+          ?.toLowerCase()
+          .includes(query) ||
+        letter.template
+          ?.toLowerCase()
+          .includes(query)
+      );
+    });
+  }, [search, coverLetters]);
 
   return (
     <div className="mx-auto max-w-[1400px]">
+
       {/* =====================================================
           HERO
       ====================================================== */}
+
       <section className="relative overflow-hidden rounded-2xl bg-zinc-950 px-6 py-8 text-white sm:px-8 sm:py-10">
+
         <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-[#987542]/20 blur-3xl" />
 
         <div className="relative flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
+
           <div className="max-w-2xl">
+
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#c6a36c]">
               <Sparkles size={14} />
+
               Resume workspace
             </div>
 
@@ -72,81 +278,132 @@ function Dashboard() {
             </h1>
 
             <p className="mt-3 max-w-xl text-sm leading-6 text-zinc-400">
-              Manage your saved resumes, continue editing your latest version,
-              and keep every career version organized in one place.
+              Manage your saved resumes and cover letters,
+              continue editing your latest versions, and keep
+              every career document organized in one place.
             </p>
+
           </div>
 
-          {/* =================================================
-              CREATE NEW RESUME
-              BLACK → GOLD ON HOVER / ACTIVE
-          ================================================== */}
-          <Link
-            to="/builder?new=1"
-            className="
-              group
-              inline-flex
-              h-11
-              shrink-0
-              items-center
-              justify-center
-              gap-2
-              rounded-xl
-              bg-zinc-950
-              px-5
-              text-sm
-              font-semibold
-              text-white
-              ring-1
-              ring-white/20
-              shadow-[0_8px_25px_rgba(0,0,0,0.25)]
-              transition-all
-              duration-200
-              ease-out
-              hover:bg-[#ae8954]
-              hover:text-white
-              hover:ring-[#c6a36c]
-              hover:shadow-[0_10px_30px_rgba(174,137,84,0.30)]
-              active:scale-[0.98]
-              active:bg-[#987542]
-              focus:outline-none
-              focus:ring-2
-              focus:ring-[#c6a36c]
-              focus:ring-offset-2
-              focus:ring-offset-zinc-950
-            "
-          >
-            <Plus
-              size={17}
-              strokeWidth={2}
-              className="
-                text-white
-                transition-transform
-                duration-200
-                group-hover:rotate-90
-              "
-            />
+          <div className="flex flex-wrap gap-3">
 
-            Create New Resume
-          </Link>
+            {/* CREATE RESUME */}
+
+            <Link
+  to="/builder?new=1"
+  className="
+    group
+    inline-flex
+    h-11
+    shrink-0
+    items-center
+    justify-center
+    gap-2
+    rounded-xl
+    bg-black
+    border
+    border-white/20
+    px-5
+    text-sm
+    font-semibold
+    text-white
+    shadow-[0_8px_25px_rgba(0,0,0,0.20)]
+    transition-all
+    duration-200
+    hover:bg-[#ae8954]
+    hover:border-[#ae8954]
+    hover:text-white
+    active:scale-[0.98]
+  "
+>
+  <Plus
+    size={17}
+    strokeWidth={2}
+    className="transition-transform duration-200 group-hover:rotate-90"
+  />
+
+  Create Resume
+</Link>
+
+            {/* CREATE COVER LETTER */}
+
+            <Link
+  to="/cover-letter-builder"
+  className="
+    group
+    inline-flex
+    h-11
+    shrink-0
+    items-center
+    justify-center
+    gap-2
+    rounded-xl
+    border
+    border-white/20
+    bg-black
+    px-5
+    text-sm
+    font-semibold
+    text-white
+    shadow-[0_8px_25px_rgba(0,0,0,0.20)]
+    transition-all
+    duration-200
+    hover:border-[#ae8954]
+    hover:bg-[#ae8954]
+    hover:text-white
+    active:scale-[0.98]
+  "
+>
+  <Mail
+    size={17}
+    strokeWidth={2}
+    className="transition-transform duration-200 group-hover:scale-110"
+  />
+
+  Create Cover Letter
+</Link>
+
+          </div>
+
         </div>
       </section>
 
       {/* =====================================================
           STATS
       ====================================================== */}
+
       <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+
         {[
-          ["Total Resumes", resumes.length, FileText],
-          ["Completed", completed, TrendingUp],
-          ["In Progress", inProgress, BriefcaseBusiness],
-          ["Downloads", "—", Download],
+          [
+            "Total Resumes",
+            resumes.length,
+            FileText,
+          ],
+          [
+            "Completed",
+            completed,
+            TrendingUp,
+          ],
+          [
+            "In Progress",
+            inProgress,
+            BriefcaseBusiness,
+          ],
+          [
+            "Cover Letters",
+            coverLetters.length,
+            Mail,
+          ],
         ].map(([label, value, Icon]) => (
+
           <div
             key={label}
             className="rounded-2xl border border-stone-200 bg-white p-5"
           >
+
             <div className="flex items-center justify-between">
+
               <span className="text-xs font-medium text-zinc-500">
                 {label}
               </span>
@@ -154,21 +411,29 @@ function Dashboard() {
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-stone-100 text-zinc-700">
                 <Icon size={16} />
               </div>
+
             </div>
 
             <p className="mt-5 text-2xl font-semibold tracking-tight text-zinc-950">
               {value}
             </p>
+
           </div>
+
         ))}
+
       </section>
 
       {/* =====================================================
           YOUR RESUMES
       ====================================================== */}
+
       <section className="mt-8 rounded-2xl border border-stone-200 bg-white p-5 sm:p-6">
+
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+
           <div>
+
             <h2 className="text-base font-semibold text-zinc-950">
               Your resumes
             </h2>
@@ -176,13 +441,17 @@ function Dashboard() {
             <p className="mt-1 text-xs text-zinc-500">
               Your saved resume versions appear here automatically.
             </p>
+
           </div>
 
           <div className="relative w-full sm:max-w-xs">
+
             <input
               value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search resumes..."
+              onChange={(event) =>
+                setSearch(event.target.value)
+              }
+              placeholder="Search resumes & cover letters..."
               className="
                 h-10
                 w-full
@@ -197,14 +466,19 @@ function Dashboard() {
                 focus:border-zinc-900
               "
             />
+
           </div>
+
         </div>
 
         {/* =================================================
-            EMPTY STATE
+            EMPTY RESUME STATE
         ================================================== */}
+
         {filteredResumes.length === 0 ? (
+
           <div className="mt-6 rounded-xl border border-dashed border-stone-200 bg-stone-50 px-6 py-10 text-center">
+
             <FileText
               className="mx-auto text-zinc-300"
               size={28}
@@ -241,115 +515,145 @@ function Dashboard() {
                   transition-all
                   duration-200
                   hover:bg-[#ae8954]
-                  hover:text-white
                   active:scale-[0.98]
-                  active:bg-[#987542]
                 "
               >
                 <Plus
                   size={14}
+                  strokeWidth={2.3}
                   className="transition-transform duration-200 group-hover:rotate-90"
                 />
 
-                Create Resume
+                <span>Create Resume</span>
               </Link>
             )}
+
           </div>
+
         ) : (
+
           /* =================================================
              RESUME LIST
           ================================================== */
+
           <div className="mt-6 divide-y divide-stone-100">
-            {filteredResumes.slice(0, 6).map((resume) => {
-              const progress =
-                resume.progress ||
-                calculateResumeProgress(resume.data);
 
-              return (
-                <div
-                  key={resume.id}
-                  className="
-                    flex
-                    flex-col
-                    gap-4
-                    py-4
-                    first:pt-0
-                    last:pb-0
-                    sm:flex-row
-                    sm:items-center
-                    sm:justify-between
-                  "
-                >
-                  <div className="flex min-w-0 items-center gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-100 text-zinc-600">
-                      <FileText size={17} />
-                    </div>
+            {filteredResumes
+              .slice(0, 6)
+              .map((resume) => {
 
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-zinc-900">
-                        {resume.title}
-                      </p>
+                const progress =
+                  resume.progress ||
+                  calculateResumeProgress(
+                    resume.data
+                  );
 
-                      <p className="mt-1 flex items-center gap-2 text-[11px] text-zinc-400">
-                        <span className="capitalize">
-                          {resume.template || "Executive"}
-                        </span>
+                return (
+                  <div
+                    key={resume.id}
+                    className="
+                      flex
+                      flex-col
+                      gap-4
+                      py-4
+                      first:pt-0
+                      last:pb-0
+                      sm:flex-row
+                      sm:items-center
+                      sm:justify-between
+                    "
+                  >
 
-                        <span>·</span>
+                    <div className="flex min-w-0 items-center gap-3">
 
-                        <Clock3 size={11} />
-
-                        {formatUpdatedAt(resume.updatedAt)}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4 sm:min-w-[280px]">
-                    <div className="min-w-0 flex-1">
-                      <div className="mb-1.5 flex justify-between text-[10px] text-zinc-400">
-                        <span>Progress</span>
-
-                        <span className="font-semibold text-zinc-700">
-                          {progress}%
-                        </span>
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-100 text-zinc-600">
+                        <FileText size={17} />
                       </div>
 
-                      <ProgressBar value={progress} />
+                      <div className="min-w-0">
+
+                        <p className="truncate text-sm font-semibold text-zinc-900">
+                          {resume.title}
+                        </p>
+
+                        <p className="mt-1 flex items-center gap-2 text-[11px] text-zinc-400">
+
+                          <span className="capitalize">
+                            {resume.template || "Executive"}
+                          </span>
+
+                          <span>·</span>
+
+                          <Clock3 size={11} />
+
+                          {formatUpdatedAt(
+                            resume.updatedAt
+                          )}
+
+                        </p>
+
+                      </div>
+
                     </div>
 
-                    <Link
-                      to={`/builder?id=${encodeURIComponent(resume.id)}`}
-                      className="
-                        flex
-                        h-9
-                        shrink-0
-                        items-center
-                        gap-1.5
-                        rounded-lg
-                        border
-                        border-stone-200
-                        px-3
-                        text-xs
-                        font-semibold
-                        text-zinc-700
-                        transition
-                        hover:border-[#ae8954]
-                        hover:text-[#987542]
-                      "
-                    >
-                      Open
-                      <ArrowRight size={13} />
-                    </Link>
+                    <div className="flex items-center gap-4 sm:min-w-[280px]">
+
+                      <div className="min-w-0 flex-1">
+
+                        <div className="mb-1.5 flex justify-between text-[10px] text-zinc-400">
+
+                          <span>Progress</span>
+
+                          <span className="font-semibold text-zinc-700">
+                            {progress}%
+                          </span>
+
+                        </div>
+
+                        <ProgressBar
+                          value={progress}
+                        />
+
+                      </div>
+
+                      <Link
+                        to={`/builder?id=${encodeURIComponent(
+                          resume.id
+                        )}`}
+                        className="
+                          flex
+                          h-9
+                          shrink-0
+                          items-center
+                          gap-1.5
+                          rounded-lg
+                          border
+                          border-stone-200
+                          px-3
+                          text-xs
+                          font-semibold
+                          text-zinc-700
+                          transition
+                          hover:border-[#ae8954]
+                          hover:text-[#987542]
+                        "
+                      >
+                        Open
+
+                        <ArrowRight size={13} />
+                      </Link>
+
+                    </div>
+
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+
           </div>
         )}
 
-        {/* =================================================
-            VIEW ALL
-        ================================================== */}
+        {/* VIEW ALL RESUMES */}
+
         {resumes.length > 6 && (
           <Link
             to="/dashboard/resumes"
@@ -370,10 +674,281 @@ function Dashboard() {
             "
           >
             View all resumes
+
             <ArrowRight size={14} />
           </Link>
         )}
+
       </section>
+
+      {/* =====================================================
+          YOUR COVER LETTERS
+      ====================================================== */}
+
+      <section className="mt-8 rounded-2xl border border-stone-200 bg-white p-5 sm:p-6">
+
+        {/* HEADER */}
+
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+
+          <div>
+
+            <div className="flex items-center gap-2">
+
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#f3ede3] text-[#987542]">
+                <Mail size={15} />
+              </div>
+
+              <h2 className="text-base font-semibold text-zinc-950">
+                Your cover letters
+              </h2>
+
+            </div>
+
+            <p className="mt-2 text-xs text-zinc-500">
+              Your saved cover letters appear here automatically.
+            </p>
+
+          </div>
+
+          <Link
+            to="/dashboard/cover-letters"
+            className="
+              inline-flex
+              h-9
+              items-center
+              justify-center
+              gap-1.5
+              rounded-lg
+              border
+              border-stone-200
+              px-3
+              text-xs
+              font-semibold
+              text-zinc-700
+              transition
+              hover:border-[#ae8954]
+              hover:text-[#987542]
+            "
+          >
+            View all
+
+            <ArrowRight size={13} />
+          </Link>
+
+        </div>
+
+        {/* =================================================
+            EMPTY COVER LETTERS
+        ================================================== */}
+
+        {filteredCoverLetters.length === 0 ? (
+
+          <div className="mt-6 rounded-xl border border-dashed border-stone-200 bg-stone-50 px-6 py-12 text-center">
+
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-white text-zinc-300 shadow-sm">
+              <Mail size={22} />
+            </div>
+
+            <p className="mt-4 text-sm font-medium text-zinc-800">
+              {coverLetters.length
+                ? "No matching cover letters"
+                : "No cover letters yet"}
+            </p>
+
+            <p className="mx-auto mt-1 max-w-md text-xs leading-5 text-zinc-500">
+              {coverLetters.length
+                ? "Try another search."
+                : "Create a professional cover letter and it will appear here."}
+            </p>
+
+            {!coverLetters.length && (
+              <Link
+  to="/cover-letter-builder"
+  className="
+    group
+    mt-5
+    inline-flex
+    w-fit
+    shrink-0
+    items-center
+    justify-center
+    gap-2
+    rounded-lg
+    border
+    border-white/30
+    bg-black
+    px-4
+    py-2
+    text-[13px]
+    font-semibold
+    !text-white
+    leading-none
+    whitespace-nowrap
+    shadow-[0_6px_18px_rgba(0,0,0,0.18)]
+    transition-all
+    duration-200
+    hover:border-[#ae8954]
+    hover:bg-[#ae8954]
+    hover:!text-white
+    active:scale-[0.98]
+  "
+>
+  <Plus
+    size={14}
+    strokeWidth={2}
+    className="shrink-0 !text-white transition-transform duration-200 group-hover:rotate-90"
+  />
+
+  <span className="!text-white">
+    Create Cover Letter
+  </span>
+</Link>
+            )}
+
+          </div>
+
+        ) : (
+
+          /* =================================================
+             COVER LETTER LIST
+          ================================================== */
+
+          <div className="mt-6 divide-y divide-stone-100">
+
+            {filteredCoverLetters
+              .slice(0, 6)
+              .map((letter) => (
+
+                <div
+                  key={letter.id}
+                  className="
+                    flex
+                    flex-col
+                    gap-4
+                    py-4
+                    first:pt-0
+                    last:pb-0
+                    sm:flex-row
+                    sm:items-center
+                    sm:justify-between
+                  "
+                >
+
+                  {/* THUMBNAIL + INFO */}
+
+                  <div className="flex min-w-0 items-center gap-4">
+
+                    <CoverLetterThumbnail
+                      letter={letter}
+                    />
+
+                    <div className="min-w-0">
+
+                      <p className="truncate text-sm font-semibold text-zinc-900">
+                        {letter.title ||
+                          "Untitled Cover Letter"}
+                      </p>
+
+                      <p className="mt-1 truncate text-xs text-zinc-500">
+
+                        {letter.company ||
+                          "No company"}
+
+                        {letter.position
+                          ? ` • ${letter.position}`
+                          : ""}
+
+                      </p>
+
+                      <p className="mt-2 flex items-center gap-2 text-[10px] text-zinc-400">
+
+                        <span className="capitalize">
+                          {letter.template ||
+                            "modern"}
+                        </span>
+
+                        <span>·</span>
+
+                        <Clock3 size={10} />
+
+                        {formatUpdatedAt(
+                          letter.updatedAt ||
+                            letter.createdAt
+                        )}
+
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                  {/* OPEN */}
+
+                  <Link
+                    to={`/cover-letter-builder?id=${encodeURIComponent(
+                      letter.id
+                    )}`}
+                    className="
+                      flex
+                      h-9
+                      shrink-0
+                      items-center
+                      justify-center
+                      gap-1.5
+                      rounded-lg
+                      border
+                      border-stone-200
+                      px-3
+                      text-xs
+                      font-semibold
+                      text-zinc-700
+                      transition
+                      hover:border-[#ae8954]
+                      hover:text-[#987542]
+                    "
+                  >
+                    Open
+
+                    <ArrowRight size={13} />
+                  </Link>
+
+                </div>
+
+              ))}
+
+          </div>
+        )}
+
+        {/* VIEW ALL */}
+
+        {coverLetters.length > 6 && (
+          <Link
+            to="/dashboard/cover-letters"
+            className="
+              mt-6
+              flex
+              items-center
+              justify-center
+              gap-2
+              border-t
+              border-stone-100
+              pt-5
+              text-xs
+              font-semibold
+              text-zinc-600
+              transition
+              hover:text-[#987542]
+            "
+          >
+            View all cover letters
+
+            <ArrowRight size={14} />
+          </Link>
+        )}
+
+      </section>
+
     </div>
   );
 }

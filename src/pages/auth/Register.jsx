@@ -7,12 +7,20 @@ import {
   Mail,
   UserRound,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+
+import {
+  Link,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+
 import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 
 function Register() {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const { register } = useAuth();
 
   const [form, setForm] = useState({
@@ -28,6 +36,10 @@ function Register() {
     useState(false);
   const [loading, setLoading] = useState(false);
 
+  // ---------------------------------------------------------
+  // INPUT UPDATE
+  // ---------------------------------------------------------
+
   const updateField = (field, value) => {
     setForm((current) => ({
       ...current,
@@ -41,6 +53,10 @@ function Register() {
     }));
   };
 
+  // ---------------------------------------------------------
+  // VALIDATION
+  // ---------------------------------------------------------
+
   const validate = () => {
     const nextErrors = {};
 
@@ -53,7 +69,9 @@ function Register() {
     if (!form.email.trim()) {
       nextErrors.email = "Email is required.";
     } else if (
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+        form.email.trim()
+      )
     ) {
       nextErrors.email = "Enter a valid email address.";
     }
@@ -61,18 +79,26 @@ function Register() {
     if (!form.password) {
       nextErrors.password = "Password is required.";
     } else if (form.password.length < 8) {
-      nextErrors.password = "Use at least 8 characters.";
+      nextErrors.password =
+        "Use at least 8 characters.";
     }
 
     if (!form.confirmPassword) {
       nextErrors.confirmPassword =
         "Please confirm your password.";
-    } else if (form.password !== form.confirmPassword) {
-      nextErrors.confirmPassword = "Passwords do not match.";
+    } else if (
+      form.password !== form.confirmPassword
+    ) {
+      nextErrors.confirmPassword =
+        "Passwords do not match.";
     }
 
     return nextErrors;
   };
+
+  // ---------------------------------------------------------
+  // REGISTER
+  // ---------------------------------------------------------
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -94,7 +120,26 @@ function Register() {
         password: form.password,
       });
 
-      navigate("/dashboard", { replace: true });
+      // -----------------------------------------------------
+      // IMPORTANT:
+      // If user came from template selection,
+      // continue to builder after registration.
+      // -----------------------------------------------------
+
+      const destination =
+        location.state?.from ||
+        localStorage.getItem(
+          "resumely_after_login"
+        ) ||
+        "/dashboard";
+
+      localStorage.removeItem(
+        "resumely_after_login"
+      );
+
+      navigate(destination, {
+        replace: true,
+      });
     } catch (error) {
       setErrors({
         form:
@@ -108,34 +153,53 @@ function Register() {
 
   return (
     <div className="min-h-[calc(100vh-72px)] bg-[#f8f8f6]">
+
       <div className="mx-auto grid min-h-[calc(100vh-72px)] max-w-[1440px] lg:grid-cols-[0.9fr_1.1fr]">
+
+        {/* =====================================================
+            LEFT PREMIUM PANEL
+        ====================================================== */}
+
         <div className="hidden flex-col justify-between border-r border-stone-200 bg-zinc-950 p-10 text-white lg:flex xl:p-14">
-          <Link to="/" className="flex items-center gap-3">
+
+          {/* LOGO */}
+
+          <Link
+            to="/"
+            className="flex items-center gap-3"
+          >
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-sm font-bold text-zinc-950">
               R
             </span>
 
             <span className="text-lg font-semibold tracking-tight">
-              Resume<span className="text-[#c6a36c]">ly</span>
+              Resume
+              <span className="text-[#c6a36c]">
+                ly
+              </span>
             </span>
           </Link>
 
+          {/* CONTENT */}
+
           <div className="max-w-lg">
+
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#c6a36c]">
               Get started
             </p>
 
             <h1 className="mt-5 text-5xl font-semibold leading-[1.02] tracking-[-0.05em] xl:text-6xl">
-              Turn your experience into a resume that feels like
-              you.
+              Turn your experience into a resume that feels like you.
             </h1>
 
             <p className="mt-6 max-w-md text-sm leading-7 text-zinc-400">
-              Create your account and build a polished resume with
-              a focused editor and professional templates.
+              Create your account and build a polished
+              resume with a focused editor and
+              professional templates.
             </p>
 
             <div className="mt-8 space-y-3">
+
               {[
                 "Start with professional templates",
                 "Edit with a live preview",
@@ -153,29 +217,51 @@ function Register() {
                   {item}
                 </div>
               ))}
+
             </div>
+
           </div>
 
           <p className="text-xs text-zinc-600">
             Your career story starts here.
           </p>
+
         </div>
 
+        {/* =====================================================
+            RIGHT REGISTER PANEL
+        ====================================================== */}
+
         <div className="flex items-center justify-center px-5 py-12 sm:px-8">
+
           <div className="w-full max-w-[440px]">
+
+            {/* MOBILE LOGO */}
+
             <div className="mb-8 lg:hidden">
-              <Link to="/" className="flex items-center gap-3">
+
+              <Link
+                to="/"
+                className="flex items-center gap-3"
+              >
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-950 text-sm font-bold text-white">
                   R
                 </span>
 
                 <span className="text-lg font-semibold tracking-tight">
-                  Resume<span className="text-[#b08d57]">ly</span>
+                  Resume
+                  <span className="text-[#b08d57]">
+                    ly
+                  </span>
                 </span>
               </Link>
+
             </div>
 
+            {/* REGISTER CARD */}
+
             <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-[0_20px_60px_rgba(24,24,27,0.07)] sm:p-8">
+
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#987542]">
                 Create account
               </p>
@@ -188,18 +274,26 @@ function Register() {
                 Build your first professional resume.
               </p>
 
+              {/* ERROR */}
+
               {errors.form && (
                 <div className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-5 text-red-700">
                   {errors.form}
                 </div>
               )}
 
+              {/* FORM */}
+
               <form
                 onSubmit={handleSubmit}
                 className="mt-7 space-y-4"
                 noValidate
               >
+
+                {/* NAME */}
+
                 <div>
+
                   <label
                     htmlFor="register-name"
                     className="mb-1.5 block text-xs font-medium text-zinc-600"
@@ -208,6 +302,7 @@ function Register() {
                   </label>
 
                   <div className="relative">
+
                     <UserRound
                       size={16}
                       className="absolute left-3 top-3 text-zinc-400"
@@ -218,17 +313,21 @@ function Register() {
                       type="text"
                       value={form.name}
                       onChange={(event) =>
-                        updateField("name", event.target.value)
+                        updateField(
+                          "name",
+                          event.target.value
+                        )
                       }
                       placeholder="John Doe"
                       autoComplete="name"
                       disabled={loading}
-                      className={`h-11 w-full rounded-xl border bg-white pl-10 pr-3 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:cursor-not-allowed disabled:bg-zinc-50 ${
+                      className={`h-11 w-full rounded-xl border bg-white pl-10 pr-3 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:bg-zinc-50 ${
                         errors.name
-                          ? "border-red-300"
+                          ? "border-red-300 focus:border-red-500"
                           : "border-stone-200 focus:border-zinc-900"
                       }`}
                     />
+
                   </div>
 
                   {errors.name && (
@@ -236,9 +335,13 @@ function Register() {
                       {errors.name}
                     </p>
                   )}
+
                 </div>
 
+                {/* EMAIL */}
+
                 <div>
+
                   <label
                     htmlFor="register-email"
                     className="mb-1.5 block text-xs font-medium text-zinc-600"
@@ -247,6 +350,7 @@ function Register() {
                   </label>
 
                   <div className="relative">
+
                     <Mail
                       size={16}
                       className="absolute left-3 top-3 text-zinc-400"
@@ -257,17 +361,21 @@ function Register() {
                       type="email"
                       value={form.email}
                       onChange={(event) =>
-                        updateField("email", event.target.value)
+                        updateField(
+                          "email",
+                          event.target.value
+                        )
                       }
                       placeholder="you@example.com"
                       autoComplete="email"
                       disabled={loading}
-                      className={`h-11 w-full rounded-xl border bg-white pl-10 pr-3 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:cursor-not-allowed disabled:bg-zinc-50 ${
+                      className={`h-11 w-full rounded-xl border bg-white pl-10 pr-3 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:bg-zinc-50 ${
                         errors.email
-                          ? "border-red-300"
+                          ? "border-red-300 focus:border-red-500"
                           : "border-stone-200 focus:border-zinc-900"
                       }`}
                     />
+
                   </div>
 
                   {errors.email && (
@@ -275,9 +383,13 @@ function Register() {
                       {errors.email}
                     </p>
                   )}
+
                 </div>
 
+                {/* PASSWORD */}
+
                 <div>
+
                   <label
                     htmlFor="register-password"
                     className="mb-1.5 block text-xs font-medium text-zinc-600"
@@ -286,6 +398,7 @@ function Register() {
                   </label>
 
                   <div className="relative">
+
                     <LockKeyhole
                       size={16}
                       className="absolute left-3 top-3 text-zinc-400"
@@ -293,20 +406,24 @@ function Register() {
 
                     <input
                       id="register-password"
-                      type={showPassword ? "text" : "password"}
+                      type={
+                        showPassword
+                          ? "text"
+                          : "password"
+                      }
                       value={form.password}
                       onChange={(event) =>
                         updateField(
                           "password",
-                          event.target.value,
+                          event.target.value
                         )
                       }
                       placeholder="Create a password"
                       autoComplete="new-password"
                       disabled={loading}
-                      className={`h-11 w-full rounded-xl border bg-white pl-10 pr-11 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:cursor-not-allowed disabled:bg-zinc-50 ${
+                      className={`h-11 w-full rounded-xl border bg-white pl-10 pr-11 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:bg-zinc-50 ${
                         errors.password
-                          ? "border-red-300"
+                          ? "border-red-300 focus:border-red-500"
                           : "border-stone-200 focus:border-zinc-900"
                       }`}
                     />
@@ -314,10 +431,12 @@ function Register() {
                     <button
                       type="button"
                       onClick={() =>
-                        setShowPassword((current) => !current)
+                        setShowPassword(
+                          (current) => !current
+                        )
                       }
                       disabled={loading}
-                      className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center text-zinc-400 hover:text-zinc-900 disabled:cursor-not-allowed"
+                      className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center text-zinc-400 hover:text-zinc-900"
                       aria-label={
                         showPassword
                           ? "Hide password"
@@ -330,6 +449,7 @@ function Register() {
                         <Eye size={16} />
                       )}
                     </button>
+
                   </div>
 
                   {errors.password && (
@@ -337,9 +457,13 @@ function Register() {
                       {errors.password}
                     </p>
                   )}
+
                 </div>
 
+                {/* CONFIRM PASSWORD */}
+
                 <div>
+
                   <label
                     htmlFor="register-confirm-password"
                     className="mb-1.5 block text-xs font-medium text-zinc-600"
@@ -348,6 +472,7 @@ function Register() {
                   </label>
 
                   <div className="relative">
+
                     <LockKeyhole
                       size={16}
                       className="absolute left-3 top-3 text-zinc-400"
@@ -364,15 +489,15 @@ function Register() {
                       onChange={(event) =>
                         updateField(
                           "confirmPassword",
-                          event.target.value,
+                          event.target.value
                         )
                       }
                       placeholder="Confirm your password"
                       autoComplete="new-password"
                       disabled={loading}
-                      className={`h-11 w-full rounded-xl border bg-white pl-10 pr-11 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:cursor-not-allowed disabled:bg-zinc-50 ${
+                      className={`h-11 w-full rounded-xl border bg-white pl-10 pr-11 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:bg-zinc-50 ${
                         errors.confirmPassword
-                          ? "border-red-300"
+                          ? "border-red-300 focus:border-red-500"
                           : "border-stone-200 focus:border-zinc-900"
                       }`}
                     />
@@ -381,15 +506,15 @@ function Register() {
                       type="button"
                       onClick={() =>
                         setShowConfirmPassword(
-                          (current) => !current,
+                          (current) => !current
                         )
                       }
                       disabled={loading}
-                      className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center text-zinc-400 hover:text-zinc-900 disabled:cursor-not-allowed"
+                      className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center text-zinc-400 hover:text-zinc-900"
                       aria-label={
                         showConfirmPassword
-                          ? "Hide confirm password"
-                          : "Show confirm password"
+                          ? "Hide password"
+                          : "Show password"
                       }
                     >
                       {showConfirmPassword ? (
@@ -398,6 +523,7 @@ function Register() {
                         <Eye size={16} />
                       )}
                     </button>
+
                   </div>
 
                   {errors.confirmPassword && (
@@ -405,7 +531,10 @@ function Register() {
                       {errors.confirmPassword}
                     </p>
                   )}
+
                 </div>
+
+                {/* SUBMIT */}
 
                 <button
                   type="submit"
@@ -416,23 +545,44 @@ function Register() {
                     ? "Creating account..."
                     : "Create Account"}
 
-                  {!loading && <ArrowRight size={16} />}
+                  {!loading && (
+                    <ArrowRight size={16} />
+                  )}
                 </button>
+
               </form>
 
+              {/* LOGIN */}
+
               <p className="mt-7 text-center text-sm text-zinc-500">
+
                 Already have an account?{" "}
+
                 <Link
                   to="/login"
+                  state={{
+                    from:
+                      location.state?.from ||
+                      localStorage.getItem(
+                        "resumely_after_login"
+                      ) ||
+                      undefined,
+                  }}
                   className="font-semibold text-zinc-900 hover:text-[#987542]"
                 >
                   Sign in
                 </Link>
+
               </p>
+
             </div>
+
           </div>
+
         </div>
+
       </div>
+
     </div>
   );
 }

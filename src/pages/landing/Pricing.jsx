@@ -123,15 +123,52 @@ function Pricing() {
 
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                 <Link
-                  to="/register"
-                  className="group inline-flex items-center justify-center gap-3 rounded-xl bg-zinc-950 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(0,0,0,.14)] transition hover:-translate-y-0.5 hover:bg-zinc-800"
-                >
-                  Start for free
-                  <ArrowRight
-                    size={16}
-                    className="transition-transform group-hover:translate-x-1"
-                  />
-                </Link>
+  to="/register"
+  className="
+    group
+    inline-flex
+    w-fit
+    shrink-0
+    items-center
+    justify-center
+    gap-3
+    rounded-xl
+    border
+    border-white/25
+    bg-black
+    px-6
+    py-3.5
+    text-sm
+    font-semibold
+    !text-white
+    leading-none
+    whitespace-nowrap
+    shadow-[0_18px_45px_rgba(0,0,0,0.14)]
+    transition-all
+    duration-200
+    hover:-translate-y-0.5
+    hover:border-[#ae8954]
+    hover:bg-[#ae8954]
+    hover:!text-white
+    active:scale-[0.98]
+  "
+>
+  <span className="!text-white">
+    Start for Free
+  </span>
+
+  <ArrowRight
+    size={16}
+    strokeWidth={2}
+    className="
+      shrink-0
+      !text-white
+      transition-transform
+      duration-200
+      group-hover:translate-x-1
+    "
+  />
+</Link>
 
                 <Link
                   to="/templates"
@@ -225,12 +262,51 @@ function Pricing() {
                 </div>
 
                 <Link
-                  to="/register"
-                  className="mt-8 flex w-full items-center justify-center gap-2 rounded-xl bg-zinc-950 px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-zinc-800"
-                >
-                  Create my account
-                  <ArrowRight size={15} />
-                </Link>
+  to="/register"
+  className="
+    group
+    mt-8
+    flex
+    w-full
+    items-center
+    justify-center
+    gap-2
+    rounded-xl
+    border
+    border-white/25
+    bg-black
+    px-5
+    py-3.5
+    text-sm
+    font-semibold
+    !text-white
+    leading-none
+    whitespace-nowrap
+    shadow-[0_10px_30px_rgba(0,0,0,0.18)]
+    transition-all
+    duration-200
+    hover:border-[#ae8954]
+    hover:bg-[#ae8954]
+    hover:!text-white
+    active:scale-[0.98]
+  "
+>
+  <span className="!text-white">
+    Create My Account
+  </span>
+
+  <ArrowRight
+    size={15}
+    strokeWidth={2}
+    className="
+      shrink-0
+      !text-white
+      transition-transform
+      duration-200
+      group-hover:translate-x-1
+    "
+  />
+</Link>
 
                 <p className="mt-4 text-center text-[9px] uppercase tracking-[0.15em] text-zinc-400">
                   No payment information required
@@ -608,15 +684,53 @@ function Pricing() {
               </p>
 
               <Link
-                to="/register"
-                className="group mt-9 inline-flex items-center gap-3 rounded-xl bg-white px-7 py-3.5 text-sm font-semibold text-zinc-950 transition hover:bg-zinc-100"
-              >
-                Create your free resume
-                <ArrowRight
-                  size={16}
-                  className="transition-transform group-hover:translate-x-1"
-                />
-              </Link>
+  to="/register"
+  className="
+    group
+    mt-9
+    inline-flex
+    w-fit
+    shrink-0
+    items-center
+    justify-center
+    gap-3
+    rounded-xl
+    border
+    border-white/25
+    bg-black
+    px-7
+    py-3.5
+    text-sm
+    font-semibold
+    !text-white
+    leading-none
+    whitespace-nowrap
+    shadow-[0_10px_30px_rgba(0,0,0,0.18)]
+    transition-all
+    duration-200
+    hover:-translate-y-0.5
+    hover:border-[#ae8954]
+    hover:bg-[#ae8954]
+    hover:!text-white
+    active:scale-[0.98]
+  "
+>
+  <span className="!text-white">
+    Create Your Free Resume
+  </span>
+
+  <ArrowRight
+    size={16}
+    strokeWidth={2}
+    className="
+      shrink-0
+      !text-white
+      transition-transform
+      duration-200
+      group-hover:translate-x-1
+    "
+  />
+</Link>
 
               <div className="mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[9px] font-bold uppercase tracking-[0.16em] text-zinc-600">
                 <span>Resume</span>

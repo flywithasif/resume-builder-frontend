@@ -1,24 +1,23 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
 
 function ProtectedRoute() {
-  const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
 
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f8f8f6]">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-900" />
-      </div>
-    );
-  }
+  const token = localStorage.getItem("resumely_token");
 
-  if (!isAuthenticated) {
+  if (!token) {
+    const destination =
+      location.pathname +
+      location.search +
+      location.hash;
+
     return (
       <Navigate
         to="/login"
         replace
-        state={{ from: location.pathname }}
+        state={{
+          from: destination,
+        }}
       />
     );
   }

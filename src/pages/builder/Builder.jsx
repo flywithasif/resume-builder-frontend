@@ -25,6 +25,8 @@ import {
 } from "lucide-react";
 
 import { useState } from "react";
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
 import {
   calculateResumeProgress,
   createResumeRecord,
@@ -609,8 +611,134 @@ function Builder() {
 
   const [saved, setSaved] = useState(false);
 
-  const handleDownload = () => {
-    window.print();
+  const handleDownload = async () => {
+    // The actual A4 page is inside this wrapper. Capture the page itself,
+    // not the editor shell around it.
+    const wrapper = document.getElementById("resume-download-area");
+    const page = wrapper?.querySelector(":scope > .resume-print-area > div");
+
+    if (!page) {
+      console.error("Resume PDF page not found.");
+      window.alert("Resume preview is not ready yet. Please try again.");
+      return;
+    }
+
+    try {
+      if (document.fonts?.ready) {
+        await document.fonts.ready;
+      }
+
+      await new Promise((resolve) =>
+        window.requestAnimationFrame(() => resolve()),
+      );
+
+      // Use the exact rendered page dimensions. Do NOT use scrollWidth or the
+      // browser viewport width here; those can introduce the black strip seen
+      // in the generated PDF when the editor is horizontally scrollable.
+      const width = page.clientWidth;
+      const height = page.scrollHeight;
+
+      if (!width || !height) {
+        throw new Error("Resume page has no measurable size.");
+      }
+
+      const canvas = await html2canvas(page, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: false,
+        backgroundColor: "#ffffff",
+        logging: false,
+        imageTimeout: 15000,
+        x: 0,
+        y: 0,
+        width,
+        height,
+        windowWidth: width,
+        windowHeight: height,
+        scrollX: 0,
+        scrollY: 0,
+        removeContainer: true,
+        onclone: (clonedDocument) => {
+          const clonedPage = clonedDocument.querySelector(
+            ".resume-print-area > div",
+          );
+
+          if (clonedPage) {
+            clonedPage.style.width = `${width}px`;
+            clonedPage.style.maxWidth = `${width}px`;
+            clonedPage.style.minWidth = `${width}px`;
+            clonedPage.style.margin = "0";
+            clonedPage.style.boxShadow = "none";
+            clonedPage.style.overflow = "hidden";
+            clonedPage.style.backgroundColor = "#ffffff";
+          }
+        },
+      });
+
+      if (!canvas.width || !canvas.height) {
+        throw new Error("Resume could not be rendered to canvas.");
+      }
+
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+        compress: true,
+      });
+
+      const pageWidth = 210;
+      const pageHeight = 297;
+      const imageWidth = pageWidth;
+      const imageHeight = (canvas.height * imageWidth) / canvas.width;
+      const imageData = canvas.toDataURL("image/jpeg", 0.98);
+
+      // Add the captured resume page and split it cleanly across A4 pages.
+      let remaining = imageHeight;
+      let offset = 0;
+
+      pdf.addImage(
+        imageData,
+        "JPEG",
+        0,
+        offset,
+        imageWidth,
+        imageHeight,
+        undefined,
+        "FAST",
+      );
+
+      remaining -= pageHeight;
+
+      while (remaining > 0.5) {
+        offset = remaining - imageHeight;
+        pdf.addPage();
+        pdf.addImage(
+          imageData,
+          "JPEG",
+          0,
+          offset,
+          imageWidth,
+          imageHeight,
+          undefined,
+          "FAST",
+        );
+        remaining -= pageHeight;
+      }
+
+      const safeName =
+        makeResumeTitle(resume)
+          .replace(/[^a-z0-9]+/gi, "-")
+          .replace(/^-+|-+$/g, "")
+          .toLowerCase() || "resume";
+
+      pdf.save(`${safeName}.pdf`);
+    } catch (error) {
+      console.error("Resume PDF download failed:", error);
+
+      // Last-resort browser PDF flow. The print CSS already hides the editor
+      // and prints only .resume-print-area at A4 size.
+      window.print();
+    }
   };
 
   const updatePersonal = (field, value) => {
@@ -1235,10 +1363,15 @@ function Builder() {
               </div>
             </div>
 
-            <TemplateRenderer
-              resume={resume}
-              template={selectedTemplate}
-            />
+            <div
+              id="resume-download-area"
+              className="mx-auto w-full max-w-[760px] bg-white"
+            >
+              <TemplateRenderer
+                resume={resume}
+                template={selectedTemplate}
+              />
+            </div>
           </div>
         </main>
       </div>
