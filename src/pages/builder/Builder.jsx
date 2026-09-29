@@ -611,70 +611,16 @@ function Builder() {
 
   const [saved, setSaved] = useState(false);
 
-  const handleDownload = async () => {
-    const wrapper = document.getElementById("resume-download-area");
-    const page = wrapper?.querySelector(":scope > .resume-print-area > div");
-
-    if (!page) {
-      console.error("Resume PDF page not found.");
-      window.alert("Resume preview is not ready yet. Please try again.");
-      return;
-    }
-
+  const handleDownload = () => {
     try {
-      if (document.fonts?.ready) {
-        await document.fonts.ready;
-      }
+      /*
+        Resume PDF download intentionally uses the same approach as the
+        Cover Letter builder: build the PDF directly with jsPDF.
 
-      await new Promise((resolve) =>
-        window.requestAnimationFrame(() => resolve()),
-      );
-
-      const width = page.clientWidth;
-      const height = page.scrollHeight;
-
-      if (!width || !height) {
-        throw new Error("Resume page has no measurable size.");
-      }
-
-      const canvas = await html2canvas(page, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: false,
-        backgroundColor: "#ffffff",
-        logging: false,
-        imageTimeout: 15000,
-        x: 0,
-        y: 0,
-        width,
-        height,
-        windowWidth: width,
-        windowHeight: height,
-        scrollX: 0,
-        scrollY: 0,
-        removeContainer: true,
-        onclone: (clonedDocument) => {
-          const clonedPage = clonedDocument.querySelector(
-            ".resume-print-area > div",
-          );
-
-          if (clonedPage) {
-            clonedPage.style.width = `${width}px`;
-            clonedPage.style.maxWidth = `${width}px`;
-            clonedPage.style.minWidth = `${width}px`;
-            clonedPage.style.height = "auto";
-            clonedPage.style.margin = "0";
-            clonedPage.style.boxShadow = "none";
-            clonedPage.style.overflow = "visible";
-            clonedPage.style.backgroundColor = "#ffffff";
-          }
-        },
-      });
-
-      if (!canvas.width || !canvas.height) {
-        throw new Error("Resume could not be rendered to canvas.");
-      }
-
+        This avoids html2canvas completely, so the browser's rendered CSS,
+        Tailwind colors, shadows, overflow and viewport size cannot break
+        the PDF download.
+      */
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "mm",
@@ -684,43 +630,510 @@ function Builder() {
 
       const pageWidth = 210;
       const pageHeight = 297;
-      const imageWidth = pageWidth;
-      const imageHeight = (canvas.height * imageWidth) / canvas.width;
-      const imageData = canvas.toDataURL("image/jpeg", 0.98);
+      const margin = 20;
+      const contentWidth = pageWidth - margin * 2;
 
-      let remainingHeight = imageHeight;
-      let sourceOffset = 0;
+      const templateColors = {
+        executive: {
+          accent: "#18181b",
+          heading: "#18181b",
+          muted: "#71717a",
+        },
+        modern: {
+          accent: "#987542",
+          heading: "#18181b",
+          muted: "#71717a",
+        },
+        minimal: {
+          accent: "#52525b",
+          heading: "#18181b",
+          muted: "#71717a",
+        },
+        corporate: {
+          accent: "#1e293b",
+          heading: "#0f172a",
+          muted: "#64748b",
+        },
+        creative: {
+          accent: "#987542",
+          heading: "#18181b",
+          muted: "#71717a",
+        },
+        ats: {
+          accent: "#000000",
+          heading: "#000000",
+          muted: "#333333",
+        },
+        tech: {
+          accent: "#475569",
+          heading: "#0f172a",
+          muted: "#64748b",
+        },
+        elegant: {
+          accent: "#987542",
+          heading: "#18181b",
+          muted: "#71717a",
+        },
+      };
 
-      pdf.addImage(
-        imageData,
-        "JPEG",
-        0,
-        0,
-        imageWidth,
-        imageHeight,
-        undefined,
-        "FAST",
-      );
+      const colors =
+        templateColors[selectedTemplate] ||
+        templateColors.executive;
 
-      remainingHeight -= pageHeight;
+      const hexToRgb = (hex) => {
+        const clean = String(hex || "#18181b").replace("#", "");
+        const value =
+          clean.length === 3
+            ? clean
+                .split("")
+                .map((item) => item + item)
+                .join("")
+            : clean;
 
-      while (remainingHeight > 0.5) {
-        sourceOffset += pageHeight;
+        return {
+          r: parseInt(value.substring(0, 2), 16) || 24,
+          g: parseInt(value.substring(2, 4), 16) || 24,
+          b: parseInt(value.substring(4, 6), 16) || 27,
+        };
+      };
 
-        pdf.addPage();
+      const accentRgb = hexToRgb(colors.accent);
+      const headingRgb = hexToRgb(colors.heading);
+      const mutedRgb = hexToRgb(colors.muted);
 
-        pdf.addImage(
-          imageData,
-          "JPEG",
-          0,
-          -sourceOffset,
-          imageWidth,
-          imageHeight,
-          undefined,
-          "FAST",
+      let y = 20;
+
+      const addPageIfNeeded = (requiredHeight = 10) => {
+        if (y + requiredHeight > pageHeight - 18) {
+          pdf.addPage();
+          y = margin;
+          return true;
+        }
+
+        return false;
+      };
+
+      const addSectionTitle = (title) => {
+        addPageIfNeeded(16);
+
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(10);
+        pdf.setTextColor(
+          headingRgb.r,
+          headingRgb.g,
+          headingRgb.b,
         );
 
-        remainingHeight -= pageHeight;
+        pdf.text(String(title).toUpperCase(), margin, y);
+
+        pdf.setDrawColor(
+          accentRgb.r,
+          accentRgb.g,
+          accentRgb.b,
+        );
+        pdf.setLineWidth(0.35);
+        pdf.line(
+          margin,
+          y + 2,
+          margin + contentWidth,
+          y + 2,
+        );
+
+        y += 9;
+      };
+
+      const addParagraph = (
+        value,
+        {
+          fontSize = 8.5,
+          lineHeight = 4.2,
+          color = mutedRgb,
+          spacing = 4,
+        } = {},
+      ) => {
+        if (!value) return;
+
+        const lines = pdf.splitTextToSize(
+          String(value),
+          contentWidth,
+        );
+
+        const requiredHeight =
+          lines.length * lineHeight + spacing;
+
+        addPageIfNeeded(requiredHeight);
+
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(fontSize);
+        pdf.setTextColor(color.r, color.g, color.b);
+        pdf.text(lines, margin, y);
+
+        y += requiredHeight;
+      };
+
+      const addEntry = ({
+        title,
+        subtitle,
+        date,
+        description,
+      }) => {
+        const descriptionLines = description
+          ? pdf.splitTextToSize(
+              String(description),
+              contentWidth,
+            )
+          : [];
+
+        const requiredHeight =
+          7 +
+          (subtitle ? 4 : 0) +
+          (date ? 4 : 0) +
+          (descriptionLines.length
+            ? descriptionLines.length * 3.8 + 3
+            : 0);
+
+        addPageIfNeeded(requiredHeight);
+
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(9);
+        pdf.setTextColor(
+          headingRgb.r,
+          headingRgb.g,
+          headingRgb.b,
+        );
+
+        if (date) {
+          const safeDate = String(date);
+          const titleWidth =
+            contentWidth -
+            pdf.getTextWidth(safeDate) -
+            5;
+
+          const titleLines = pdf.splitTextToSize(
+            String(title || ""),
+            Math.max(titleWidth, 40),
+          );
+
+          pdf.text(titleLines, margin, y);
+
+          pdf.setFont("helvetica", "normal");
+          pdf.setFontSize(7.5);
+          pdf.setTextColor(
+            mutedRgb.r,
+            mutedRgb.g,
+            mutedRgb.b,
+          );
+          pdf.text(
+            safeDate,
+            pageWidth - margin,
+            y,
+            { align: "right" },
+          );
+
+          y += titleLines.length * 4;
+        } else {
+          const titleLines = pdf.splitTextToSize(
+            String(title || ""),
+            contentWidth,
+          );
+
+          pdf.text(titleLines, margin, y);
+          y += titleLines.length * 4;
+        }
+
+        if (subtitle) {
+          const subtitleLines = pdf.splitTextToSize(
+            String(subtitle),
+            contentWidth,
+          );
+
+          pdf.setFont("helvetica", "normal");
+          pdf.setFontSize(8);
+          pdf.setTextColor(
+            mutedRgb.r,
+            mutedRgb.g,
+            mutedRgb.b,
+          );
+          pdf.text(subtitleLines, margin, y);
+          y += subtitleLines.length * 3.8;
+        }
+
+        if (description) {
+          const lines = pdf.splitTextToSize(
+            String(description),
+            contentWidth,
+          );
+
+          addPageIfNeeded(lines.length * 3.8 + 2);
+
+          pdf.setFont("helvetica", "normal");
+          pdf.setFontSize(8);
+          pdf.setTextColor(
+            mutedRgb.r,
+            mutedRgb.g,
+            mutedRgb.b,
+          );
+          pdf.text(lines, margin, y);
+          y += lines.length * 3.8 + 2;
+        }
+
+        y += 3;
+      };
+
+      // =========================================================
+      // HEADER
+      // =========================================================
+
+      pdf.setFillColor(
+        accentRgb.r,
+        accentRgb.g,
+        accentRgb.b,
+      );
+      pdf.rect(0, 0, pageWidth, 3, "F");
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(22);
+      pdf.setTextColor(
+        headingRgb.r,
+        headingRgb.g,
+        headingRgb.b,
+      );
+
+      const fullName =
+        `${resume.personal.firstName || ""} ${
+          resume.personal.lastName || ""
+        }`.trim() || "Your Name";
+
+      pdf.text(fullName, margin, y + 5);
+      y += 11;
+
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(10);
+      pdf.setTextColor(
+        accentRgb.r,
+        accentRgb.g,
+        accentRgb.b,
+      );
+      pdf.text(
+        resume.personal.title || "Professional Title",
+        margin,
+        y,
+      );
+      y += 6;
+
+      const contact = [
+        resume.personal.email,
+        resume.personal.phone,
+        resume.personal.location,
+        resume.personal.website,
+      ]
+        .filter(Boolean)
+        .join("   |   ");
+
+      if (contact) {
+        const contactLines = pdf.splitTextToSize(
+          contact,
+          contentWidth,
+        );
+
+        pdf.setFontSize(7.5);
+        pdf.setTextColor(
+          mutedRgb.r,
+          mutedRgb.g,
+          mutedRgb.b,
+        );
+        pdf.text(contactLines, margin, y);
+        y += contactLines.length * 3.5;
+      }
+
+      pdf.setDrawColor(225, 225, 226);
+      pdf.setLineWidth(0.3);
+      pdf.line(
+        margin,
+        y + 2,
+        pageWidth - margin,
+        y + 2,
+      );
+
+      y += 11;
+
+      // =========================================================
+      // SUMMARY
+      // =========================================================
+
+      if (resume.summary) {
+        addSectionTitle("Profile");
+        addParagraph(resume.summary);
+      }
+
+      // =========================================================
+      // EXPERIENCE
+      // =========================================================
+
+      if (resume.experience?.length > 0) {
+        addSectionTitle("Experience");
+
+        resume.experience.forEach((item) => {
+          addEntry({
+            title: item.position || "Position",
+            subtitle: [
+              item.company,
+              item.location,
+            ]
+              .filter(Boolean)
+              .join(" | "),
+            date: [
+              item.startDate,
+              item.endDate,
+            ]
+              .filter(Boolean)
+              .join(" — "),
+            description: item.description,
+          });
+        });
+      }
+
+      // =========================================================
+      // EDUCATION
+      // =========================================================
+
+      if (resume.education?.length > 0) {
+        addSectionTitle("Education");
+
+        resume.education.forEach((item) => {
+          addEntry({
+            title: item.degree || "Degree",
+            subtitle: [
+              item.school,
+              item.location,
+            ]
+              .filter(Boolean)
+              .join(" | "),
+            date: [
+              item.startDate,
+              item.endDate,
+            ]
+              .filter(Boolean)
+              .join(" — "),
+          });
+        });
+      }
+
+      // =========================================================
+      // SKILLS
+      // =========================================================
+
+      if (resume.skills?.length > 0) {
+        addSectionTitle("Skills");
+
+        const skills = resume.skills
+          .filter(Boolean)
+          .join("  •  ");
+
+        addParagraph(skills, {
+          fontSize: 8.5,
+          lineHeight: 4,
+          color: headingRgb,
+          spacing: 5,
+        });
+      }
+
+      // =========================================================
+      // PROJECTS
+      // =========================================================
+
+      if (resume.projects?.length > 0) {
+        addSectionTitle("Projects");
+
+        resume.projects.forEach((item) => {
+          const projectDescription = [
+            item.description,
+            item.link ? `Link: ${item.link}` : "",
+          ]
+            .filter(Boolean)
+            .join("\n");
+
+          addEntry({
+            title: item.name || "Project",
+            description: projectDescription,
+          });
+        });
+      }
+
+      // =========================================================
+      // CERTIFICATIONS
+      // =========================================================
+
+      if (resume.certifications?.length > 0) {
+        addSectionTitle("Certifications");
+
+        resume.certifications.forEach((item) => {
+          addEntry({
+            title: item.name || "Certification",
+            subtitle: item.issuer || "",
+            date: item.year || "",
+          });
+        });
+      }
+
+      // =========================================================
+      // LANGUAGES
+      // =========================================================
+
+      if (resume.languages?.length > 0) {
+        addSectionTitle("Languages");
+
+        const languages = resume.languages
+          .filter((item) => item?.name)
+          .map((item) =>
+            item.level
+              ? `${item.name} - ${item.level}`
+              : item.name,
+          )
+          .join("  |  ");
+
+        addParagraph(languages, {
+          fontSize: 8.5,
+          lineHeight: 4,
+          color: headingRgb,
+          spacing: 5,
+        });
+      }
+
+      // =========================================================
+      // FOOTER ON ALL PAGES
+      // =========================================================
+
+      const totalPages = pdf.getNumberOfPages();
+
+      for (let pageNumber = 1; pageNumber <= totalPages; pageNumber += 1) {
+        pdf.setPage(pageNumber);
+
+        pdf.setDrawColor(235, 235, 236);
+        pdf.setLineWidth(0.25);
+        pdf.line(
+          margin,
+          pageHeight - 13,
+          pageWidth - margin,
+          pageHeight - 13,
+        );
+
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(6.5);
+        pdf.setTextColor(161, 161, 170);
+
+        pdf.text(
+          fullName,
+          margin,
+          pageHeight - 8,
+        );
+
+        pdf.text(
+          `${selectedTemplate || "executive"}  |  ${pageNumber}/${totalPages}`,
+          pageWidth - margin,
+          pageHeight - 8,
+          { align: "right" },
+        );
       }
 
       const safeName =
@@ -731,8 +1144,14 @@ function Builder() {
 
       pdf.save(`${safeName}.pdf`);
     } catch (error) {
-      console.error("Resume PDF download failed:", error);
-      window.alert("PDF download failed. Please try again.");
+      console.error(
+        "Resume PDF download failed:",
+        error,
+      );
+
+      window.alert(
+        "PDF download failed. Please try again.",
+      );
     }
   };
 
