@@ -612,8 +612,6 @@ function Builder() {
   const [saved, setSaved] = useState(false);
 
   const handleDownload = async () => {
-    // The actual A4 page is inside this wrapper. Capture the page itself,
-    // not the editor shell around it.
     const wrapper = document.getElementById("resume-download-area");
     const page = wrapper?.querySelector(":scope > .resume-print-area > div");
 
@@ -632,9 +630,6 @@ function Builder() {
         window.requestAnimationFrame(() => resolve()),
       );
 
-      // Use the exact rendered page dimensions. Do NOT use scrollWidth or the
-      // browser viewport width here; those can introduce the black strip seen
-      // in the generated PDF when the editor is horizontally scrollable.
       const width = page.clientWidth;
       const height = page.scrollHeight;
 
@@ -667,9 +662,10 @@ function Builder() {
             clonedPage.style.width = `${width}px`;
             clonedPage.style.maxWidth = `${width}px`;
             clonedPage.style.minWidth = `${width}px`;
+            clonedPage.style.height = "auto";
             clonedPage.style.margin = "0";
             clonedPage.style.boxShadow = "none";
-            clonedPage.style.overflow = "hidden";
+            clonedPage.style.overflow = "visible";
             clonedPage.style.backgroundColor = "#ffffff";
           }
         },
@@ -692,37 +688,39 @@ function Builder() {
       const imageHeight = (canvas.height * imageWidth) / canvas.width;
       const imageData = canvas.toDataURL("image/jpeg", 0.98);
 
-      // Add the captured resume page and split it cleanly across A4 pages.
-      let remaining = imageHeight;
-      let offset = 0;
+      let remainingHeight = imageHeight;
+      let sourceOffset = 0;
 
       pdf.addImage(
         imageData,
         "JPEG",
         0,
-        offset,
+        0,
         imageWidth,
         imageHeight,
         undefined,
         "FAST",
       );
 
-      remaining -= pageHeight;
+      remainingHeight -= pageHeight;
 
-      while (remaining > 0.5) {
-        offset = remaining - imageHeight;
+      while (remainingHeight > 0.5) {
+        sourceOffset += pageHeight;
+
         pdf.addPage();
+
         pdf.addImage(
           imageData,
           "JPEG",
           0,
-          offset,
+          -sourceOffset,
           imageWidth,
           imageHeight,
           undefined,
           "FAST",
         );
-        remaining -= pageHeight;
+
+        remainingHeight -= pageHeight;
       }
 
       const safeName =
@@ -734,10 +732,7 @@ function Builder() {
       pdf.save(`${safeName}.pdf`);
     } catch (error) {
       console.error("Resume PDF download failed:", error);
-
-      // Last-resort browser PDF flow. The print CSS already hides the editor
-      // and prints only .resume-print-area at A4 size.
-      window.print();
+      window.alert("PDF download failed. Please try again.");
     }
   };
 
