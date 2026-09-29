@@ -204,10 +204,9 @@ function About() {
               </h1>
 
               <p className="mt-8 max-w-2xl text-base leading-8 text-zinc-500 sm:text-lg">
-                Resumely is building a more thoughtful way to create resumes
-                and cover letters — combining professional document design,
-                focused editing and a premium experience into one career
-                workspace.
+                Resumely is building a more thoughtful way to create resumes and
+                cover letters — combining professional document design, focused
+                editing and a premium experience into one career workspace.
               </p>
 
               <div className="mt-10 flex flex-col gap-3 sm:flex-row">
@@ -215,10 +214,11 @@ function About() {
                   to="/templates"
                   className="group inline-flex items-center justify-center gap-3 rounded-xl bg-zinc-950 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_15px_35px_rgba(0,0,0,.14)] transition hover:-translate-y-0.5 hover:bg-zinc-800"
                 >
-                  Explore templates
+                  <span className="text-white">Explore templates</span>
+
                   <ArrowRight
                     size={16}
-                    className="transition-transform group-hover:translate-x-1"
+                    className="text-white transition-transform group-hover:translate-x-1"
                   />
                 </Link>
 
@@ -346,8 +346,8 @@ function About() {
 
                 <p>
                   We believe the technology should disappear into the
-                  experience, leaving you with more time to think about the
-                  work you have actually done.
+                  experience, leaving you with more time to think about the work
+                  you have actually done.
                 </p>
               </div>
             </div>
@@ -453,9 +453,9 @@ function About() {
               </h2>
 
               <p className="mt-7 max-w-md text-sm leading-7 text-zinc-500">
-                Resumely is being built around the complete application
-                journey — from your first draft to the final document you send
-                to an employer.
+                Resumely is being built around the complete application journey
+                — from your first draft to the final document you send to an
+                employer.
               </p>
 
               <Link
@@ -586,8 +586,8 @@ function About() {
 
               <p className="mt-7 max-w-xl text-sm leading-7 text-zinc-500 sm:text-base">
                 The product is structured around the way people actually build
-                applications: collect your information, shape the story,
-                refine the presentation and review the final result.
+                applications: collect your information, shape the story, refine
+                the presentation and review the final result.
               </p>
 
               <div className="mt-10 space-y-7">
@@ -688,9 +688,9 @@ function About() {
 
                   <p className="mt-6 max-w-md text-sm leading-7 text-zinc-500">
                     Your resume contains information about your professional
-                    life. Resumely is designed with that responsibility in
-                    mind, with a product experience that puts control and
-                    clarity first.
+                    life. Resumely is designed with that responsibility in mind,
+                    with a product experience that puts control and clarity
+                    first.
                   </p>
                 </div>
               </div>
@@ -774,9 +774,21 @@ function About() {
 
           <div className="mx-auto mt-14 grid max-w-4xl gap-3 text-left sm:grid-cols-3">
             {[
-              ["01", "Create", "Turn experience into a clear professional story."],
-              ["02", "Present", "Use design that makes information easier to understand."],
-              ["03", "Apply", "Move from document creation to your next opportunity."],
+              [
+                "01",
+                "Create",
+                "Turn experience into a clear professional story.",
+              ],
+              [
+                "02",
+                "Present",
+                "Use design that makes information easier to understand.",
+              ],
+              [
+                "03",
+                "Apply",
+                "Move from document creation to your next opportunity.",
+              ],
             ].map(([num, title, text]) => (
               <div
                 key={num}
@@ -803,8 +815,8 @@ function About() {
           />
 
           <blockquote className="mt-7 text-3xl font-medium leading-[1.15] tracking-[-0.04em] text-zinc-900 sm:text-5xl">
-            “The best career document is not the one with the most design. It
-            is the one that makes your experience impossible to misunderstand.”
+            “The best career document is not the one with the most design. It is
+            the one that makes your experience impossible to misunderstand.”
           </blockquote>
 
           <div className="mt-8 flex items-center justify-center gap-3">
@@ -885,8 +897,8 @@ function About() {
 
               <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
                 <Link
-  to="/register"
-  className="
+                  to="/register"
+                  className="
     group
     inline-flex
     w-fit
@@ -913,23 +925,21 @@ function About() {
     hover:!text-white
     active:scale-[0.98]
   "
->
-  <span className="!text-white">
-    Create Your Resume
-  </span>
+                >
+                  <span className="!text-white">Create Your Resume</span>
 
-  <ArrowRight
-    size={16}
-    strokeWidth={2}
-    className="
+                  <ArrowRight
+                    size={16}
+                    strokeWidth={2}
+                    className="
       shrink-0
       !text-white
       transition-transform
       duration-200
       group-hover:translate-x-1
     "
-  />
-</Link>
+                  />
+                </Link>
 
                 <Link
                   to="/templates"
