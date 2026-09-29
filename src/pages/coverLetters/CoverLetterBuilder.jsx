@@ -15,6 +15,11 @@ import {
 import jsPDF from "jspdf";
 
 import coverLetterTemplates from "../../data/coverLetterTemplates";
+import {
+  createCoverLetter,
+  getCoverLetterFromApi,
+  updateCoverLetterOnApi,
+} from "../../services/coverLetterService";
 
 const STORAGE_KEY = "resumely_cover_letters";
 
@@ -293,7 +298,7 @@ function CoverLetterBuilder() {
 
     if (editingId) {
       const existing = savedLetters.find(
-        (item) => item.id === editingId
+        (item) => String(item.id) === String(editingId)
       );
 
       if (existing) {
@@ -322,12 +327,72 @@ function CoverLetterBuilder() {
   }, [data.template]);
 
   useEffect(() => {
-    if (!editingId) {
-      setData((current) => ({
-        ...current,
-        template: queryTemplate,
-      }));
+    let cancelled = false;
+
+    async function loadCoverLetter() {
+      if (!editingId) {
+        setData((current) => ({
+          ...current,
+          template: queryTemplate,
+        }));
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem("resumely_token");
+
+        if (token) {
+          const result = await getCoverLetterFromApi(editingId);
+
+          if (!cancelled && result?.coverLetter) {
+            const serverLetter = result.coverLetter;
+
+            setData({
+              ...defaultData,
+              ...(serverLetter.data || {}),
+              id: serverLetter._id,
+              title:
+                serverLetter.title ||
+                serverLetter.data?.title ||
+                defaultData.title,
+              template:
+                serverLetter.template ||
+                serverLetter.data?.template ||
+                queryTemplate,
+              createdAt: serverLetter.createdAt,
+              updatedAt: serverLetter.updatedAt,
+            });
+
+            return;
+          }
+        }
+      } catch (error) {
+        console.warn(
+          "Cover letter API load failed. Falling back to local storage.",
+          error,
+        );
+      }
+
+      if (cancelled) return;
+
+      const savedLetters = getSavedLetters();
+      const existing = savedLetters.find(
+        (item) => String(item.id) === String(editingId),
+      );
+
+      if (existing) {
+        setData({
+          ...defaultData,
+          ...existing,
+        });
+      }
     }
+
+    loadCoverLetter();
+
+    return () => {
+      cancelled = true;
+    };
   }, [editingId, queryTemplate]);
 
   const updateField = (field, value) => {
@@ -339,8 +404,77 @@ function CoverLetterBuilder() {
     }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const existingLetters = getSavedLetters();
+
+    const isMongoId =
+      typeof data.id === "string" &&
+      /^[a-f\\d]{24}$/i.test(data.id);
+
+    const serverId =
+      editingId && /^[a-f\\d]{24}$/i.test(editingId)
+        ? editingId
+        : isMongoId
+          ? data.id
+          : null;
+
+    const payload = {
+      title:
+        data.title?.trim() ||
+        `${data.position || "Cover Letter"} - ${
+          data.company || "Company"
+        }`,
+      template: data.template,
+      data: {
+        ...data,
+        id: undefined,
+      },
+    };
+
+    delete payload.data.id;
+
+    try {
+      const token = localStorage.getItem("resumely_token");
+
+      if (token) {
+        const result = serverId
+          ? await updateCoverLetterOnApi(serverId, payload)
+          : await createCoverLetter(payload);
+
+        if (result?.coverLetter) {
+          const serverLetter = result.coverLetter;
+
+          const letter = {
+            ...(serverLetter.data || data),
+            id: serverLetter._id,
+            title:
+              serverLetter.title ||
+              serverLetter.data?.title ||
+              payload.title,
+            template:
+              serverLetter.template ||
+              serverLetter.data?.template ||
+              data.template,
+            createdAt: serverLetter.createdAt,
+            updatedAt: serverLetter.updatedAt,
+          };
+
+          setData(letter);
+          setSaved(true);
+
+          window.setTimeout(() => {
+            setSaved(false);
+          }, 2200);
+
+          return letter;
+        }
+      }
+    } catch (error) {
+      console.warn(
+        "Cover letter API save failed. Falling back to local storage.",
+        error,
+      );
+    }
 
     const id =
       editingId ||
@@ -350,19 +484,16 @@ function CoverLetterBuilder() {
     const letter = {
       ...data,
       id,
-      title:
-        data.title?.trim() ||
-        `${data.position || "Cover Letter"} - ${
-          data.company || "Company"
-        }`,
+      title: payload.title,
       updatedAt: new Date().toISOString(),
       createdAt:
-        existingLetters.find((item) => item.id === id)
-          ?.createdAt || new Date().toISOString(),
+        existingLetters.find(
+          (item) => String(item.id) === String(id),
+        )?.createdAt || new Date().toISOString(),
     };
 
     const index = existingLetters.findIndex(
-      (item) => item.id === id
+      (item) => String(item.id) === String(id),
     );
 
     let updated;
@@ -376,7 +507,7 @@ function CoverLetterBuilder() {
 
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify(updated)
+      JSON.stringify(updated),
     );
 
     setData(letter);
@@ -385,11 +516,13 @@ function CoverLetterBuilder() {
     window.setTimeout(() => {
       setSaved(false);
     }, 2200);
+
+    return letter;
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     try {
-      handleSave();
+      await handleSave();
 
       const pdf = new jsPDF({
         orientation: "portrait",

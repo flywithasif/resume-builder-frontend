@@ -24,18 +24,22 @@ import {
   Check,
 } from "lucide-react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import {
   calculateResumeProgress,
-  createResumeRecord,
   getResumeById,
   getResumes,
   saveResumes,
   makeResumeTitle,
 } from "../../utils/resumeStorage";
 import { Link, useSearchParams } from "react-router-dom";
+import {
+  createResume,
+  getResumeFromApi,
+  updateResumeOnApi,
+} from "../../services/resumeService";
 import { ResumeRenderer as TemplateRenderer } from "../templates/resumeTemplates";
 
 const initialResume = {
@@ -610,6 +614,53 @@ function Builder() {
     useState(false);
 
   const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("resumely_token");
+
+    if (!token || isNewResume || !requestedResumeId) {
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadResumeFromBackend() {
+      try {
+        const result = await getResumeFromApi(requestedResumeId);
+        const serverResume = result?.resume;
+
+        if (cancelled || !serverResume) {
+          return;
+        }
+
+        setResume(serverResume.data || initialResume);
+        setSelectedTemplate(serverResume.template || "executive");
+        setActiveResumeId(serverResume._id || requestedResumeId);
+
+        localStorage.setItem(
+          "resume_builder_draft",
+          JSON.stringify(serverResume.data || initialResume),
+        );
+        localStorage.setItem(
+          "resumely_active_resume_id",
+          String(serverResume._id || requestedResumeId),
+        );
+        localStorage.setItem(
+          "resumely_template",
+          serverResume.template || "executive",
+        );
+      } catch (error) {
+        console.error("Resume API load failed:", error);
+      }
+    }
+
+    loadResumeFromBackend();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isNewResume, requestedResumeId]);
+
 
   const handleDownload = () => {
     try {
@@ -1440,10 +1491,92 @@ function Builder() {
     setSaved(false);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const now = new Date().toISOString();
-    const existing = getResumes();
+    const token = localStorage.getItem("resumely_token");
+    const title = makeResumeTitle(resume);
+    const payload = {
+      title,
+      template: selectedTemplate,
+      data: resume,
+    };
 
+    if (token) {
+      try {
+        const isMongoId =
+          typeof activeResumeId === "string" &&
+          /^[a-f\d]{24}$/i.test(activeResumeId);
+
+        const result = isMongoId
+          ? await updateResumeOnApi(activeResumeId, payload)
+          : await createResume(payload);
+
+        const serverResume = result?.resume;
+
+        if (!serverResume?._id) {
+          throw new Error("Resume was not returned by the server.");
+        }
+
+        const recordId = serverResume._id;
+        const localRecord = {
+          id: recordId,
+          title: serverResume.title || title,
+          template: serverResume.template || selectedTemplate,
+          progress:
+            serverResume.progress ??
+            calculateResumeProgress(resume),
+          createdAt: serverResume.createdAt || now,
+          updatedAt: serverResume.updatedAt || now,
+          data: serverResume.data || resume,
+        };
+
+        const existing = getResumes();
+        const withoutCurrent = existing.filter(
+          (item) => String(item.id) !== String(recordId),
+        );
+
+        saveResumes([localRecord, ...withoutCurrent]);
+        setActiveResumeId(recordId);
+
+        localStorage.setItem(
+          "resume_builder_draft",
+          JSON.stringify(serverResume.data || resume),
+        );
+        localStorage.setItem(
+          "resumely_active_resume_id",
+          String(recordId),
+        );
+        localStorage.setItem(
+          "resumely_template",
+          serverResume.template || selectedTemplate,
+        );
+        localStorage.setItem(
+          "resumely_template_name",
+          (serverResume.template || selectedTemplate)
+            .charAt(0)
+            .toUpperCase() +
+            (serverResume.template || selectedTemplate).slice(1),
+        );
+
+        setSaved(true);
+
+        window.setTimeout(() => {
+          setSaved(false);
+        }, 2500);
+
+        return;
+      } catch (error) {
+        console.error("Resume cloud save failed:", error);
+        window.alert(
+          error?.message ||
+            "Resume could not be saved to your account. Please try again.",
+        );
+        return;
+      }
+    }
+
+    // Keep local storage as a fallback for signed-out/local development use.
+    const existing = getResumes();
     let recordId = activeResumeId;
 
     if (recordId) {
@@ -1451,7 +1584,7 @@ function Builder() {
         String(item.id) === String(recordId)
           ? {
               ...item,
-              title: makeResumeTitle(resume),
+              title,
               template: selectedTemplate,
               progress: calculateResumeProgress(resume),
               updatedAt: now,
@@ -1462,14 +1595,22 @@ function Builder() {
 
       saveResumes(next);
     } else {
-      const record = createResumeRecord({
-        data: resume,
-        template: selectedTemplate,
-      });
+      const localId = Date.now();
+      recordId = localId;
+      setActiveResumeId(localId);
 
-      recordId = record.id;
-      setActiveResumeId(record.id);
-      saveResumes([record, ...existing]);
+      saveResumes([
+        {
+          id: localId,
+          title,
+          template: selectedTemplate,
+          progress: calculateResumeProgress(resume),
+          createdAt: now,
+          updatedAt: now,
+          data: resume,
+        },
+        ...existing,
+      ]);
     }
 
     localStorage.setItem(
