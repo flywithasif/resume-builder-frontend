@@ -2,10 +2,11 @@ import { Outlet } from "react-router-dom";
 
 import Navbar from "../components/layout/Navbar";
 import DashboardLayout from "../layouts/DashboardLayout";
+import Footer from "../layouts/Footer";
 
 function TemplateRouteLayout() {
   const isAuthenticated = Boolean(
-    localStorage.getItem("resumely_token")
+    localStorage.getItem("resumely_token"),
   );
 
   /*
@@ -17,6 +18,8 @@ function TemplateRouteLayout() {
     /templates/:templateId
 
     -> Public Navbar
+    -> Template Content
+    -> Public Footer
 
 
     =========================================================
@@ -28,7 +31,7 @@ function TemplateRouteLayout() {
 
     -> Dashboard Sidebar
     -> Dashboard Topbar
-    -> Template content
+    -> Template Content
   */
 
   if (isAuthenticated) {
@@ -42,6 +45,8 @@ function TemplateRouteLayout() {
       <main>
         <Outlet />
       </main>
+
+      <Footer />
     </div>
   );
 }

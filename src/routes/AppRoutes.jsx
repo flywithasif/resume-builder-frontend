@@ -10,34 +10,52 @@ import DashboardLayout from "../layouts/DashboardLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import TemplateRouteLayout from "./TemplateRouteLayout";
 
-/* LANDING */
+/* =========================================================
+   LANDING
+========================================================= */
+
 import Home from "../pages/landing/Home";
 import Pricing from "../pages/landing/Pricing";
 import About from "../pages/landing/About";
 import HowItWorks from "../pages/landing/HowItWorks";
 import CoverLetter from "../pages/landing/CoverLetter";
+import Templates from "../pages/landing/Templates";
 
-/* AUTH */
+/* =========================================================
+   AUTH
+========================================================= */
+
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import ForgotPassword from "../pages/auth/ForgotPassword";
 import ResetPassword from "../pages/auth/ResetPassword";
 
-/* DASHBOARD */
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
 import Dashboard from "../pages/dashboard/Dashboard";
 import Resumes from "../pages/dashboard/Resumes";
 import CoverLetters from "../pages/dashboard/CoverLetters";
 import Profile from "../pages/dashboard/Profile";
 import Settings from "../pages/dashboard/Settings";
 
-/* RESUME BUILDER */
+/* =========================================================
+   RESUME BUILDER
+========================================================= */
+
 import Builder from "../pages/builder/Builder";
 
-/* RESUME TEMPLATES */
-import Templates from "../pages/templates/Templates";
+/* =========================================================
+   RESUME TEMPLATES
+========================================================= */
+
 import TemplateDetails from "../pages/templates/TemplateDetails";
 
-/* COVER LETTER */
+/* =========================================================
+   COVER LETTER
+========================================================= */
+
 import CoverLetterTemplates from "../pages/templates/CoverLetterTemplates";
 import CoverLetterBuilder from "../pages/coverLetters/CoverLetterBuilder";
 
@@ -73,14 +91,15 @@ function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-
         {/* =====================================================
             PUBLIC WEBSITE
         ====================================================== */}
 
         <Route element={<PublicLayout />}>
-
-          <Route path="/" element={<Home />} />
+          <Route
+            path="/"
+            element={<Home />}
+          />
 
           <Route
             path="/cover-letter"
@@ -102,7 +121,9 @@ function AppRoutes() {
             element={<Pricing />}
           />
 
-          {/* AUTH */}
+          {/* =================================================
+              AUTH
+          ================================================= */}
 
           <Route
             path="/login"
@@ -123,7 +144,6 @@ function AppRoutes() {
             path="/reset-password"
             element={<ResetPassword />}
           />
-
         </Route>
 
         {/* =====================================================
@@ -140,26 +160,32 @@ function AppRoutes() {
         ====================================================== */}
 
         <Route element={<TemplateRouteLayout />}>
-
-          {/* RESUME TEMPLATES */}
+          {/* =================================================
+              RESUME TEMPLATE LANDING
+          ================================================= */}
 
           <Route
             path="/templates"
             element={<Templates />}
           />
 
+          {/* =================================================
+              INDIVIDUAL RESUME TEMPLATE
+          ================================================= */}
+
           <Route
             path="/templates/:templateId"
             element={<TemplateDetails />}
           />
 
-          {/* COVER LETTER TEMPLATES */}
+          {/* =================================================
+              COVER LETTER TEMPLATES
+          ================================================= */}
 
           <Route
             path="/cover-letter-templates"
             element={<CoverLetterTemplates />}
           />
-
         </Route>
 
         {/* =====================================================
@@ -167,13 +193,11 @@ function AppRoutes() {
         ====================================================== */}
 
         <Route element={<ProtectedRoute />}>
-
           {/* =================================================
               DASHBOARD
           ================================================= */}
 
           <Route element={<DashboardLayout />}>
-
             <Route
               path="/dashboard"
               element={<Dashboard />}
@@ -198,7 +222,6 @@ function AppRoutes() {
               path="/dashboard/settings"
               element={<Settings />}
             />
-
           </Route>
 
           {/* =================================================
@@ -224,16 +247,16 @@ function AppRoutes() {
             path="/cover-letter-builder"
             element={<CoverLetterBuilder />}
           />
-
         </Route>
 
-        {/* 404 */}
+        {/* =====================================================
+            404
+        ====================================================== */}
 
         <Route
           path="*"
           element={<NotFound />}
         />
-
       </Routes>
     </BrowserRouter>
   );
