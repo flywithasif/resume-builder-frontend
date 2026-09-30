@@ -61,33 +61,46 @@ function Profile() {
   };
 
   return (
-    <div className="mx-auto max-w-[1050px]">
-      {/* Header */}
-      <div className="max-w-2xl">
+    <div className="mx-auto w-full max-w-[1050px]">
+      {/* =====================================================
+          HEADER
+      ===================================================== */}
+
+      <div className="w-full max-w-2xl">
         <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#ae8954]">
           Account
         </p>
 
-        <h1 className="mt-2 text-3xl font-semibold tracking-[-0.045em]">
+        <h1 className="mt-2 text-2xl font-semibold tracking-[-0.045em] sm:text-3xl">
           Profile
         </h1>
 
-        <p className="mt-2 text-sm leading-6 text-zinc-500">
+        <p className="mt-2 max-w-xl text-sm leading-6 text-zinc-500">
           Manage your personal information and account security
           from one place.
         </p>
       </div>
 
-      <form onSubmit={saveChanges} className="mt-8 space-y-5">
-        {/* Personal */}
-        <section className="overflow-hidden rounded-2xl border border-[#e7e2d9] bg-white">
-          <div className="border-b border-[#eeeae3] p-5 sm:p-6">
-            <div className="flex items-start gap-3">
+      {/* =====================================================
+          FORM
+      ===================================================== */}
+
+      <form
+        onSubmit={saveChanges}
+        className="mt-6 w-full space-y-4 sm:mt-8 sm:space-y-5"
+      >
+        {/* =================================================
+            PERSONAL INFORMATION
+        ================================================= */}
+
+        <section className="w-full overflow-hidden rounded-2xl border border-[#e7e2d9] bg-white">
+          <div className="border-b border-[#eeeae3] p-4 sm:p-6">
+            <div className="flex min-w-0 items-start gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#111111] text-white">
                 <UserRound size={17} />
               </div>
 
-              <div>
+              <div className="min-w-0">
                 <h2 className="text-sm font-semibold">
                   Personal information
                 </h2>
@@ -99,8 +112,9 @@ function Profile() {
             </div>
           </div>
 
-          <div className="grid gap-5 p-5 sm:grid-cols-2 sm:p-6">
-            <div>
+          <div className="grid min-w-0 grid-cols-1 gap-4 p-4 sm:grid-cols-2 sm:gap-5 sm:p-6">
+            {/* Full Name */}
+            <div className="min-w-0">
               <label className="mb-1.5 block text-xs font-medium text-zinc-600">
                 Full name
               </label>
@@ -108,7 +122,7 @@ function Profile() {
               <div className="relative">
                 <UserRound
                   size={15}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400"
+                  className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400"
                 />
 
                 <input
@@ -117,12 +131,13 @@ function Profile() {
                     update("name", event.target.value)
                   }
                   placeholder="Your name"
-                  className="h-11 w-full rounded-xl border border-[#e5e0d8] bg-[#fbfaf8] pl-10 pr-3 text-sm outline-none transition focus:border-zinc-900"
+                  className="h-11 w-full min-w-0 rounded-xl border border-[#e5e0d8] bg-[#fbfaf8] pl-10 pr-3 text-sm outline-none transition focus:border-zinc-900"
                 />
               </div>
             </div>
 
-            <div>
+            {/* Email */}
+            <div className="min-w-0">
               <label className="mb-1.5 block text-xs font-medium text-zinc-600">
                 Email address
               </label>
@@ -130,7 +145,7 @@ function Profile() {
               <div className="relative">
                 <Mail
                   size={15}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400"
+                  className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400"
                 />
 
                 <input
@@ -140,12 +155,13 @@ function Profile() {
                     update("email", event.target.value)
                   }
                   placeholder="you@example.com"
-                  className="h-11 w-full rounded-xl border border-[#e5e0d8] bg-[#fbfaf8] pl-10 pr-3 text-sm outline-none transition focus:border-zinc-900"
+                  className="h-11 w-full min-w-0 rounded-xl border border-[#e5e0d8] bg-[#fbfaf8] pl-10 pr-3 text-sm outline-none transition focus:border-zinc-900"
                 />
               </div>
             </div>
 
-            <div>
+            {/* Mobile Number */}
+            <div className="min-w-0 sm:col-span-2 lg:col-span-1">
               <label className="mb-1.5 block text-xs font-medium text-zinc-600">
                 Mobile number
               </label>
@@ -153,7 +169,7 @@ function Profile() {
               <div className="relative">
                 <Smartphone
                   size={15}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400"
+                  className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400"
                 />
 
                 <input
@@ -163,27 +179,30 @@ function Profile() {
                     update("phone", event.target.value)
                   }
                   placeholder="+91 98765 43210"
-                  className="h-11 w-full rounded-xl border border-[#e5e0d8] bg-[#fbfaf8] pl-10 pr-3 text-sm outline-none transition focus:border-zinc-900"
+                  className="h-11 w-full min-w-0 rounded-xl border border-[#e5e0d8] bg-[#fbfaf8] pl-10 pr-3 text-sm outline-none transition focus:border-zinc-900"
                 />
               </div>
             </div>
           </div>
         </section>
 
-        {/* Security */}
-        <section className="overflow-hidden rounded-2xl border border-[#e7e2d9] bg-white">
-          <div className="border-b border-[#eeeae3] p-5 sm:p-6">
-            <div className="flex items-start gap-3">
+        {/* =================================================
+            PASSWORD & SECURITY
+        ================================================= */}
+
+        <section className="w-full overflow-hidden rounded-2xl border border-[#e7e2d9] bg-white">
+          <div className="border-b border-[#eeeae3] p-4 sm:p-6">
+            <div className="flex min-w-0 items-start gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#111111] text-white">
                 <LockKeyhole size={17} />
               </div>
 
-              <div>
+              <div className="min-w-0">
                 <h2 className="text-sm font-semibold">
                   Password & security
                 </h2>
 
-                <p className="mt-1 text-xs leading-5 text-zinc-500">
+                <p className="mt-1 max-w-2xl text-xs leading-5 text-zinc-500">
                   Password changes will be connected to the backend
                   security flow.
                 </p>
@@ -191,8 +210,9 @@ function Profile() {
             </div>
           </div>
 
-          <div className="grid gap-5 p-5 sm:grid-cols-2 sm:p-6">
-            <div>
+          <div className="grid min-w-0 grid-cols-1 gap-4 p-4 sm:grid-cols-2 sm:gap-5 sm:p-6">
+            {/* Current Password */}
+            <div className="min-w-0">
               <label className="mb-1.5 block text-xs font-medium text-zinc-600">
                 Current password
               </label>
@@ -207,11 +227,12 @@ function Profile() {
                   )
                 }
                 placeholder="Current password"
-                className="h-11 w-full rounded-xl border border-[#e5e0d8] bg-[#fbfaf8] px-3 text-sm outline-none focus:border-zinc-900"
+                className="h-11 w-full min-w-0 rounded-xl border border-[#e5e0d8] bg-[#fbfaf8] px-3 text-sm outline-none focus:border-zinc-900"
               />
             </div>
 
-            <div>
+            {/* New Password */}
+            <div className="min-w-0">
               <label className="mb-1.5 block text-xs font-medium text-zinc-600">
                 New password
               </label>
@@ -223,11 +244,12 @@ function Profile() {
                   update("newPassword", event.target.value)
                 }
                 placeholder="New password"
-                className="h-11 w-full rounded-xl border border-[#e5e0d8] bg-[#fbfaf8] px-3 text-sm outline-none focus:border-zinc-900"
+                className="h-11 w-full min-w-0 rounded-xl border border-[#e5e0d8] bg-[#fbfaf8] px-3 text-sm outline-none focus:border-zinc-900"
               />
             </div>
 
-            <div>
+            {/* Confirm Password */}
+            <div className="min-w-0">
               <label className="mb-1.5 block text-xs font-medium text-zinc-600">
                 Confirm new password
               </label>
@@ -242,17 +264,18 @@ function Profile() {
                   )
                 }
                 placeholder="Confirm password"
-                className="h-11 w-full rounded-xl border border-[#e5e0d8] bg-[#fbfaf8] px-3 text-sm outline-none focus:border-zinc-900"
+                className="h-11 w-full min-w-0 rounded-xl border border-[#e5e0d8] bg-[#fbfaf8] px-3 text-sm outline-none focus:border-zinc-900"
               />
             </div>
 
-            <div className="flex items-center gap-3 rounded-xl bg-[#f6f3ed] p-4">
+            {/* Security Note */}
+            <div className="flex min-w-0 items-start gap-3 rounded-xl bg-[#f6f3ed] p-4 sm:items-center">
               <ShieldCheck
                 size={18}
-                className="shrink-0 text-[#ae8954]"
+                className="mt-0.5 shrink-0 text-[#ae8954] sm:mt-0"
               />
 
-              <p className="text-xs leading-5 text-zinc-600">
+              <p className="min-w-0 text-xs leading-5 text-zinc-600">
                 Your password update will be handled securely
                 through the API in the next backend stage.
               </p>
@@ -260,20 +283,23 @@ function Profile() {
           </div>
         </section>
 
-        {/* Notifications */}
-        <section className="rounded-2xl border border-[#e7e2d9] bg-white p-5 sm:p-6">
-          <div className="flex items-center justify-between gap-5">
-            <div className="flex items-start gap-3">
+        {/* =================================================
+            NOTIFICATIONS
+        ================================================= */}
+
+        <section className="w-full rounded-2xl border border-[#e7e2d9] bg-white p-4 sm:p-6">
+          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
+            <div className="flex min-w-0 items-start gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#f3f0ea] text-zinc-700">
                 <Bell size={17} />
               </div>
 
-              <div>
+              <div className="min-w-0">
                 <h2 className="text-sm font-semibold">
                   Product notifications
                 </h2>
 
-                <p className="mt-1 text-xs leading-5 text-zinc-500">
+                <p className="mt-1 max-w-xl text-xs leading-5 text-zinc-500">
                   Receive important updates about your workspace.
                 </p>
               </div>
@@ -288,7 +314,7 @@ function Profile() {
                 )
               }
               className={[
-                "relative h-6 w-11 shrink-0 rounded-full transition",
+                "relative h-6 w-11 shrink-0 self-start rounded-full transition sm:self-center",
                 form.notifications
                   ? "bg-[#111111]"
                   : "bg-zinc-200",
@@ -307,10 +333,13 @@ function Profile() {
           </div>
         </section>
 
-        {/* Save */}
-        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
+        {/* =================================================
+            SAVE
+        ================================================= */}
+
+        <div className="flex w-full flex-col gap-3 pb-2 sm:flex-row sm:items-center sm:justify-end">
           {saved && (
-            <span className="flex items-center justify-center gap-1.5 text-xs font-medium text-emerald-600">
+            <span className="flex items-center justify-center gap-1.5 text-xs font-medium text-emerald-600 sm:justify-end">
               <Check size={14} />
               Changes saved
             </span>
@@ -318,7 +347,7 @@ function Profile() {
 
           <button
             type="submit"
-            className="inline-flex h-11 items-center justify-center rounded-xl bg-[#111111] px-6 text-xs font-semibold text-white transition hover:bg-[#ae8954]"
+            className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[#111111] px-6 text-xs font-semibold text-white transition hover:bg-[#ae8954] sm:w-auto"
           >
             Save changes
           </button>

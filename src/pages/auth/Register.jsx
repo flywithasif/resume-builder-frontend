@@ -152,23 +152,20 @@ function Register() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-72px)] bg-[#f8f8f6]">
-
-      <div className="mx-auto grid min-h-[calc(100vh-72px)] max-w-[1440px] lg:grid-cols-[0.9fr_1.1fr]">
-
+    <div className="min-h-[calc(100dvh-72px)] bg-[#f8f8f6]">
+      <div className="mx-auto flex min-h-[calc(100dvh-72px)] w-full max-w-[1440px] lg:grid lg:grid-cols-[0.9fr_1.1fr]">
         {/* =====================================================
             LEFT PREMIUM PANEL
         ====================================================== */}
 
-        <div className="hidden flex-col justify-between border-r border-stone-200 bg-zinc-950 p-10 text-white lg:flex xl:p-14">
-
+        <div className="hidden flex-col justify-between border-r border-stone-200 bg-zinc-950 p-8 text-white lg:flex xl:p-14">
           {/* LOGO */}
 
           <Link
             to="/"
-            className="flex items-center gap-3"
+            className="flex w-fit items-center gap-3"
           >
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-sm font-bold text-zinc-950">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-sm font-bold text-zinc-950">
               R
             </span>
 
@@ -182,13 +179,12 @@ function Register() {
 
           {/* CONTENT */}
 
-          <div className="max-w-lg">
-
+          <div className="my-auto max-w-lg py-10">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#c6a36c]">
               Get started
             </p>
 
-            <h1 className="mt-5 text-5xl font-semibold leading-[1.02] tracking-[-0.05em] xl:text-6xl">
+            <h1 className="mt-5 text-4xl font-semibold leading-[1.05] tracking-[-0.05em] xl:text-6xl">
               Turn your experience into a resume that feels like you.
             </h1>
 
@@ -199,7 +195,6 @@ function Register() {
             </p>
 
             <div className="mt-8 space-y-3">
-
               {[
                 "Start with professional templates",
                 "Edit with a live preview",
@@ -211,40 +206,34 @@ function Register() {
                 >
                   <CheckCircle2
                     size={16}
-                    className="text-[#c6a36c]"
+                    className="shrink-0 text-[#c6a36c]"
                   />
 
-                  {item}
+                  <span>{item}</span>
                 </div>
               ))}
-
             </div>
-
           </div>
 
           <p className="text-xs text-zinc-600">
             Your career story starts here.
           </p>
-
         </div>
 
         {/* =====================================================
             RIGHT REGISTER PANEL
         ====================================================== */}
 
-        <div className="flex items-center justify-center px-5 py-12 sm:px-8">
-
+        <div className="flex min-w-0 items-center justify-center px-4 py-8 sm:px-6 sm:py-10 md:px-8 md:py-12 lg:px-10 xl:px-14">
           <div className="w-full max-w-[440px]">
-
             {/* MOBILE LOGO */}
 
-            <div className="mb-8 lg:hidden">
-
+            <div className="mb-6 sm:mb-8 lg:hidden">
               <Link
                 to="/"
-                className="flex items-center gap-3"
+                className="flex w-fit items-center gap-3"
               >
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-950 text-sm font-bold text-white">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-950 text-sm font-bold text-white">
                   R
                 </span>
 
@@ -255,18 +244,16 @@ function Register() {
                   </span>
                 </span>
               </Link>
-
             </div>
 
             {/* REGISTER CARD */}
 
-            <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-[0_20px_60px_rgba(24,24,27,0.07)] sm:p-8">
-
+            <div className="w-full rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_20px_60px_rgba(24,24,27,0.07)] sm:p-7 md:p-8">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#987542]">
                 Create account
               </p>
 
-              <h2 className="mt-2 text-2xl font-semibold tracking-[-0.035em] text-zinc-950">
+              <h2 className="mt-2 text-xl font-semibold tracking-[-0.035em] text-zinc-950 sm:text-2xl">
                 Create your account
               </h2>
 
@@ -286,14 +273,12 @@ function Register() {
 
               <form
                 onSubmit={handleSubmit}
-                className="mt-7 space-y-4"
+                className="mt-6 space-y-4 sm:mt-7"
                 noValidate
               >
-
                 {/* NAME */}
 
                 <div>
-
                   <label
                     htmlFor="register-name"
                     className="mb-1.5 block text-xs font-medium text-zinc-600"
@@ -302,10 +287,9 @@ function Register() {
                   </label>
 
                   <div className="relative">
-
                     <UserRound
                       size={16}
-                      className="absolute left-3 top-3 text-zinc-400"
+                      className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
                     />
 
                     <input
@@ -321,13 +305,12 @@ function Register() {
                       placeholder="John Doe"
                       autoComplete="name"
                       disabled={loading}
-                      className={`h-11 w-full rounded-xl border bg-white pl-10 pr-3 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:bg-zinc-50 ${
+                      className={`h-11 w-full min-w-0 rounded-xl border bg-white pl-10 pr-3 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:bg-zinc-50 ${
                         errors.name
                           ? "border-red-300 focus:border-red-500"
                           : "border-stone-200 focus:border-zinc-900"
                       }`}
                     />
-
                   </div>
 
                   {errors.name && (
@@ -335,13 +318,11 @@ function Register() {
                       {errors.name}
                     </p>
                   )}
-
                 </div>
 
                 {/* EMAIL */}
 
                 <div>
-
                   <label
                     htmlFor="register-email"
                     className="mb-1.5 block text-xs font-medium text-zinc-600"
@@ -350,10 +331,9 @@ function Register() {
                   </label>
 
                   <div className="relative">
-
                     <Mail
                       size={16}
-                      className="absolute left-3 top-3 text-zinc-400"
+                      className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
                     />
 
                     <input
@@ -369,13 +349,12 @@ function Register() {
                       placeholder="you@example.com"
                       autoComplete="email"
                       disabled={loading}
-                      className={`h-11 w-full rounded-xl border bg-white pl-10 pr-3 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:bg-zinc-50 ${
+                      className={`h-11 w-full min-w-0 rounded-xl border bg-white pl-10 pr-3 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:bg-zinc-50 ${
                         errors.email
                           ? "border-red-300 focus:border-red-500"
                           : "border-stone-200 focus:border-zinc-900"
                       }`}
                     />
-
                   </div>
 
                   {errors.email && (
@@ -383,13 +362,11 @@ function Register() {
                       {errors.email}
                     </p>
                   )}
-
                 </div>
 
                 {/* PASSWORD */}
 
                 <div>
-
                   <label
                     htmlFor="register-password"
                     className="mb-1.5 block text-xs font-medium text-zinc-600"
@@ -398,10 +375,9 @@ function Register() {
                   </label>
 
                   <div className="relative">
-
                     <LockKeyhole
                       size={16}
-                      className="absolute left-3 top-3 text-zinc-400"
+                      className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
                     />
 
                     <input
@@ -421,7 +397,7 @@ function Register() {
                       placeholder="Create a password"
                       autoComplete="new-password"
                       disabled={loading}
-                      className={`h-11 w-full rounded-xl border bg-white pl-10 pr-11 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:bg-zinc-50 ${
+                      className={`h-11 w-full min-w-0 rounded-xl border bg-white pl-10 pr-11 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:bg-zinc-50 ${
                         errors.password
                           ? "border-red-300 focus:border-red-500"
                           : "border-stone-200 focus:border-zinc-900"
@@ -436,7 +412,7 @@ function Register() {
                         )
                       }
                       disabled={loading}
-                      className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center text-zinc-400 hover:text-zinc-900"
+                      className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center text-zinc-400 transition-colors hover:text-zinc-900"
                       aria-label={
                         showPassword
                           ? "Hide password"
@@ -449,7 +425,6 @@ function Register() {
                         <Eye size={16} />
                       )}
                     </button>
-
                   </div>
 
                   {errors.password && (
@@ -457,13 +432,11 @@ function Register() {
                       {errors.password}
                     </p>
                   )}
-
                 </div>
 
                 {/* CONFIRM PASSWORD */}
 
                 <div>
-
                   <label
                     htmlFor="register-confirm-password"
                     className="mb-1.5 block text-xs font-medium text-zinc-600"
@@ -472,10 +445,9 @@ function Register() {
                   </label>
 
                   <div className="relative">
-
                     <LockKeyhole
                       size={16}
-                      className="absolute left-3 top-3 text-zinc-400"
+                      className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
                     />
 
                     <input
@@ -495,7 +467,7 @@ function Register() {
                       placeholder="Confirm your password"
                       autoComplete="new-password"
                       disabled={loading}
-                      className={`h-11 w-full rounded-xl border bg-white pl-10 pr-11 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:bg-zinc-50 ${
+                      className={`h-11 w-full min-w-0 rounded-xl border bg-white pl-10 pr-11 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:bg-zinc-50 ${
                         errors.confirmPassword
                           ? "border-red-300 focus:border-red-500"
                           : "border-stone-200 focus:border-zinc-900"
@@ -510,7 +482,7 @@ function Register() {
                         )
                       }
                       disabled={loading}
-                      className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center text-zinc-400 hover:text-zinc-900"
+                      className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center text-zinc-400 transition-colors hover:text-zinc-900"
                       aria-label={
                         showConfirmPassword
                           ? "Hide password"
@@ -523,7 +495,6 @@ function Register() {
                         <Eye size={16} />
                       )}
                     </button>
-
                   </div>
 
                   {errors.confirmPassword && (
@@ -531,7 +502,6 @@ function Register() {
                       {errors.confirmPassword}
                     </p>
                   )}
-
                 </div>
 
                 {/* SUBMIT */}
@@ -539,23 +509,24 @@ function Register() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-zinc-950 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-zinc-950 px-4 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {loading
                     ? "Creating account..."
                     : "Create Account"}
 
                   {!loading && (
-                    <ArrowRight size={16} />
+                    <ArrowRight
+                      size={16}
+                      className="shrink-0"
+                    />
                   )}
                 </button>
-
               </form>
 
               {/* LOGIN */}
 
-              <p className="mt-7 text-center text-sm text-zinc-500">
-
+              <p className="mt-6 text-center text-sm leading-6 text-zinc-500 sm:mt-7">
                 Already have an account?{" "}
 
                 <Link
@@ -572,17 +543,11 @@ function Register() {
                 >
                   Sign in
                 </Link>
-
               </p>
-
             </div>
-
           </div>
-
         </div>
-
       </div>
-
     </div>
   );
 }

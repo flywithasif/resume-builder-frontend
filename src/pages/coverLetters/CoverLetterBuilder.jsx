@@ -65,7 +65,7 @@ const defaultData = {
 function getSavedLetters() {
   try {
     const data = JSON.parse(
-      localStorage.getItem(STORAGE_KEY) || "[]"
+      localStorage.getItem(STORAGE_KEY) || "[]",
     );
 
     return Array.isArray(data) ? data : [];
@@ -79,7 +79,7 @@ function getQueryTemplate(searchParams) {
 
   return (
     coverLetterTemplates.find(
-      (template) => template.id === queryTemplate
+      (template) => template.id === queryTemplate,
     )?.id || "modern"
   );
 }
@@ -92,7 +92,7 @@ function InputField({
   type = "text",
 }) {
   return (
-    <label className="block">
+    <label className="block min-w-0">
       <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-zinc-500">
         {label}
       </span>
@@ -102,7 +102,7 @@ function InputField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="h-10 w-full rounded-lg border border-[#e2ddd4] bg-white px-3 text-sm text-zinc-900 outline-none transition focus:border-[#987542] focus:ring-2 focus:ring-[#987542]/10"
+        className="h-10 w-full min-w-0 rounded-lg border border-[#e2ddd4] bg-white px-3 text-sm text-zinc-900 outline-none transition focus:border-[#987542] focus:ring-2 focus:ring-[#987542]/10"
       />
     </label>
   );
@@ -115,7 +115,7 @@ function TextAreaField({
   rows = 5,
 }) {
   return (
-    <label className="block">
+    <label className="block min-w-0">
       <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-zinc-500">
         {label}
       </span>
@@ -124,7 +124,7 @@ function TextAreaField({
         rows={rows}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full resize-y rounded-lg border border-[#e2ddd4] bg-white px-3 py-2.5 text-sm leading-6 text-zinc-900 outline-none transition focus:border-[#987542] focus:ring-2 focus:ring-[#987542]/10"
+        className="w-full min-w-0 resize-y rounded-lg border border-[#e2ddd4] bg-white px-3 py-2.5 text-sm leading-6 text-zinc-900 outline-none transition focus:border-[#987542] focus:ring-2 focus:ring-[#987542]/10"
       />
     </label>
   );
@@ -151,7 +151,17 @@ function CoverLetterPreview({ data, template }) {
   return (
     <div
       id="cover-letter-print-area"
-      className="cover-letter-paper relative min-h-[1123px] w-[794px] shrink-0 bg-white px-[72px] py-[66px] text-zinc-900 shadow-[0_20px_60px_rgba(0,0,0,0.12)]"
+      className="
+        cover-letter-paper
+        relative
+        w-full
+        max-w-[794px]
+        shrink-0
+        overflow-hidden
+        bg-white
+        text-zinc-900
+        shadow-[0_20px_60px_rgba(0,0,0,0.12)]
+      "
     >
       {/* MODERN TOP */}
       {!isMinimal && (
@@ -169,10 +179,10 @@ function CoverLetterPreview({ data, template }) {
             : "border-zinc-200"
         }`}
       >
-        <div className="flex items-start justify-between gap-8">
+        <div className="flex items-start justify-between gap-5 sm:gap-8">
           <div className="min-w-0">
             <h1
-              className={`break-words text-[28px] font-bold tracking-[-0.03em] ${
+              className={`break-words text-[clamp(22px,4vw,28px)] font-bold tracking-[-0.03em] ${
                 isBold ? "uppercase" : ""
               }`}
               style={{
@@ -185,89 +195,109 @@ function CoverLetterPreview({ data, template }) {
               {data.fullName || "Your Name"}
             </h1>
 
-            <p className="mt-2 text-[11px] font-medium text-zinc-500">
+            <p className="mt-2 break-words text-[10px] font-medium text-zinc-500 sm:text-[11px]">
               {data.position || "Job Position"}
             </p>
           </div>
 
           {isCreative && (
             <div
-              className="h-11 w-11 shrink-0 rounded-full"
+              className="h-9 w-9 shrink-0 rounded-full sm:h-11 sm:w-11"
               style={{ backgroundColor: accent }}
             />
           )}
         </div>
 
-        <div className="mt-5 flex flex-wrap gap-x-5 gap-y-1 text-[10px] text-zinc-500">
-          {data.email && <span>{data.email}</span>}
-          {data.phone && <span>{data.phone}</span>}
-          {data.location && <span>{data.location}</span>}
+        <div className="mt-5 flex flex-wrap gap-x-4 gap-y-1 break-words text-[9px] text-zinc-500 sm:gap-x-5 sm:text-[10px]">
+          {data.email && (
+            <span className="break-all">
+              {data.email}
+            </span>
+          )}
+
+          {data.phone && (
+            <span className="break-words">
+              {data.phone}
+            </span>
+          )}
+
+          {data.location && (
+            <span className="break-words">
+              {data.location}
+            </span>
+          )}
         </div>
       </header>
 
       {/* RECIPIENT */}
-      <section className="mt-9">
-        <div className="flex justify-between gap-8">
-          <div className="text-[11px] leading-5 text-zinc-600">
-            <p className="font-semibold text-zinc-900">
+      <section className="mt-7 sm:mt-9">
+        <div className="flex items-start justify-between gap-5 sm:gap-8">
+          <div className="min-w-0 text-[10px] leading-5 text-zinc-600 sm:text-[11px]">
+            <p className="break-words font-semibold text-zinc-900">
               {data.hiringManager || "Hiring Manager"}
             </p>
 
-            <p>{data.company || "Company Name"}</p>
+            <p className="break-words">
+              {data.company || "Company Name"}
+            </p>
 
             {data.companyAddress && (
-              <p>{data.companyAddress}</p>
+              <p className="break-words">
+                {data.companyAddress}
+              </p>
             )}
           </div>
 
-          <p className="text-right text-[10px] text-zinc-500">
+          <p className="shrink-0 text-right text-[9px] text-zinc-500 sm:text-[10px]">
             {data.date}
           </p>
         </div>
       </section>
 
       {/* SUBJECT */}
-      <section className="mt-8">
+      <section className="mt-7 sm:mt-8">
         <p
-          className="text-[11px] font-bold"
+          className="break-words text-[10px] font-bold sm:text-[11px]"
           style={{ color: accent }}
         >
           {data.subject ||
-            `Application for ${data.position || "Job Position"}`}
+            `Application for ${
+              data.position || "Job Position"
+            }`}
         </p>
       </section>
 
       {/* CONTENT */}
       <main
-        className={`mt-7 text-[11.5px] leading-[1.8] text-zinc-700 ${
+        className={`mt-6 break-words text-[10.5px] leading-[1.8] text-zinc-700 sm:mt-7 sm:text-[11.5px] ${
           isExecutive ? "leading-[1.9]" : ""
         }`}
       >
-        <p className="font-medium text-zinc-900">
+        <p className="break-words font-medium text-zinc-900">
           {data.greeting}
         </p>
 
-        <p className="mt-6 whitespace-pre-line">
+        <p className="mt-5 whitespace-pre-line break-words sm:mt-6">
           {data.opening}
         </p>
 
-        <p className="mt-5 whitespace-pre-line">
+        <p className="mt-4 whitespace-pre-line break-words sm:mt-5">
           {data.body}
         </p>
 
-        <p className="mt-5 whitespace-pre-line">
+        <p className="mt-4 whitespace-pre-line break-words sm:mt-5">
           {data.secondBody}
         </p>
 
-        <p className="mt-5 whitespace-pre-line">
+        <p className="mt-4 whitespace-pre-line break-words sm:mt-5">
           {data.closing}
         </p>
 
-        <div className="mt-9">
+        <div className="mt-8 sm:mt-9">
           <p>{data.signOff}</p>
 
           <p
-            className="mt-5 font-semibold"
+            className="mt-4 break-words font-semibold sm:mt-5"
             style={{ color: accent }}
           >
             {data.fullName || "Your Name"}
@@ -276,10 +306,15 @@ function CoverLetterPreview({ data, template }) {
       </main>
 
       {/* FOOTER */}
-      <footer className="absolute bottom-9 left-[72px] right-[72px] border-t border-zinc-100 pt-3">
-        <div className="flex items-center justify-between text-[8px] uppercase tracking-[0.12em] text-zinc-400">
-          <span>{data.fullName || "Your Name"}</span>
-          <span>{template?.name || "Modern"}</span>
+      <footer className="absolute bottom-6 left-[6%] right-[6%] border-t border-zinc-100 pt-3 sm:bottom-9">
+        <div className="flex items-center justify-between gap-4 text-[7px] uppercase tracking-[0.12em] text-zinc-400 sm:text-[8px]">
+          <span className="min-w-0 truncate">
+            {data.fullName || "Your Name"}
+          </span>
+
+          <span className="shrink-0">
+            {template?.name || "Modern"}
+          </span>
         </div>
       </footer>
     </div>
@@ -298,7 +333,7 @@ function CoverLetterBuilder() {
 
     if (editingId) {
       const existing = savedLetters.find(
-        (item) => String(item.id) === String(editingId)
+        (item) => String(item.id) === String(editingId),
       );
 
       if (existing) {
@@ -321,7 +356,7 @@ function CoverLetterBuilder() {
   const selectedTemplate = useMemo(() => {
     return (
       coverLetterTemplates.find(
-        (template) => template.id === data.template
+        (template) => template.id === data.template,
       ) || coverLetterTemplates[0]
     );
   }, [data.template]);
@@ -335,17 +370,25 @@ function CoverLetterBuilder() {
           ...current,
           template: queryTemplate,
         }));
+
         return;
       }
 
       try {
-        const token = localStorage.getItem("resumely_token");
+        const token = localStorage.getItem(
+          "resumely_token",
+        );
 
         if (token) {
-          const result = await getCoverLetterFromApi(editingId);
+          const result =
+            await getCoverLetterFromApi(editingId);
 
-          if (!cancelled && result?.coverLetter) {
-            const serverLetter = result.coverLetter;
+          if (
+            !cancelled &&
+            result?.coverLetter
+          ) {
+            const serverLetter =
+              result.coverLetter;
 
             setData({
               ...defaultData,
@@ -359,8 +402,10 @@ function CoverLetterBuilder() {
                 serverLetter.template ||
                 serverLetter.data?.template ||
                 queryTemplate,
-              createdAt: serverLetter.createdAt,
-              updatedAt: serverLetter.updatedAt,
+              createdAt:
+                serverLetter.createdAt,
+              updatedAt:
+                serverLetter.updatedAt,
             });
 
             return;
@@ -376,8 +421,11 @@ function CoverLetterBuilder() {
       if (cancelled) return;
 
       const savedLetters = getSavedLetters();
+
       const existing = savedLetters.find(
-        (item) => String(item.id) === String(editingId),
+        (item) =>
+          String(item.id) ===
+          String(editingId),
       );
 
       if (existing) {
@@ -409,10 +457,11 @@ function CoverLetterBuilder() {
 
     const isMongoId =
       typeof data.id === "string" &&
-      /^[a-f\\d]{24}$/i.test(data.id);
+      /^[a-f\d]{24}$/i.test(data.id);
 
     const serverId =
-      editingId && /^[a-f\\d]{24}$/i.test(editingId)
+      editingId &&
+      /^[a-f\d]{24}$/i.test(editingId)
         ? editingId
         : isMongoId
           ? data.id
@@ -434,15 +483,21 @@ function CoverLetterBuilder() {
     delete payload.data.id;
 
     try {
-      const token = localStorage.getItem("resumely_token");
+      const token = localStorage.getItem(
+        "resumely_token",
+      );
 
       if (token) {
         const result = serverId
-          ? await updateCoverLetterOnApi(serverId, payload)
+          ? await updateCoverLetterOnApi(
+              serverId,
+              payload,
+            )
           : await createCoverLetter(payload);
 
         if (result?.coverLetter) {
-          const serverLetter = result.coverLetter;
+          const serverLetter =
+            result.coverLetter;
 
           const letter = {
             ...(serverLetter.data || data),
@@ -455,8 +510,10 @@ function CoverLetterBuilder() {
               serverLetter.template ||
               serverLetter.data?.template ||
               data.template,
-            createdAt: serverLetter.createdAt,
-            updatedAt: serverLetter.updatedAt,
+            createdAt:
+              serverLetter.createdAt,
+            updatedAt:
+              serverLetter.updatedAt,
           };
 
           setData(letter);
@@ -488,12 +545,16 @@ function CoverLetterBuilder() {
       updatedAt: new Date().toISOString(),
       createdAt:
         existingLetters.find(
-          (item) => String(item.id) === String(id),
-        )?.createdAt || new Date().toISOString(),
+          (item) =>
+            String(item.id) ===
+            String(id),
+        )?.createdAt ||
+        new Date().toISOString(),
     };
 
     const index = existingLetters.findIndex(
-      (item) => String(item.id) === String(id),
+      (item) =>
+        String(item.id) === String(id),
     );
 
     let updated;
@@ -502,7 +563,10 @@ function CoverLetterBuilder() {
       updated = [...existingLetters];
       updated[index] = letter;
     } else {
-      updated = [letter, ...existingLetters];
+      updated = [
+        letter,
+        ...existingLetters,
+      ];
     }
 
     localStorage.setItem(
@@ -534,49 +598,110 @@ function CoverLetterBuilder() {
       const pageWidth = 210;
       const pageHeight = 297;
       const margin = 20;
-      const contentWidth = pageWidth - margin * 2;
+      const contentWidth =
+        pageWidth - margin * 2;
 
       const hexToRgb = (hex) => {
-        const clean = String(hex || "#987542").replace("#", "");
+        const clean = String(
+          hex || "#987542",
+        ).replace("#", "");
+
         const value =
           clean.length === 3
             ? clean
                 .split("")
-                .map((value) => value + value)
+                .map(
+                  (value) =>
+                    value + value,
+                )
                 .join("")
             : clean;
 
         return {
-          r: parseInt(value.substring(0, 2), 16) || 152,
-          g: parseInt(value.substring(2, 4), 16) || 117,
-          b: parseInt(value.substring(4, 6), 16) || 66,
+          r:
+            parseInt(
+              value.substring(0, 2),
+              16,
+            ) || 152,
+          g:
+            parseInt(
+              value.substring(2, 4),
+              16,
+            ) || 117,
+          b:
+            parseInt(
+              value.substring(4, 6),
+              16,
+            ) || 66,
         };
       };
 
-      const accentRgb = hexToRgb(selectedTemplate?.accent);
+      const accentRgb = hexToRgb(
+        selectedTemplate?.accent,
+      );
 
       if (
-        selectedTemplate?.layout !== "minimal" &&
-        selectedTemplate?.layout !== "simple" &&
-        selectedTemplate?.layout !== "ats"
+        selectedTemplate?.layout !==
+          "minimal" &&
+        selectedTemplate?.layout !==
+          "simple" &&
+        selectedTemplate?.layout !==
+          "ats"
       ) {
         pdf.setFillColor(
           accentRgb.r,
           accentRgb.g,
           accentRgb.b,
         );
-        pdf.rect(0, 0, pageWidth, 3, "F");
+
+        pdf.rect(
+          0,
+          0,
+          pageWidth,
+          3,
+          "F",
+        );
       }
 
-      pdf.setTextColor(24, 24, 27);
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(20);
-      pdf.text(data.fullName || "Your Name", margin, 28);
+      pdf.setTextColor(
+        24,
+        24,
+        27,
+      );
 
-      pdf.setFont("helvetica", "normal");
+      pdf.setFont(
+        "helvetica",
+        "bold",
+      );
+
+      pdf.setFontSize(20);
+
+      pdf.text(
+        data.fullName ||
+          "Your Name",
+        margin,
+        28,
+      );
+
+      pdf.setFont(
+        "helvetica",
+        "normal",
+      );
+
       pdf.setFontSize(9);
-      pdf.setTextColor(113, 113, 122);
-      pdf.text(data.position || "Job Position", margin, 35);
+
+      pdf.setTextColor(
+        113,
+        113,
+        122,
+      );
+
+      pdf.text(
+        data.position ||
+          "Job Position",
+        margin,
+        35,
+      );
 
       const contact = [
         data.email,
@@ -587,27 +712,58 @@ function CoverLetterBuilder() {
         .join("   •   ");
 
       pdf.setFontSize(8);
-      pdf.text(contact, margin, 42);
 
-      pdf.setDrawColor(228, 228, 231);
-      pdf.line(margin, 49, pageWidth - margin, 49);
+      pdf.text(
+        contact,
+        margin,
+        42,
+      );
+
+      pdf.setDrawColor(
+        228,
+        228,
+        231,
+      );
+
+      pdf.line(
+        margin,
+        49,
+        pageWidth - margin,
+        49,
+      );
 
       let y = 63;
 
-      pdf.setTextColor(39, 39, 42);
-      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(
+        39,
+        39,
+        42,
+      );
+
+      pdf.setFont(
+        "helvetica",
+        "bold",
+      );
+
       pdf.setFontSize(9);
+
       pdf.text(
-        data.hiringManager || "Hiring Manager",
+        data.hiringManager ||
+          "Hiring Manager",
         margin,
         y,
       );
 
       y += 5;
 
-      pdf.setFont("helvetica", "normal");
+      pdf.setFont(
+        "helvetica",
+        "normal",
+      );
+
       pdf.text(
-        data.company || "Company Name",
+        data.company ||
+          "Company Name",
         margin,
         y,
       );
@@ -615,15 +771,31 @@ function CoverLetterBuilder() {
       y += 5;
 
       if (data.companyAddress) {
-        pdf.text(data.companyAddress, margin, y);
+        pdf.text(
+          data.companyAddress,
+          margin,
+          y,
+        );
+
         y += 5;
       }
 
-      pdf.setTextColor(113, 113, 122);
+      pdf.setTextColor(
+        113,
+        113,
+        122,
+      );
+
       pdf.setFontSize(8);
-      pdf.text(data.date || "", pageWidth - margin, 63, {
-        align: "right",
-      });
+
+      pdf.text(
+        data.date || "",
+        pageWidth - margin,
+        63,
+        {
+          align: "right",
+        },
+      );
 
       y += 13;
 
@@ -632,54 +804,102 @@ function CoverLetterBuilder() {
         accentRgb.g,
         accentRgb.b,
       );
-      pdf.setFont("helvetica", "bold");
+
+      pdf.setFont(
+        "helvetica",
+        "bold",
+      );
+
       pdf.setFontSize(9);
+
       pdf.text(
         data.subject ||
-          `Application for ${data.position || "Job Position"}`,
+          `Application for ${
+            data.position ||
+            "Job Position"
+          }`,
         margin,
         y,
       );
 
       y += 13;
 
-      pdf.setTextColor(63, 63, 70);
-      pdf.setFont("helvetica", "normal");
+      pdf.setTextColor(
+        63,
+        63,
+        70,
+      );
+
+      pdf.setFont(
+        "helvetica",
+        "normal",
+      );
+
       pdf.setFontSize(9.5);
 
       const lineHeight = 5.4;
 
-      const addParagraph = (text, spacing = 7) => {
+      const addParagraph = (
+        text,
+        spacing = 7,
+      ) => {
         if (!text) return;
 
-        const lines = pdf.splitTextToSize(
-          String(text),
-          contentWidth,
-        );
+        const lines =
+          pdf.splitTextToSize(
+            String(text),
+            contentWidth,
+          );
 
         const requiredHeight =
-          lines.length * lineHeight + spacing;
+          lines.length *
+            lineHeight +
+          spacing;
 
-        if (y + requiredHeight > pageHeight - 28) {
+        if (
+          y + requiredHeight >
+          pageHeight - 28
+        ) {
           pdf.addPage();
           y = margin;
         }
 
-        pdf.text(lines, margin, y);
-        y += lines.length * lineHeight + spacing;
+        pdf.text(
+          lines,
+          margin,
+          y,
+        );
+
+        y +=
+          lines.length *
+            lineHeight +
+          spacing;
       };
 
-      pdf.setFont("helvetica", "bold");
-      pdf.setTextColor(39, 39, 42);
+      pdf.setFont(
+        "helvetica",
+        "bold",
+      );
+
+      pdf.setTextColor(
+        39,
+        39,
+        42,
+      );
+
       pdf.text(
-        data.greeting || "Dear Hiring Manager,",
+        data.greeting ||
+          "Dear Hiring Manager,",
         margin,
         y,
       );
 
       y += 11;
 
-      pdf.setFont("helvetica", "normal");
+      pdf.setFont(
+        "helvetica",
+        "normal",
+      );
 
       addParagraph(data.opening);
       addParagraph(data.body);
@@ -694,26 +914,38 @@ function CoverLetterBuilder() {
       }
 
       pdf.text(
-        data.signOff || "Sincerely,",
+        data.signOff ||
+          "Sincerely,",
         margin,
         y,
       );
 
       y += 12;
 
-      pdf.setFont("helvetica", "bold");
+      pdf.setFont(
+        "helvetica",
+        "bold",
+      );
+
       pdf.setTextColor(
         accentRgb.r,
         accentRgb.g,
         accentRgb.b,
       );
+
       pdf.text(
-        data.fullName || "Your Name",
+        data.fullName ||
+          "Your Name",
         margin,
         y,
       );
 
-      pdf.setDrawColor(240, 240, 241);
+      pdf.setDrawColor(
+        240,
+        240,
+        241,
+      );
+
       pdf.line(
         margin,
         pageHeight - 18,
@@ -721,21 +953,34 @@ function CoverLetterBuilder() {
         pageHeight - 18,
       );
 
-      pdf.setFont("helvetica", "normal");
+      pdf.setFont(
+        "helvetica",
+        "normal",
+      );
+
       pdf.setFontSize(6.5);
-      pdf.setTextColor(161, 161, 170);
+
+      pdf.setTextColor(
+        161,
+        161,
+        170,
+      );
 
       pdf.text(
-        data.fullName || "Your Name",
+        data.fullName ||
+          "Your Name",
         margin,
         pageHeight - 12,
       );
 
       pdf.text(
-        selectedTemplate?.name || "Modern",
+        selectedTemplate?.name ||
+          "Modern",
         pageWidth - margin,
         pageHeight - 12,
-        { align: "right" },
+        {
+          align: "right",
+        },
       );
 
       const safeName = (
@@ -745,11 +990,22 @@ function CoverLetterBuilder() {
         }`
       )
         .trim()
-        .replace(/[^a-z0-9]+/gi, "-")
-        .replace(/^-+|-+$/g, "")
+        .replace(
+          /[^a-z0-9]+/gi,
+          "-",
+        )
+        .replace(
+          /^-+|-+$/g,
+          "",
+        )
         .toLowerCase();
 
-      pdf.save(`${safeName || "cover-letter"}.pdf`);
+      pdf.save(
+        `${
+          safeName ||
+          "cover-letter"
+        }.pdf`,
+      );
     } catch (error) {
       console.error(
         "Cover letter PDF download failed:",
@@ -763,14 +1019,14 @@ function CoverLetterBuilder() {
   };
 
   return (
-    <div className="min-h-screen bg-[#eeece7]">
+    <div className="min-h-screen overflow-x-hidden bg-[#eeece7]">
       {/* =====================================================
           HEADER
       ====================================================== */}
 
       <header className="sticky top-0 z-50 border-b border-[#ddd8cf] bg-white/95 backdrop-blur">
-        <div className="flex h-[68px] items-center justify-between px-4 sm:px-6">
-          <div className="flex min-w-0 items-center gap-3">
+        <div className="flex min-h-[64px] items-center justify-between gap-2 px-3 sm:min-h-[68px] sm:px-6">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             <Link
               to="/dashboard/cover-letters"
               className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#e2ddd4] text-zinc-600 transition hover:bg-[#f5f2ed]"
@@ -779,51 +1035,60 @@ function CoverLetterBuilder() {
             </Link>
 
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-zinc-950">
+              <p className="truncate text-[13px] font-semibold text-zinc-950 sm:text-sm">
                 {editingId
                   ? "Edit Cover Letter"
                   : "New Cover Letter"}
               </p>
 
-              <p className="hidden text-[10px] text-zinc-400 sm:block">
+              <p className="hidden truncate text-[10px] text-zinc-400 sm:block">
                 {selectedTemplate.name} template
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <button
               type="button"
               onClick={() =>
-                setPreviewMobile((current) => !current)
+                setPreviewMobile(
+                  (current) => !current,
+                )
               }
-              className="flex h-9 items-center gap-2 rounded-lg border border-[#e2ddd4] bg-white px-3 text-xs font-medium text-zinc-700 hover:bg-[#f5f2ed] lg:hidden"
+              className="flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-[#e2ddd4] bg-white px-2.5 text-xs font-medium text-zinc-700 hover:bg-[#f5f2ed] sm:px-3 lg:hidden"
             >
               <Eye size={15} />
-              Preview
+
+              <span className="hidden xs:inline">
+                Preview
+              </span>
             </button>
 
             <button
               type="button"
               onClick={handleSave}
-              className={`flex h-9 items-center gap-2 rounded-lg px-3 text-xs font-semibold transition ${
+              className={`flex h-9 shrink-0 items-center gap-2 rounded-lg px-2.5 text-xs font-semibold transition sm:px-3 ${
                 saved
                   ? "bg-emerald-600 text-white"
                   : "border border-[#e2ddd4] bg-white text-zinc-700 hover:bg-[#f5f2ed]"
               }`}
             >
               <Save size={15} />
+
               <span className="hidden sm:inline">
-                {saved ? "Saved" : "Save"}
+                {saved
+                  ? "Saved"
+                  : "Save"}
               </span>
             </button>
 
             <button
               type="button"
               onClick={handleDownload}
-              className="flex h-9 items-center gap-2 rounded-lg bg-zinc-950 px-3 text-xs font-semibold text-white transition hover:bg-[#987542]"
+              className="flex h-9 shrink-0 items-center gap-2 rounded-lg bg-zinc-950 px-2.5 text-xs font-semibold text-white transition hover:bg-[#987542] sm:px-3"
             >
               <Download size={15} />
+
               <span className="hidden sm:inline">
                 Download
               </span>
@@ -836,20 +1101,40 @@ function CoverLetterBuilder() {
           WORKSPACE
       ====================================================== */}
 
-      <main className="mx-auto grid max-w-[1700px] gap-5 p-4 sm:p-6 lg:grid-cols-[430px_minmax(0,1fr)] lg:p-7">
+      <main
+        className="
+          mx-auto
+          grid
+          w-full
+          max-w-[1700px]
+          gap-4
+          p-3
+          sm:gap-5
+          sm:p-5
+          md:p-6
+          lg:grid-cols-[minmax(340px,430px)_minmax(0,1fr)]
+          lg:p-7
+          xl:grid-cols-[430px_minmax(0,1fr)]
+        "
+      >
         {/* ===================================================
             LEFT EDITOR
         ==================================================== */}
 
         <aside
-          className={`space-y-4 ${
-            previewMobile ? "hidden lg:block" : ""
+          className={`min-w-0 space-y-4 ${
+            previewMobile
+              ? "hidden lg:block"
+              : ""
           }`}
         >
           {/* TEMPLATE */}
-          <section className="rounded-2xl border border-[#ded9d0] bg-white p-5">
+          <section className="rounded-2xl border border-[#ded9d0] bg-white p-4 sm:p-5">
             <div className="flex items-center gap-2">
-              <Sparkles size={15} className="text-[#987542]" />
+              <Sparkles
+                size={15}
+                className="text-[#987542]"
+              />
 
               <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#987542]">
                 Template
@@ -860,30 +1145,36 @@ function CoverLetterBuilder() {
               <select
                 value={data.template}
                 onChange={(e) =>
-                  updateField("template", e.target.value)
+                  updateField(
+                    "template",
+                    e.target.value,
+                  )
                 }
                 className="h-11 w-full rounded-xl border border-[#e2ddd4] bg-[#faf9f7] px-3 text-sm font-medium text-zinc-900 outline-none focus:border-[#987542]"
               >
-                {coverLetterTemplates.map((template) => (
-                  <option
-                    key={template.id}
-                    value={template.id}
-                  >
-                    {template.name} — {template.category}
-                  </option>
-                ))}
+                {coverLetterTemplates.map(
+                  (template) => (
+                    <option
+                      key={template.id}
+                      value={template.id}
+                    >
+                      {template.name} —{" "}
+                      {template.category}
+                    </option>
+                  ),
+                )}
               </select>
             </div>
           </section>
 
           {/* BASIC INFO */}
-          <section className="rounded-2xl border border-[#ded9d0] bg-white p-5">
+          <section className="rounded-2xl border border-[#ded9d0] bg-white p-4 sm:p-5">
             <div className="mb-5 flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#f3ede3] text-[#987542]">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#f3ede3] text-[#987542]">
                 <FileText size={15} />
               </div>
 
-              <div>
+              <div className="min-w-0">
                 <h2 className="text-sm font-semibold text-zinc-950">
                   Personal Information
                 </h2>
@@ -899,7 +1190,10 @@ function CoverLetterBuilder() {
                 label="Letter Name"
                 value={data.title}
                 onChange={(value) =>
-                  updateField("title", value)
+                  updateField(
+                    "title",
+                    value,
+                  )
                 }
                 placeholder="My Cover Letter"
               />
@@ -908,7 +1202,10 @@ function CoverLetterBuilder() {
                 label="Full Name"
                 value={data.fullName}
                 onChange={(value) =>
-                  updateField("fullName", value)
+                  updateField(
+                    "fullName",
+                    value,
+                  )
                 }
                 placeholder="Your Name"
               />
@@ -918,7 +1215,10 @@ function CoverLetterBuilder() {
                   label="Email"
                   value={data.email}
                   onChange={(value) =>
-                    updateField("email", value)
+                    updateField(
+                      "email",
+                      value,
+                    )
                   }
                   placeholder="you@example.com"
                   type="email"
@@ -928,7 +1228,10 @@ function CoverLetterBuilder() {
                   label="Phone"
                   value={data.phone}
                   onChange={(value) =>
-                    updateField("phone", value)
+                    updateField(
+                      "phone",
+                      value,
+                    )
                   }
                   placeholder="+91..."
                 />
@@ -938,7 +1241,10 @@ function CoverLetterBuilder() {
                 label="Location"
                 value={data.location}
                 onChange={(value) =>
-                  updateField("location", value)
+                  updateField(
+                    "location",
+                    value,
+                  )
                 }
                 placeholder="Gurgaon, India"
               />
@@ -947,7 +1253,10 @@ function CoverLetterBuilder() {
                 label="Date"
                 value={data.date}
                 onChange={(value) =>
-                  updateField("date", value)
+                  updateField(
+                    "date",
+                    value,
+                  )
                 }
                 placeholder="28 September 2026"
               />
@@ -955,7 +1264,7 @@ function CoverLetterBuilder() {
           </section>
 
           {/* JOB INFO */}
-          <section className="rounded-2xl border border-[#ded9d0] bg-white p-5">
+          <section className="rounded-2xl border border-[#ded9d0] bg-white p-4 sm:p-5">
             <div className="mb-5">
               <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#987542]">
                 Job Information
@@ -969,9 +1278,14 @@ function CoverLetterBuilder() {
             <div className="space-y-4">
               <InputField
                 label="Hiring Manager"
-                value={data.hiringManager}
+                value={
+                  data.hiringManager
+                }
                 onChange={(value) =>
-                  updateField("hiringManager", value)
+                  updateField(
+                    "hiringManager",
+                    value,
+                  )
                 }
                 placeholder="Hiring Manager"
               />
@@ -980,16 +1294,24 @@ function CoverLetterBuilder() {
                 label="Company"
                 value={data.company}
                 onChange={(value) =>
-                  updateField("company", value)
+                  updateField(
+                    "company",
+                    value,
+                  )
                 }
                 placeholder="Company Name"
               />
 
               <InputField
                 label="Company Address"
-                value={data.companyAddress}
+                value={
+                  data.companyAddress
+                }
                 onChange={(value) =>
-                  updateField("companyAddress", value)
+                  updateField(
+                    "companyAddress",
+                    value,
+                  )
                 }
                 placeholder="Company Address"
               />
@@ -998,7 +1320,10 @@ function CoverLetterBuilder() {
                 label="Position"
                 value={data.position}
                 onChange={(value) =>
-                  updateField("position", value)
+                  updateField(
+                    "position",
+                    value,
+                  )
                 }
                 placeholder="Job Position"
               />
@@ -1007,7 +1332,10 @@ function CoverLetterBuilder() {
                 label="Subject"
                 value={data.subject}
                 onChange={(value) =>
-                  updateField("subject", value)
+                  updateField(
+                    "subject",
+                    value,
+                  )
                 }
                 placeholder="Application for..."
               />
@@ -1016,7 +1344,10 @@ function CoverLetterBuilder() {
                 label="Greeting"
                 value={data.greeting}
                 onChange={(value) =>
-                  updateField("greeting", value)
+                  updateField(
+                    "greeting",
+                    value,
+                  )
                 }
                 placeholder="Dear Hiring Manager,"
               />
@@ -1024,7 +1355,7 @@ function CoverLetterBuilder() {
           </section>
 
           {/* CONTENT */}
-          <section className="rounded-2xl border border-[#ded9d0] bg-white p-5">
+          <section className="rounded-2xl border border-[#ded9d0] bg-white p-4 sm:p-5">
             <div className="mb-5">
               <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#987542]">
                 Content
@@ -1040,7 +1371,10 @@ function CoverLetterBuilder() {
                 label="Opening Paragraph"
                 value={data.opening}
                 onChange={(value) =>
-                  updateField("opening", value)
+                  updateField(
+                    "opening",
+                    value,
+                  )
                 }
                 rows={6}
               />
@@ -1049,7 +1383,10 @@ function CoverLetterBuilder() {
                 label="Main Body"
                 value={data.body}
                 onChange={(value) =>
-                  updateField("body", value)
+                  updateField(
+                    "body",
+                    value,
+                  )
                 }
                 rows={7}
               />
@@ -1058,7 +1395,10 @@ function CoverLetterBuilder() {
                 label="Second Paragraph"
                 value={data.secondBody}
                 onChange={(value) =>
-                  updateField("secondBody", value)
+                  updateField(
+                    "secondBody",
+                    value,
+                  )
                 }
                 rows={7}
               />
@@ -1067,7 +1407,10 @@ function CoverLetterBuilder() {
                 label="Closing"
                 value={data.closing}
                 onChange={(value) =>
-                  updateField("closing", value)
+                  updateField(
+                    "closing",
+                    value,
+                  )
                 }
                 rows={6}
               />
@@ -1076,7 +1419,10 @@ function CoverLetterBuilder() {
                 label="Sign Off"
                 value={data.signOff}
                 onChange={(value) =>
-                  updateField("signOff", value)
+                  updateField(
+                    "signOff",
+                    value,
+                  )
                 }
                 placeholder="Sincerely,"
               />
@@ -1094,7 +1440,10 @@ function CoverLetterBuilder() {
             }`}
           >
             <Save size={16} />
-            {saved ? "Cover Letter Saved" : "Save Cover Letter"}
+
+            {saved
+              ? "Cover Letter Saved"
+              : "Save Cover Letter"}
           </button>
         </aside>
 
@@ -1103,8 +1452,10 @@ function CoverLetterBuilder() {
         ==================================================== */}
 
         <section
-          className={`min-w-0 rounded-2xl border border-[#d8d3ca] bg-[#dcd9d2] p-3 sm:p-6 lg:p-8 ${
-            previewMobile ? "block" : "hidden lg:block"
+          className={`min-w-0 overflow-hidden rounded-2xl border border-[#d8d3ca] bg-[#dcd9d2] p-2.5 sm:p-5 md:p-6 lg:p-8 ${
+            previewMobile
+              ? "block"
+              : "hidden lg:block"
           }`}
         >
           <div className="mb-4 flex items-center justify-between lg:hidden">
@@ -1114,14 +1465,16 @@ function CoverLetterBuilder() {
 
             <button
               type="button"
-              onClick={() => setPreviewMobile(false)}
+              onClick={() =>
+                setPreviewMobile(false)
+              }
               className="text-xs font-semibold text-[#987542]"
             >
               Back to Editor
             </button>
           </div>
 
-          <div className="flex min-w-0 justify-center overflow-auto pb-5">
+          <div className="flex min-w-0 justify-center overflow-x-hidden overflow-y-visible pb-5">
             <CoverLetterPreview
               data={data}
               template={selectedTemplate}
@@ -1131,10 +1484,49 @@ function CoverLetterBuilder() {
       </main>
 
       {/* =====================================================
-          PRINT STYLES
+          RESPONSIVE PREVIEW STYLES
       ====================================================== */}
 
       <style>{`
+        .cover-letter-paper {
+          min-height: 1123px;
+          padding: 66px 72px;
+        }
+
+        .cover-letter-paper > header {
+          position: relative;
+        }
+
+        @media (max-width: 1023px) {
+          .cover-letter-paper {
+            padding: 54px 52px;
+          }
+        }
+
+        @media (max-width: 767px) {
+          .cover-letter-paper {
+            min-height: 900px;
+            padding: 44px 30px;
+          }
+
+          .cover-letter-paper > footer {
+            left: 30px;
+            right: 30px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .cover-letter-paper {
+            min-height: 820px;
+            padding: 38px 22px;
+          }
+
+          .cover-letter-paper > footer {
+            left: 22px;
+            right: 22px;
+          }
+        }
+
         @media print {
           @page {
             size: A4;
@@ -1161,6 +1553,7 @@ function CoverLetterBuilder() {
             top: 0 !important;
             width: 210mm !important;
             min-height: 297mm !important;
+            max-width: none !important;
             margin: 0 !important;
             padding: 18mm !important;
             box-shadow: none !important;

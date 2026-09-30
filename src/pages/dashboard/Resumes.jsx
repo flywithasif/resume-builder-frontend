@@ -139,22 +139,22 @@ function Resumes() {
   };
 
   return (
-    <div>
+    <div className="w-full min-w-0">
       {/* =====================================================
           HEADER
       ====================================================== */}
 
-      <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-        <div>
+      <div className="flex min-w-0 flex-col justify-between gap-4 sm:gap-5 md:flex-row md:items-end">
+        <div className="min-w-0">
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#ae8954]">
             Workspace
           </p>
 
-          <h1 className="mt-2 text-3xl font-semibold tracking-[-0.045em] text-zinc-950">
+          <h1 className="mt-2 break-words text-2xl font-semibold tracking-[-0.045em] text-zinc-950 sm:text-3xl">
             My Resumes
           </h1>
 
-          <p className="mt-2 text-sm text-zinc-500">
+          <p className="mt-2 max-w-2xl text-sm leading-5 text-zinc-500">
             Create, edit and manage all your professional resume
             versions.
           </p>
@@ -165,27 +165,27 @@ function Resumes() {
         ==================================================== */}
 
         <Link
-  to="/templates"
-  className="group inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-zinc-950 px-5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#987542] hover:text-white hover:shadow-md active:scale-[0.98]"
->
-  <Plus
-    size={17}
-    strokeWidth={2.3}
-    className="text-white transition-transform duration-200 group-hover:rotate-90"
-  />
+          to="/templates"
+          className="group inline-flex h-11 w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-zinc-950 px-5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#987542] hover:text-white hover:shadow-md active:scale-[0.98] sm:w-auto"
+        >
+          <Plus
+            size={17}
+            strokeWidth={2.3}
+            className="shrink-0 text-white transition-transform duration-200 group-hover:rotate-90"
+          />
 
-  <span className="text-white">
-    Create New Resume
-  </span>
-</Link>
+          <span className="whitespace-nowrap text-white">
+            Create New Resume
+          </span>
+        </Link>
       </div>
 
       {/* =====================================================
           TOOLBAR
       ====================================================== */}
 
-      <div className="mt-7 rounded-2xl border border-[#e7e2d9] bg-white p-3 sm:p-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mt-6 rounded-2xl border border-[#e7e2d9] bg-white p-3 sm:mt-7 sm:p-4">
+        <div className="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-2 px-1">
             <span className="text-sm font-semibold text-zinc-950">
               {resumes.length}
@@ -196,10 +196,10 @@ function Resumes() {
             </span>
           </div>
 
-          <div className="relative w-full sm:w-72">
+          <div className="relative w-full sm:max-w-sm md:w-72">
             <Search
               size={16}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400"
+              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400"
             />
 
             <input
@@ -219,21 +219,21 @@ function Resumes() {
       ====================================================== */}
 
       {filteredResumes.length > 0 ? (
-        <div className="mt-5 space-y-3">
+        <div className="mt-4 space-y-3 sm:mt-5">
           {filteredResumes.map((resume) => {
             const progress = Number(resume.progress || 0);
 
             return (
               <article
                 key={resume.id}
-                className="group relative overflow-visible rounded-2xl border border-[#e7e2d9] bg-white transition hover:border-[#d7d0c5] hover:shadow-[0_12px_35px_rgba(0,0,0,0.05)]"
+                className="group relative min-w-0 overflow-visible rounded-2xl border border-[#e7e2d9] bg-white transition hover:border-[#d7d0c5] hover:shadow-[0_12px_35px_rgba(0,0,0,0.05)]"
               >
-                <div className="flex flex-col gap-5 p-4 sm:flex-row sm:items-center sm:p-5">
+                <div className="flex min-w-0 flex-col gap-4 p-3.5 sm:gap-5 sm:p-5 md:flex-row md:items-center">
                   {/* =================================================
                       PREVIEW
                   ================================================== */}
 
-                  <div className="h-[155px] w-full shrink-0 overflow-hidden rounded-xl border border-[#e5e0d8] bg-[#f0eee9] sm:h-[150px] sm:w-[115px]">
+                  <div className="h-[190px] w-full shrink-0 overflow-hidden rounded-xl border border-[#e5e0d8] bg-[#f0eee9] sm:h-[150px] sm:w-[115px]">
                     <ResumePreview
                       template={resume.template}
                     />
@@ -244,15 +244,15 @@ function Resumes() {
                   ================================================== */}
 
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="min-w-0">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h2 className="truncate text-base font-semibold text-zinc-950">
+                    <div className="flex min-w-0 items-start justify-between gap-3 sm:gap-4">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex min-w-0 flex-wrap items-center gap-2">
+                          <h2 className="max-w-full break-words text-base font-semibold text-zinc-950 sm:truncate">
                             {resume.title ||
                               "Untitled Resume"}
                           </h2>
 
-                          <span className="rounded-full bg-[#f3f0ea] px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.08em] text-[#987542]">
+                          <span className="shrink-0 rounded-full bg-[#f3f0ea] px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.08em] text-[#987542]">
                             {resume.template ||
                               "Executive"}
                           </span>
@@ -260,16 +260,19 @@ function Resumes() {
 
                         <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-zinc-400">
                           <span className="flex items-center gap-1.5">
-                            <Clock3 size={12} />
+                            <Clock3
+                              size={12}
+                              className="shrink-0"
+                            />
 
-                            {formatUpdatedAt(
-                              resume.updatedAt
-                            )}
+                            <span className="whitespace-nowrap">
+                              {formatUpdatedAt(
+                                resume.updatedAt
+                              )}
+                            </span>
                           </span>
 
-                          <span>
-                            Resume version
-                          </span>
+                          <span>Resume version</span>
                         </div>
                       </div>
 
@@ -288,6 +291,7 @@ function Resumes() {
                             )
                           }
                           className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-400 transition hover:bg-[#f3f0ea] hover:text-zinc-900"
+                          aria-label="Resume options"
                         >
                           <MoreHorizontal size={18} />
                         </button>
@@ -303,7 +307,7 @@ function Resumes() {
                               className="fixed inset-0 z-10 cursor-default"
                             />
 
-                            <div className="absolute right-0 top-10 z-20 w-44 rounded-xl border border-[#e5e0d8] bg-white p-1.5 shadow-[0_18px_50px_rgba(0,0,0,0.10)]">
+                            <div className="absolute right-0 top-10 z-20 w-[min(11rem,calc(100vw-2rem))] rounded-xl border border-[#e5e0d8] bg-white p-1.5 shadow-[0_18px_50px_rgba(0,0,0,0.10)]">
                               {/* EDIT */}
 
                               <Link
@@ -311,12 +315,11 @@ function Resumes() {
                                 onClick={() =>
                                   setMenuId(null)
                                 }
-                                className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-zinc-600 hover:bg-[#f6f3ee] hover:text-zinc-950"
+                                className="flex min-h-9 items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-zinc-600 hover:bg-[#f6f3ee] hover:text-zinc-950"
                               >
                                 <Pencil size={14} />
                                 Edit resume
                               </Link>
-
 
                               {/* PREVIEW */}
 
@@ -328,7 +331,7 @@ function Resumes() {
                                   );
                                   setMenuId(null);
                                 }}
-                                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-zinc-600 hover:bg-[#f6f3ee] hover:text-zinc-950"
+                                className="flex min-h-9 w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-zinc-600 hover:bg-[#f6f3ee] hover:text-zinc-950"
                               >
                                 <Download size={14} />
                                 Preview / Print
@@ -343,7 +346,7 @@ function Resumes() {
                                     resume
                                   )
                                 }
-                                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-zinc-600 hover:bg-[#f6f3ee] hover:text-zinc-950"
+                                className="flex min-h-9 w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-zinc-600 hover:bg-[#f6f3ee] hover:text-zinc-950"
                               >
                                 <Copy size={14} />
                                 Duplicate
@@ -360,7 +363,7 @@ function Resumes() {
                                     resume.id
                                   )
                                 }
-                                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-red-500 hover:bg-red-50"
+                                className="flex min-h-9 w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-red-500 hover:bg-red-50"
                               >
                                 <Trash2 size={14} />
                                 Delete
@@ -375,18 +378,18 @@ function Resumes() {
                         PROGRESS
                     ================================================== */}
 
-                    <div className="mt-7 max-w-xl">
-                      <div className="flex items-center justify-between">
+                    <div className="mt-5 w-full max-w-xl sm:mt-7">
+                      <div className="flex items-center justify-between gap-3">
                         <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-zinc-400">
                           Completion
                         </span>
 
-                        <span className="text-[11px] font-semibold text-zinc-700">
+                        <span className="shrink-0 text-[11px] font-semibold text-zinc-700">
                           {progress}%
                         </span>
                       </div>
 
-                      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#eeeae3]">
+                      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#eeeae3]">
                         <div
                           className="h-full rounded-full bg-zinc-950 transition-all"
                           style={{
@@ -400,33 +403,37 @@ function Resumes() {
                         ACTIONS
                     ================================================== */}
 
-                    <div className="mt-5 flex flex-wrap items-center gap-2">
-                     <Link
-  to={`/builder/${resume.id}`}
-  className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3.5 text-[11px] font-semibold transition-all duration-200"
-  style={{
-    backgroundColor: "#000000",
-    color: "#ffffff",
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.backgroundColor = "#987542";
-    e.currentTarget.style.color = "#ffffff";
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.backgroundColor = "#000000";
-    e.currentTarget.style.color = "#ffffff";
-  }}
->
-  <Pencil size={13} />
-  Edit
-</Link>
+                    <div className="mt-4 flex flex-wrap items-center gap-2 sm:mt-5">
+                      <Link
+                        to={`/builder/${resume.id}`}
+                        className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg px-3.5 text-[11px] font-semibold transition-all duration-200"
+                        style={{
+                          backgroundColor: "#000000",
+                          color: "#ffffff",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor =
+                            "#987542";
+                          e.currentTarget.style.color =
+                            "#ffffff";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor =
+                            "#000000";
+                          e.currentTarget.style.color =
+                            "#ffffff";
+                        }}
+                      >
+                        <Pencil size={13} />
+                        Edit
+                      </Link>
 
                       <button
                         type="button"
                         onClick={() =>
                           downloadResume(resume)
                         }
-                        className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-[#e3ded6] px-3.5 text-[11px] font-semibold text-zinc-600 transition hover:border-zinc-900 hover:text-zinc-950"
+                        className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-[#e3ded6] px-3.5 text-[11px] font-semibold text-zinc-600 transition hover:border-zinc-900 hover:text-zinc-950"
                       >
                         <Eye size={13} />
                         Preview
@@ -443,7 +450,7 @@ function Resumes() {
            EMPTY STATE
         ====================================================== */
 
-        <div className="mt-5 rounded-2xl border border-dashed border-[#dcd6cd] bg-white px-6 py-20 text-center">
+        <div className="mt-4 rounded-2xl border border-dashed border-[#dcd6cd] bg-white px-4 py-14 text-center sm:mt-5 sm:px-6 sm:py-20">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f3f0ea] text-zinc-500">
             <FileText size={23} />
           </div>
@@ -462,19 +469,19 @@ function Resumes() {
 
           {!resumes.length && (
             <Link
-  to="/templates"
-  className="group mt-5 inline-flex h-10 items-center gap-2 rounded-lg bg-zinc-950 px-4 text-xs font-semibold text-white transition-all duration-200 hover:bg-[#ae8954] hover:text-white active:scale-[0.98]"
->
-  <Plus
-    size={14}
-    strokeWidth={2.3}
-    className="text-white transition-transform duration-200 group-hover:rotate-90"
-  />
+              to="/templates"
+              className="group mt-5 inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-zinc-950 px-4 text-xs font-semibold text-white transition-all duration-200 hover:bg-[#ae8954] hover:text-white active:scale-[0.98]"
+            >
+              <Plus
+                size={14}
+                strokeWidth={2.3}
+                className="text-white transition-transform duration-200 group-hover:rotate-90"
+              />
 
-  <span className="text-white">
-    Create Resume
-  </span>
-</Link>
+              <span className="text-white">
+                Create Resume
+              </span>
+            </Link>
           )}
         </div>
       )}

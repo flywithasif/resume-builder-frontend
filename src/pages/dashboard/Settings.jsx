@@ -134,12 +134,12 @@ function SectionHeader({
   description,
 }) {
   return (
-    <div className="flex items-start gap-3">
+    <div className="flex min-w-0 items-start gap-3">
       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#111111] text-white">
         <Icon size={17} />
       </div>
 
-      <div>
+      <div className="min-w-0">
         <h2 className="text-sm font-semibold text-zinc-950">
           {title}
         </h2>
@@ -159,7 +159,7 @@ function SettingRow({
   children,
 }) {
   return (
-    <div className="flex flex-col gap-4 py-5 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex min-w-0 flex-col gap-4 py-5 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex min-w-0 items-start gap-3">
         {Icon && (
           <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#f5f2ec] text-zinc-500">
@@ -180,7 +180,9 @@ function SettingRow({
         </div>
       </div>
 
-      <div className="shrink-0">{children}</div>
+      <div className="w-full shrink-0 sm:w-auto">
+        {children}
+      </div>
     </div>
   );
 }
@@ -483,20 +485,21 @@ function Settings() {
   };
 
   return (
-    <div className="mx-auto max-w-[1100px] pb-16">
+    <div className="mx-auto w-full max-w-[1100px] px-3 pb-20 sm:px-5 sm:pb-16 lg:px-6">
       {/* =====================================================
           PAGE HEADER
       ====================================================== */}
+
       <div className="max-w-3xl">
         <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#ae8954]">
           Account
         </p>
 
-        <h1 className="mt-2 text-3xl font-semibold tracking-[-0.045em] text-zinc-950">
+        <h1 className="mt-2 text-2xl font-semibold tracking-[-0.045em] text-zinc-950 sm:text-3xl">
           Settings
         </h1>
 
-        <p className="mt-2 text-sm leading-6 text-zinc-500">
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-500">
           Personalize your Resumely workspace, editor,
           notifications, privacy and data preferences.
         </p>
@@ -505,11 +508,12 @@ function Settings() {
       {/* =====================================================
           SAVE STATUS
       ====================================================== */}
-      <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-[#e7e2d9] bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2">
+
+      <div className="mt-6 flex min-w-0 flex-col gap-3 rounded-2xl border border-[#e7e2d9] bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-2">
           <div
             className={[
-              "h-2 w-2 rounded-full",
+              "h-2 w-2 shrink-0 rounded-full",
               hasChanges
                 ? "bg-[#ae8954]"
                 : "bg-emerald-500",
@@ -523,7 +527,7 @@ function Settings() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:justify-end">
           {saved && (
             <span className="flex items-center gap-1.5 text-xs font-medium text-emerald-600">
               <Check size={14} />
@@ -534,7 +538,7 @@ function Settings() {
           <button
             type="button"
             onClick={saveSettings}
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[#111111] px-5 text-xs font-semibold text-white transition-all hover:bg-[#ae8954] active:scale-[0.98]"
+            className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#111111] px-4 text-xs font-semibold text-white transition-all hover:bg-[#ae8954] active:scale-[0.98] sm:px-5"
           >
             <Save size={14} />
             Save changes
@@ -546,8 +550,9 @@ function Settings() {
         {/* ===================================================
             APPEARANCE
         ==================================================== */}
-        <section className="rounded-2xl border border-[#e7e2d9] bg-white">
-          <div className="border-b border-[#eeeae3] p-5 sm:p-6">
+
+        <section className="min-w-0 overflow-hidden rounded-2xl border border-[#e7e2d9] bg-white">
+          <div className="border-b border-[#eeeae3] p-4 sm:p-6">
             <SectionHeader
               icon={Palette}
               title="Appearance"
@@ -555,9 +560,10 @@ function Settings() {
             />
           </div>
 
-          <div className="p-5 sm:p-6">
+          <div className="p-4 sm:p-6">
             {/* Theme */}
-            <div>
+
+            <div className="min-w-0">
               <p className="text-xs font-semibold text-zinc-900">
                 Theme
               </p>
@@ -567,7 +573,7 @@ function Settings() {
                 preferred color scheme.
               </p>
 
-              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
                 {[
                   {
                     id: "light",
@@ -596,7 +602,7 @@ function Settings() {
                         update("theme", id)
                       }
                       className={[
-                        "flex items-center gap-3 rounded-xl border p-3.5 text-left transition-all",
+                        "flex min-w-0 items-center gap-3 rounded-xl border p-3.5 text-left transition-all",
                         active
                           ? "border-[#ae8954] bg-[#f6f1e8]"
                           : "border-[#e5e0d8] hover:border-[#ae8954]",
@@ -604,7 +610,7 @@ function Settings() {
                     >
                       <span
                         className={[
-                          "flex h-9 w-9 items-center justify-center rounded-lg",
+                          "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
                           active
                             ? "bg-[#111111] text-white"
                             : "bg-[#f3f0ea] text-zinc-500",
@@ -613,14 +619,14 @@ function Settings() {
                         <Icon size={16} />
                       </span>
 
-                      <span className="text-xs font-semibold text-zinc-900">
+                      <span className="truncate text-xs font-semibold text-zinc-900">
                         {label}
                       </span>
 
                       {active && (
                         <Check
                           size={15}
-                          className="ml-auto text-[#ae8954]"
+                          className="ml-auto shrink-0 text-[#ae8954]"
                         />
                       )}
                     </button>
@@ -628,13 +634,13 @@ function Settings() {
                 })}
               </div>
 
-              <div className="mt-3 flex gap-2 rounded-xl bg-[#faf8f4] p-3">
+              <div className="mt-3 flex min-w-0 gap-2 rounded-xl bg-[#faf8f4] p-3">
                 <Info
                   size={14}
                   className="mt-0.5 shrink-0 text-[#ae8954]"
                 />
 
-                <p className="text-[11px] leading-5 text-zinc-500">
+                <p className="min-w-0 text-[11px] leading-5 text-zinc-500">
                   Your preference is stored locally. The full
                   application-wide dark theme can be connected
                   to the global design tokens when the theme
@@ -644,7 +650,8 @@ function Settings() {
             </div>
 
             {/* Accent */}
-            <div className="mt-7 border-t border-[#eeeae3] pt-7">
+
+            <div className="mt-7 min-w-0 border-t border-[#eeeae3] pt-7">
               <p className="text-xs font-semibold text-zinc-900">
                 Accent style
               </p>
@@ -654,7 +661,7 @@ function Settings() {
                 preferences.
               </p>
 
-              <div className="mt-4 flex flex-wrap gap-3">
+              <div className="mt-4 flex flex-wrap gap-2.5">
                 {accents.map((item) => {
                   const active =
                     settings.accent === item.id;
@@ -667,14 +674,14 @@ function Settings() {
                         update("accent", item.id)
                       }
                       className={[
-                        "flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-medium transition-all",
+                        "flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-xs font-medium transition-all",
                         active
                           ? "border-[#111111] bg-[#f6f3ed]"
                           : "border-[#e5e0d8] hover:border-[#ae8954]",
                       ].join(" ")}
                     >
                       <span
-                        className="h-3 w-3 rounded-full"
+                        className="h-3 w-3 shrink-0 rounded-full"
                         style={{
                           backgroundColor: item.color,
                         }}
@@ -695,7 +702,8 @@ function Settings() {
             </div>
 
             {/* Density */}
-            <div className="mt-7 border-t border-[#eeeae3] pt-2">
+
+            <div className="mt-7 min-w-0 border-t border-[#eeeae3] pt-2">
               <SettingRow
                 icon={Monitor}
                 title="Compact workspace"
@@ -732,8 +740,9 @@ function Settings() {
         {/* ===================================================
             RESUME & EDITOR
         ==================================================== */}
-        <section className="rounded-2xl border border-[#e7e2d9] bg-white">
-          <div className="border-b border-[#eeeae3] p-5 sm:p-6">
+
+        <section className="min-w-0 overflow-hidden rounded-2xl border border-[#e7e2d9] bg-white">
+          <div className="border-b border-[#eeeae3] p-4 sm:p-6">
             <SectionHeader
               icon={Zap}
               title="Resume & Editor"
@@ -741,8 +750,9 @@ function Settings() {
             />
           </div>
 
-          <div className="px-5 sm:px-6">
+          <div className="px-4 sm:px-6">
             {/* Default template */}
+
             <SettingRow
               icon={FileJson}
               title="Default resume template"
@@ -756,7 +766,7 @@ function Settings() {
                     event.target.value,
                   )
                 }
-                className="h-10 w-full min-w-[180px] rounded-xl border border-[#e5e0d8] bg-[#fbfaf8] px-3 text-xs font-medium outline-none transition focus:border-[#ae8954] sm:w-auto"
+                className="h-10 w-full min-w-0 rounded-xl border border-[#e5e0d8] bg-[#fbfaf8] px-3 text-xs font-medium outline-none transition focus:border-[#ae8954] sm:w-auto sm:min-w-[180px]"
               >
                 {templates.map((template) => (
                   <option
@@ -772,6 +782,7 @@ function Settings() {
             <div className="border-t border-[#eeeae3]" />
 
             {/* Autosave */}
+
             <SettingRow
               icon={Save}
               title="Auto-save"
@@ -803,7 +814,7 @@ function Settings() {
                         event.target.value,
                       )
                     }
-                    className="h-10 min-w-[140px] rounded-xl border border-[#e5e0d8] bg-[#fbfaf8] px-3 text-xs font-medium outline-none focus:border-[#ae8954]"
+                    className="h-10 w-full min-w-0 rounded-xl border border-[#e5e0d8] bg-[#fbfaf8] px-3 text-xs font-medium outline-none focus:border-[#ae8954] sm:w-auto sm:min-w-[140px]"
                   >
                     <option value="15">
                       Every 15 seconds
@@ -881,8 +892,9 @@ function Settings() {
         {/* ===================================================
             NOTIFICATIONS
         ==================================================== */}
-        <section className="rounded-2xl border border-[#e7e2d9] bg-white">
-          <div className="border-b border-[#eeeae3] p-5 sm:p-6">
+
+        <section className="min-w-0 overflow-hidden rounded-2xl border border-[#e7e2d9] bg-white">
+          <div className="border-b border-[#eeeae3] p-4 sm:p-6">
             <SectionHeader
               icon={Bell}
               title="Notifications"
@@ -890,7 +902,7 @@ function Settings() {
             />
           </div>
 
-          <div className="px-5 sm:px-6">
+          <div className="px-4 sm:px-6">
             <SettingRow
               icon={Mail}
               title="Email notifications"
@@ -970,8 +982,9 @@ function Settings() {
         {/* ===================================================
             PRIVACY & DATA
         ==================================================== */}
-        <section className="rounded-2xl border border-[#e7e2d9] bg-white">
-          <div className="border-b border-[#eeeae3] p-5 sm:p-6">
+
+        <section className="min-w-0 overflow-hidden rounded-2xl border border-[#e7e2d9] bg-white">
+          <div className="border-b border-[#eeeae3] p-4 sm:p-6">
             <SectionHeader
               icon={ShieldCheck}
               title="Privacy & Data"
@@ -979,7 +992,7 @@ function Settings() {
             />
           </div>
 
-          <div className="px-5 sm:px-6">
+          <div className="px-4 sm:px-6">
             <SettingRow
               icon={UserRound}
               title="Profile visibility"
@@ -993,7 +1006,7 @@ function Settings() {
                     event.target.value,
                   )
                 }
-                className="h-10 min-w-[140px] rounded-xl border border-[#e5e0d8] bg-[#fbfaf8] px-3 text-xs font-medium outline-none focus:border-[#ae8954]"
+                className="h-10 w-full min-w-0 rounded-xl border border-[#e5e0d8] bg-[#fbfaf8] px-3 text-xs font-medium outline-none focus:border-[#ae8954] sm:w-auto sm:min-w-[140px]"
               >
                 <option value="private">
                   Private
@@ -1032,7 +1045,7 @@ function Settings() {
                 type="button"
                 onClick={exportWorkspace}
                 disabled={exporting}
-                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-[#e5e0d8] bg-white px-4 text-xs font-semibold text-zinc-700 transition hover:border-[#ae8954] hover:text-[#987542] disabled:opacity-50"
+                className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-[#e5e0d8] bg-white px-4 text-xs font-semibold text-zinc-700 transition hover:border-[#ae8954] hover:text-[#987542] disabled:opacity-50 sm:w-auto"
               >
                 <Download size={14} />
 
@@ -1052,7 +1065,7 @@ function Settings() {
               <button
                 type="button"
                 onClick={clearDraft}
-                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-[#ead8d8] bg-white px-4 text-xs font-semibold text-red-600 transition hover:bg-red-50"
+                className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-[#ead8d8] bg-white px-4 text-xs font-semibold text-red-600 transition hover:bg-red-50 sm:w-auto"
               >
                 <Trash2 size={14} />
                 Clear draft
@@ -1064,8 +1077,9 @@ function Settings() {
         {/* ===================================================
             ACCOUNT & SECURITY
         ==================================================== */}
-        <section className="rounded-2xl border border-[#e7e2d9] bg-white">
-          <div className="border-b border-[#eeeae3] p-5 sm:p-6">
+
+        <section className="min-w-0 overflow-hidden rounded-2xl border border-[#e7e2d9] bg-white">
+          <div className="border-b border-[#eeeae3] p-4 sm:p-6">
             <SectionHeader
               icon={LockKeyhole}
               title="Account & Security"
@@ -1073,10 +1087,10 @@ function Settings() {
             />
           </div>
 
-          <div className="p-5 sm:p-6">
-            <div className="rounded-2xl bg-[#f7f4ee] p-4">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#111111] text-xs font-semibold text-white">
+          <div className="p-4 sm:p-6">
+            <div className="min-w-0 rounded-2xl bg-[#f7f4ee] p-4">
+              <div className="flex min-w-0 items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#111111] text-xs font-semibold text-white">
                   {currentUser?.name
                     ?.split(" ")
                     .map((part) =>
@@ -1101,26 +1115,26 @@ function Settings() {
               </div>
             </div>
 
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <button
                 type="button"
                 onClick={() =>
                   navigate("/dashboard/profile")
                 }
-                className="group flex items-center justify-between rounded-xl border border-[#e5e0d8] p-4 text-left transition hover:border-[#ae8954] hover:bg-[#faf8f4]"
+                className="group flex min-w-0 items-center justify-between rounded-xl border border-[#e5e0d8] p-4 text-left transition hover:border-[#ae8954] hover:bg-[#faf8f4]"
               >
-                <div className="flex items-center gap-3">
+                <div className="flex min-w-0 items-center gap-3">
                   <UserRound
                     size={17}
-                    className="text-zinc-500 group-hover:text-[#987542]"
+                    className="shrink-0 text-zinc-500 group-hover:text-[#987542]"
                   />
 
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs font-semibold">
                       Profile
                     </p>
 
-                    <p className="mt-1 text-[11px] text-zinc-500">
+                    <p className="mt-1 truncate text-[11px] text-zinc-500">
                       Personal information
                     </p>
                   </div>
@@ -1128,7 +1142,7 @@ function Settings() {
 
                 <ChevronRight
                   size={15}
-                  className="text-zinc-400"
+                  className="ml-3 shrink-0 text-zinc-400"
                 />
               </button>
 
@@ -1137,20 +1151,20 @@ function Settings() {
                 onClick={() =>
                   navigate("/dashboard/profile")
                 }
-                className="group flex items-center justify-between rounded-xl border border-[#e5e0d8] p-4 text-left transition hover:border-[#ae8954] hover:bg-[#faf8f4]"
+                className="group flex min-w-0 items-center justify-between rounded-xl border border-[#e5e0d8] p-4 text-left transition hover:border-[#ae8954] hover:bg-[#faf8f4]"
               >
-                <div className="flex items-center gap-3">
+                <div className="flex min-w-0 items-center gap-3">
                   <LockKeyhole
                     size={17}
-                    className="text-zinc-500 group-hover:text-[#987542]"
+                    className="shrink-0 text-zinc-500 group-hover:text-[#987542]"
                   />
 
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs font-semibold">
                       Password & Security
                     </p>
 
-                    <p className="mt-1 text-[11px] text-zinc-500">
+                    <p className="mt-1 truncate text-[11px] text-zinc-500">
                       Manage account security
                     </p>
                   </div>
@@ -1158,18 +1172,18 @@ function Settings() {
 
                 <ChevronRight
                   size={15}
-                  className="text-zinc-400"
+                  className="ml-3 shrink-0 text-zinc-400"
                 />
               </button>
             </div>
 
-            <div className="mt-4 flex gap-2 rounded-xl border border-amber-100 bg-amber-50 p-3">
+            <div className="mt-4 flex min-w-0 gap-2 rounded-xl border border-amber-100 bg-amber-50 p-3">
               <Info
                 size={14}
                 className="mt-0.5 shrink-0 text-amber-600"
               />
 
-              <p className="text-[11px] leading-5 text-amber-800">
+              <p className="min-w-0 text-[11px] leading-5 text-amber-800">
                 Password changes and advanced security
                 controls are handled from your account area.
                 Backend security endpoints can be connected
@@ -1182,31 +1196,32 @@ function Settings() {
         {/* ===================================================
             IMPORT / EXPORT PREFERENCES
         ==================================================== */}
-        <section className="rounded-2xl border border-[#e7e2d9] bg-white p-5 sm:p-6">
+
+        <section className="min-w-0 overflow-hidden rounded-2xl border border-[#e7e2d9] bg-white p-4 sm:p-6">
           <SectionHeader
             icon={FileJson}
             title="Settings backup"
             description="Keep a portable copy of your Resumely preferences."
           />
 
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <button
               type="button"
               onClick={exportSettings}
-              className="flex items-center justify-between rounded-xl border border-[#e5e0d8] p-4 text-left transition hover:border-[#ae8954] hover:bg-[#faf8f4]"
+              className="flex min-w-0 items-center justify-between rounded-xl border border-[#e5e0d8] p-4 text-left transition hover:border-[#ae8954] hover:bg-[#faf8f4]"
             >
-              <div className="flex items-center gap-3">
+              <div className="flex min-w-0 items-center gap-3">
                 <Download
                   size={17}
-                  className="text-zinc-500"
+                  className="shrink-0 text-zinc-500"
                 />
 
-                <div>
+                <div className="min-w-0">
                   <p className="text-xs font-semibold">
                     Export settings
                   </p>
 
-                  <p className="mt-1 text-[11px] text-zinc-500">
+                  <p className="mt-1 truncate text-[11px] text-zinc-500">
                     Download a JSON backup
                   </p>
                 </div>
@@ -1214,7 +1229,7 @@ function Settings() {
 
               <ChevronRight
                 size={15}
-                className="text-zinc-400"
+                className="ml-3 shrink-0 text-zinc-400"
               />
             </button>
 
@@ -1224,20 +1239,20 @@ function Settings() {
                 fileInputRef.current?.click()
               }
               disabled={importing}
-              className="flex items-center justify-between rounded-xl border border-[#e5e0d8] p-4 text-left transition hover:border-[#ae8954] hover:bg-[#faf8f4] disabled:opacity-50"
+              className="flex min-w-0 items-center justify-between rounded-xl border border-[#e5e0d8] p-4 text-left transition hover:border-[#ae8954] hover:bg-[#faf8f4] disabled:opacity-50"
             >
-              <div className="flex items-center gap-3">
+              <div className="flex min-w-0 items-center gap-3">
                 <FileJson
                   size={17}
-                  className="text-zinc-500"
+                  className="shrink-0 text-zinc-500"
                 />
 
-                <div>
+                <div className="min-w-0">
                   <p className="text-xs font-semibold">
                     Import settings
                   </p>
 
-                  <p className="mt-1 text-[11px] text-zinc-500">
+                  <p className="mt-1 truncate text-[11px] text-zinc-500">
                     Restore a JSON backup
                   </p>
                 </div>
@@ -1245,7 +1260,7 @@ function Settings() {
 
               <ChevronRight
                 size={15}
-                className="text-zinc-400"
+                className="ml-3 shrink-0 text-zinc-400"
               />
             </button>
           </div>
@@ -1262,14 +1277,15 @@ function Settings() {
         {/* ===================================================
             DANGER ZONE
         ==================================================== */}
-        <section className="rounded-2xl border border-red-100 bg-white">
-          <div className="border-b border-red-100 p-5 sm:p-6">
-            <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-600">
+
+        <section className="min-w-0 overflow-hidden rounded-2xl border border-red-100 bg-white">
+          <div className="border-b border-red-100 p-4 sm:p-6">
+            <div className="flex min-w-0 items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600">
                 <Trash2 size={17} />
               </div>
 
-              <div>
+              <div className="min-w-0">
                 <h2 className="text-sm font-semibold text-zinc-950">
                   Danger zone
                 </h2>
@@ -1282,9 +1298,9 @@ function Settings() {
             </div>
           </div>
 
-          <div className="p-5 sm:p-6">
-            <div className="flex flex-col gap-4 rounded-xl border border-red-100 bg-red-50/40 p-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
+          <div className="p-4 sm:p-6">
+            <div className="flex min-w-0 flex-col gap-4 rounded-xl border border-red-100 bg-red-50/40 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
                 <p className="text-xs font-semibold text-zinc-900">
                   Clear local workspace
                 </p>
@@ -1299,7 +1315,7 @@ function Settings() {
               <button
                 type="button"
                 onClick={clearLocalWorkspace}
-                className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl border border-red-200 bg-white px-4 text-xs font-semibold text-red-600 transition hover:bg-red-600 hover:text-white"
+                className="inline-flex h-10 w-full shrink-0 items-center justify-center gap-2 rounded-xl border border-red-200 bg-white px-4 text-xs font-semibold text-red-600 transition hover:bg-red-600 hover:text-white sm:w-auto"
               >
                 <Trash2 size={14} />
                 Clear workspace
@@ -1311,14 +1327,15 @@ function Settings() {
         {/* ===================================================
             ACCOUNT ACTIONS
         ==================================================== */}
-        <section className="rounded-2xl border border-[#e7e2d9] bg-white p-5 sm:p-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
+
+        <section className="min-w-0 overflow-hidden rounded-2xl border border-[#e7e2d9] bg-white p-4 sm:p-6">
+          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
               <p className="text-xs font-semibold text-zinc-900">
                 Sign out of Resumely
               </p>
 
-              <p className="mt-1 text-xs text-zinc-500">
+              <p className="mt-1 text-xs leading-5 text-zinc-500">
                 Sign out from this browser and return to the
                 login screen.
               </p>
@@ -1327,7 +1344,7 @@ function Settings() {
             <button
               type="button"
               onClick={handleLogout}
-              className="inline-flex h-10 items-center justify-center rounded-xl border border-[#e5e0d8] px-5 text-xs font-semibold text-zinc-700 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+              className="inline-flex h-10 w-full shrink-0 items-center justify-center rounded-xl border border-[#e5e0d8] px-5 text-xs font-semibold text-zinc-700 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 sm:w-auto"
             >
               Sign out
             </button>
@@ -1337,17 +1354,18 @@ function Settings() {
         {/* ===================================================
             BOTTOM ACTION BAR
         ==================================================== */}
-        <div className="sticky bottom-4 z-20 flex flex-col gap-3 rounded-2xl border border-[#e7e2d9] bg-[#fbfaf7]/95 p-3 shadow-[0_12px_40px_rgba(0,0,0,0.08)] backdrop-blur sm:flex-row sm:items-center sm:justify-between">
+
+        <div className="sticky bottom-3 z-20 flex min-w-0 flex-col gap-3 rounded-2xl border border-[#e7e2d9] bg-[#fbfaf7]/95 p-3 shadow-[0_12px_40px_rgba(0,0,0,0.08)] backdrop-blur sm:bottom-4 sm:flex-row sm:items-center sm:justify-between">
           <button
             type="button"
             onClick={resetSettings}
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-[#e5e0d8] bg-white px-4 text-xs font-semibold text-zinc-600 transition hover:border-[#ae8954] hover:text-[#987542]"
+            className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-[#e5e0d8] bg-white px-4 text-xs font-semibold text-zinc-600 transition hover:border-[#ae8954] hover:text-[#987542] sm:w-auto"
           >
             <RotateCcw size={14} />
             Reset preferences
           </button>
 
-          <div className="flex items-center gap-3">
+          <div className="flex w-full items-center gap-3 sm:w-auto">
             {saved && (
               <span className="hidden items-center gap-1.5 text-xs font-medium text-emerald-600 sm:flex">
                 <Check size={14} />
@@ -1358,7 +1376,7 @@ function Settings() {
             <button
               type="button"
               onClick={saveSettings}
-              className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[#111111] px-5 text-xs font-semibold text-white transition-all hover:bg-[#ae8954] active:scale-[0.98]"
+              className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-[#111111] px-5 text-xs font-semibold text-white transition-all hover:bg-[#ae8954] active:scale-[0.98] sm:flex-none"
             >
               <Save size={14} />
               Save changes

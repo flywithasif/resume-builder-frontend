@@ -1,7 +1,5 @@
 import {
   ArrowLeft,
-  ChevronDown,
-  ChevronUp,
   Download,
   Eye,
   FileText,
@@ -27,6 +25,7 @@ import {
 import { useEffect, useState } from "react";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
+
 import {
   calculateResumeProgress,
   getResumeById,
@@ -34,13 +33,18 @@ import {
   saveResumes,
   makeResumeTitle,
 } from "../../utils/resumeStorage";
+
 import { Link, useSearchParams } from "react-router-dom";
+
 import {
   createResume,
   getResumeFromApi,
   updateResumeOnApi,
 } from "../../services/resumeService";
-import { ResumeRenderer as TemplateRenderer } from "../templates/resumeTemplates";
+
+import {
+  ResumeRenderer as TemplateRenderer,
+} from "../templates/resumeTemplates";
 
 const initialResume = {
   personal: {
@@ -185,7 +189,7 @@ function InputField({
   type = "text",
 }) {
   return (
-    <div>
+    <div className="min-w-0">
       <label className="mb-1.5 block text-xs font-medium text-zinc-600">
         {label}
       </label>
@@ -195,7 +199,7 @@ function InputField({
         value={value || ""}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className="h-10 w-full rounded-lg border border-stone-200 bg-white px-3 text-sm text-zinc-900 outline-none transition focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/5"
+        className="h-10 w-full min-w-0 rounded-lg border border-stone-200 bg-white px-3 text-sm text-zinc-900 outline-none transition focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/5"
       />
     </div>
   );
@@ -209,7 +213,7 @@ function TextareaField({
   rows = 5,
 }) {
   return (
-    <div>
+    <div className="min-w-0">
       <label className="mb-1.5 block text-xs font-medium text-zinc-600">
         {label}
       </label>
@@ -219,7 +223,7 @@ function TextareaField({
         value={value || ""}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className="w-full resize-none rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-sm leading-6 text-zinc-900 outline-none transition focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/5"
+        className="w-full min-w-0 resize-none rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-sm leading-6 text-zinc-900 outline-none transition focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/5"
       />
     </div>
   );
@@ -233,13 +237,13 @@ function SectionHeader({
   canRemove = false,
 }) {
   return (
-    <div className="mb-5 flex items-start justify-between gap-4">
-      <div className="flex items-start gap-3">
+    <div className="mb-5 flex items-start justify-between gap-3 sm:gap-4">
+      <div className="flex min-w-0 items-start gap-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-950 text-white">
           <Icon size={16} />
         </div>
 
-        <div>
+        <div className="min-w-0">
           <h2 className="text-sm font-semibold text-zinc-950">
             {title}
           </h2>
@@ -256,7 +260,7 @@ function SectionHeader({
         <button
           type="button"
           onClick={onRemove}
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition hover:bg-red-50 hover:text-red-600"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition hover:bg-red-50 hover:text-red-600"
           title="Remove section"
         >
           <Trash2 size={15} />
@@ -266,7 +270,10 @@ function SectionHeader({
   );
 }
 
-function ResumePreview({ resume, template = "executive" }) {
+function ResumePreview({
+  resume,
+  template = "executive",
+}) {
   const templateStyles = {
     executive: {
       page: "bg-white text-zinc-900",
@@ -277,15 +284,18 @@ function ResumePreview({ resume, template = "executive" }) {
         "border-b border-zinc-200 pb-1.5 text-[11px] font-bold uppercase tracking-[0.14em]",
       accent: "bg-zinc-900",
     },
+
     modern: {
       page: "bg-white text-zinc-900",
-      header: "border-l-4 border-[#987542] bg-stone-50 px-5 py-4",
+      header:
+        "border-l-4 border-[#987542] bg-stone-50 px-5 py-4",
       name: "text-[30px] font-bold tracking-[-0.045em]",
       title: "text-[14px] font-medium text-[#987542]",
       section:
         "border-l-2 border-[#987542] pl-2 text-[11px] font-bold uppercase tracking-[0.14em]",
       accent: "bg-[#987542]",
     },
+
     minimal: {
       page: "bg-white text-zinc-900",
       header: "pb-5",
@@ -295,77 +305,115 @@ function ResumePreview({ resume, template = "executive" }) {
         "text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500",
       accent: "bg-zinc-700",
     },
+
     corporate: {
       page: "bg-white text-zinc-900",
       header: "border-b border-slate-300 pb-5",
-      name: "text-[29px] font-bold tracking-[-0.03em] text-slate-900",
-      title: "text-[14px] font-medium text-slate-600",
+      name:
+        "text-[29px] font-bold tracking-[-0.03em] text-slate-900",
+      title:
+        "text-[14px] font-medium text-slate-600",
       section:
         "border-b border-slate-300 pb-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-800",
       accent: "bg-slate-800",
     },
+
     creative: {
       page: "bg-white text-zinc-900",
-      header: "relative overflow-hidden rounded-2xl bg-zinc-950 px-5 py-5 text-white",
-      name: "text-[30px] font-bold tracking-[-0.045em]",
-      title: "text-[14px] font-medium text-[#d8c09b]",
+      header:
+        "relative overflow-hidden rounded-2xl bg-zinc-950 px-5 py-5 text-white",
+      name:
+        "text-[30px] font-bold tracking-[-0.045em]",
+      title:
+        "text-[14px] font-medium text-[#d8c09b]",
       section:
         "border-b border-[#987542]/30 pb-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-[#987542]",
       accent: "bg-[#987542]",
     },
+
     ats: {
       page: "bg-white text-black",
       header: "border-b border-black pb-4",
       name: "text-[28px] font-bold",
-      title: "text-[13px] font-medium text-black",
+      title:
+        "text-[13px] font-medium text-black",
       section:
         "border-b border-black pb-1 text-[10px] font-bold uppercase tracking-[0.1em]",
       accent: "bg-black",
     },
+
     tech: {
       page: "bg-white text-zinc-900",
-      header: "border-l-4 border-slate-700 bg-slate-50 px-5 py-4",
-      name: "text-[29px] font-bold tracking-[-0.04em] text-slate-900",
-      title: "text-[13px] font-medium text-slate-600",
+      header:
+        "border-l-4 border-slate-700 bg-slate-50 px-5 py-4",
+      name:
+        "text-[29px] font-bold tracking-[-0.04em] text-slate-900",
+      title:
+        "text-[13px] font-medium text-slate-600",
       section:
         "border-b border-slate-200 pb-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-700",
       accent: "bg-slate-700",
     },
+
     elegant: {
       page: "bg-white text-zinc-900",
-      header: "border-b border-[#987542]/40 pb-5 text-center",
-      name: "text-[30px] font-semibold tracking-[-0.04em]",
-      title: "text-[14px] font-medium text-[#987542]",
+      header:
+        "border-b border-[#987542]/40 pb-5 text-center",
+      name:
+        "text-[30px] font-semibold tracking-[-0.04em]",
+      title:
+        "text-[14px] font-medium text-[#987542]",
       section:
         "border-b border-[#987542]/30 pb-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#987542]",
       accent: "bg-[#987542]",
     },
   };
 
-  const style = templateStyles[template] || templateStyles.executive;
+  const style =
+    templateStyles[template] ||
+    templateStyles.executive;
+
   const centered = template === "elegant";
 
   const SectionTitle = ({ children }) => (
-    <h2 className={style.section}>{children}</h2>
+    <h2 className={style.section}>
+      {children}
+    </h2>
   );
 
   return (
-    <div id="resume-print-area" className="resume-print-area mx-auto w-full max-w-[760px]">
+    <div
+      id="resume-print-area"
+      className="resume-print-area mx-auto w-full max-w-[760px]"
+    >
       <div className="overflow-hidden bg-white shadow-[0_20px_70px_rgba(24,24,27,0.12)]">
-        <div className={`min-h-[1060px] p-[8%] ${style.page}`}>
+        <div
+          className={`min-h-[1060px] p-[8%] ${style.page}`}
+        >
           <header className={style.header}>
             {template === "creative" && (
               <div className="absolute -right-8 -top-10 h-28 w-28 rounded-full bg-[#987542]/20" />
             )}
 
-            <div className={centered ? "text-center" : ""}>
+            <div
+              className={
+                centered
+                  ? "text-center"
+                  : ""
+              }
+            >
               <h1 className={style.name}>
-                {resume.personal.firstName || "Your"}{" "}
-                {resume.personal.lastName || "Name"}
+                {resume.personal.firstName ||
+                  "Your"}{" "}
+                {resume.personal.lastName ||
+                  "Name"}
               </h1>
 
-              <p className={`mt-1 ${style.title}`}>
-                {resume.personal.title || "Professional Title"}
+              <p
+                className={`mt-1 ${style.title}`}
+              >
+                {resume.personal.title ||
+                  "Professional Title"}
               </p>
 
               <div
@@ -374,7 +422,9 @@ function ResumePreview({ resume, template = "executive" }) {
                   template === "creative"
                     ? "text-zinc-300"
                     : "text-zinc-500",
-                  centered ? "justify-center" : "",
+                  centered
+                    ? "justify-center"
+                    : "",
                 ].join(" ")}
               >
                 {resume.personal.email && (
@@ -383,20 +433,25 @@ function ResumePreview({ resume, template = "executive" }) {
                     {resume.personal.email}
                   </span>
                 )}
+
                 {resume.personal.phone && (
                   <span className="flex items-center gap-1">
                     <Phone size={9} />
                     {resume.personal.phone}
                   </span>
                 )}
+
                 {resume.personal.location && (
                   <span className="flex items-center gap-1">
                     <MapPin size={9} />
                     {resume.personal.location}
                   </span>
                 )}
+
                 {resume.personal.website && (
-                  <span>{resume.personal.website}</span>
+                  <span>
+                    {resume.personal.website}
+                  </span>
                 )}
               </div>
             </div>
@@ -405,8 +460,11 @@ function ResumePreview({ resume, template = "executive" }) {
           {resume.summary && (
             <section className="mt-6">
               <SectionTitle>
-                {template === "elegant" ? "Professional Profile" : "Profile"}
+                {template === "elegant"
+                  ? "Professional Profile"
+                  : "Profile"}
               </SectionTitle>
+
               <p className="mt-2.5 text-[9px] leading-[1.7] text-zinc-600">
                 {resume.summary}
               </p>
@@ -415,149 +473,208 @@ function ResumePreview({ resume, template = "executive" }) {
 
           {resume.experience.length > 0 && (
             <section className="mt-6">
-              <SectionTitle>Experience</SectionTitle>
+              <SectionTitle>
+                Experience
+              </SectionTitle>
+
               <div className="mt-3 space-y-5">
-                {resume.experience.map((item) => (
-                  <div key={item.id}>
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <h3 className="text-[11px] font-bold">
-                          {item.position}
-                        </h3>
-                        <p className="mt-0.5 text-[9px] font-medium text-zinc-500">
-                          {item.company}
-                          {item.location ? ` · ${item.location}` : ""}
-                        </p>
+                {resume.experience.map(
+                  (item) => (
+                    <div key={item.id}>
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <h3 className="text-[11px] font-bold">
+                            {item.position}
+                          </h3>
+
+                          <p className="mt-0.5 text-[9px] font-medium text-zinc-500">
+                            {item.company}
+                            {item.location
+                              ? ` · ${item.location}`
+                              : ""}
+                          </p>
+                        </div>
+
+                        <span className="shrink-0 text-[8px] text-zinc-400">
+                          {item.startDate} —{" "}
+                          {item.endDate}
+                        </span>
                       </div>
-                      <span className="shrink-0 text-[8px] text-zinc-400">
-                        {item.startDate} — {item.endDate}
-                      </span>
+
+                      <p className="mt-1.5 text-[8.5px] leading-[1.65] text-zinc-600">
+                        {item.description}
+                      </p>
                     </div>
-                    <p className="mt-1.5 text-[8.5px] leading-[1.65] text-zinc-600">
-                      {item.description}
-                    </p>
-                  </div>
-                ))}
+                  ),
+                )}
               </div>
             </section>
           )}
 
           {resume.education.length > 0 && (
             <section className="mt-6">
-              <SectionTitle>Education</SectionTitle>
+              <SectionTitle>
+                Education
+              </SectionTitle>
+
               <div className="mt-3 space-y-4">
-                {resume.education.map((item) => (
-                  <div key={item.id}>
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <h3 className="text-[10px] font-bold">{item.degree}</h3>
-                        <p className="mt-0.5 text-[8.5px] text-zinc-500">
-                          {item.school}
-                          {item.location ? ` · ${item.location}` : ""}
-                        </p>
+                {resume.education.map(
+                  (item) => (
+                    <div key={item.id}>
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <h3 className="text-[10px] font-bold">
+                            {item.degree}
+                          </h3>
+
+                          <p className="mt-0.5 text-[8.5px] text-zinc-500">
+                            {item.school}
+                            {item.location
+                              ? ` · ${item.location}`
+                              : ""}
+                          </p>
+                        </div>
+
+                        <span className="shrink-0 text-[8px] text-zinc-400">
+                          {item.startDate} —{" "}
+                          {item.endDate}
+                        </span>
                       </div>
-                      <span className="shrink-0 text-[8px] text-zinc-400">
-                        {item.startDate} — {item.endDate}
-                      </span>
                     </div>
-                  </div>
-                ))}
+                  ),
+                )}
               </div>
             </section>
           )}
 
           {resume.skills.length > 0 && (
             <section className="mt-6">
-              <SectionTitle>Skills</SectionTitle>
+              <SectionTitle>
+                Skills
+              </SectionTitle>
+
               <div className="mt-3 flex flex-wrap gap-1.5">
-                {resume.skills.map((skill) => (
-                  <span
-                    key={skill}
-                    className={[
-                      "px-2 py-1 text-[8px] font-medium",
-                      template === "ats"
-                        ? "rounded-none border border-black text-black"
-                        : template === "elegant"
-                          ? "rounded-full border border-[#987542]/30 text-[#987542]"
-                          : "rounded bg-zinc-100 text-zinc-600",
-                    ].join(" ")}
-                  >
-                    {skill}
-                  </span>
-                ))}
+                {resume.skills.map(
+                  (skill) => (
+                    <span
+                      key={skill}
+                      className={[
+                        "px-2 py-1 text-[8px] font-medium",
+                        template === "ats"
+                          ? "rounded-none border border-black text-black"
+                          : template === "elegant"
+                            ? "rounded-full border border-[#987542]/30 text-[#987542]"
+                            : "rounded bg-zinc-100 text-zinc-600",
+                      ].join(" ")}
+                    >
+                      {skill}
+                    </span>
+                  ),
+                )}
               </div>
             </section>
           )}
 
           {resume.projects.length > 0 && (
             <section className="mt-6">
-              <SectionTitle>Projects</SectionTitle>
+              <SectionTitle>
+                Projects
+              </SectionTitle>
+
               <div className="mt-3 space-y-4">
-                {resume.projects.map((item) => (
-                  <div key={item.id}>
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-[10px] font-bold">{item.name}</h3>
-                      {item.link && (
-                        <span className="text-[8px] text-zinc-400">
-                          {item.link}
-                        </span>
-                      )}
+                {resume.projects.map(
+                  (item) => (
+                    <div key={item.id}>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-[10px] font-bold">
+                          {item.name}
+                        </h3>
+
+                        {item.link && (
+                          <span className="text-[8px] text-zinc-400">
+                            {item.link}
+                          </span>
+                        )}
+                      </div>
+
+                      <p className="mt-1.5 text-[8.5px] leading-[1.65] text-zinc-600">
+                        {item.description}
+                      </p>
                     </div>
-                    <p className="mt-1.5 text-[8.5px] leading-[1.65] text-zinc-600">
-                      {item.description}
-                    </p>
-                  </div>
-                ))}
+                  ),
+                )}
               </div>
             </section>
           )}
 
-          {resume.certifications.length > 0 && (
+          {resume.certifications.length >
+            0 && (
             <section className="mt-6">
-              <SectionTitle>Certifications</SectionTitle>
+              <SectionTitle>
+                Certifications
+              </SectionTitle>
+
               <div className="mt-3 space-y-2">
-                {resume.certifications.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center justify-between"
-                  >
-                    <div>
-                      <p className="text-[9px] font-semibold">{item.name}</p>
-                      <p className="text-[8px] text-zinc-500">{item.issuer}</p>
+                {resume.certifications.map(
+                  (item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between gap-4"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-[9px] font-semibold">
+                          {item.name}
+                        </p>
+
+                        <p className="text-[8px] text-zinc-500">
+                          {item.issuer}
+                        </p>
+                      </div>
+
+                      <span className="shrink-0 text-[8px] text-zinc-400">
+                        {item.year}
+                      </span>
                     </div>
-                    <span className="text-[8px] text-zinc-400">
-                      {item.year}
-                    </span>
-                  </div>
-                ))}
+                  ),
+                )}
               </div>
             </section>
           )}
 
           {resume.languages.length > 0 && (
             <section className="mt-6">
-              <SectionTitle>Languages</SectionTitle>
+              <SectionTitle>
+                Languages
+              </SectionTitle>
+
               <div
                 className={[
                   "mt-3 flex flex-wrap gap-x-6 gap-y-2",
-                  centered ? "justify-center" : "",
+                  centered
+                    ? "justify-center"
+                    : "",
                 ].join(" ")}
               >
-                {resume.languages.map((item) => (
-                  <div key={item.id}>
-                    <span className="text-[9px] font-semibold">
-                      {item.name}
-                    </span>
-                    <span className="ml-1.5 text-[8px] text-zinc-400">
-                      {item.level}
-                    </span>
-                  </div>
-                ))}
+                {resume.languages.map(
+                  (item) => (
+                    <div key={item.id}>
+                      <span className="text-[9px] font-semibold">
+                        {item.name}
+                      </span>
+
+                      <span className="ml-1.5 text-[8px] text-zinc-400">
+                        {item.level}
+                      </span>
+                    </div>
+                  ),
+                )}
               </div>
             </section>
           )}
 
-          <div className={`mt-7 h-0.5 w-12 ${style.accent}`} />
+          <div
+            className={`mt-7 h-0.5 w-12 ${style.accent}`}
+          />
         </div>
       </div>
     </div>
@@ -565,43 +682,93 @@ function ResumePreview({ resume, template = "executive" }) {
 }
 
 function Builder() {
-  const [searchParams] = useSearchParams();
+  const [searchParams] =
+    useSearchParams();
 
-  const requestedResumeId = searchParams.get("id");
-  const isNewResume = searchParams.get("new") === "1";
+  const requestedResumeId =
+    searchParams.get("id");
 
-  const [activeResumeId, setActiveResumeId] = useState(
-    () => (!isNewResume ? requestedResumeId : null),
+  const isNewResume =
+    searchParams.get("new") === "1";
+
+  const [activeResumeId, setActiveResumeId] =
+    useState(
+      () =>
+        !isNewResume
+          ? requestedResumeId
+          : null,
+    );
+
+  const [resume, setResume] = useState(
+    () => {
+      try {
+        if (
+          !isNewResume &&
+          requestedResumeId
+        ) {
+          const stored =
+            getResumeById(
+              requestedResumeId,
+            );
+
+          if (stored?.data) {
+            return stored.data;
+          }
+        }
+
+        if (!isNewResume) {
+          const activeId =
+            localStorage.getItem(
+              "resumely_active_resume_id",
+            );
+
+          const stored = activeId
+            ? getResumeById(activeId)
+            : null;
+
+          if (stored?.data) {
+            return stored.data;
+          }
+        }
+
+        const savedDraft =
+          localStorage.getItem(
+            "resume_builder_draft",
+          );
+
+        return savedDraft
+          ? JSON.parse(savedDraft)
+          : initialResume;
+      } catch {
+        return initialResume;
+      }
+    },
   );
 
-  const [resume, setResume] = useState(() => {
+  const [
+    selectedTemplate,
+    setSelectedTemplate,
+  ] = useState(() => {
     try {
-      if (!isNewResume && requestedResumeId) {
-        const stored = getResumeById(requestedResumeId);
-        if (stored?.data) return stored.data;
+      if (
+        !isNewResume &&
+        requestedResumeId
+      ) {
+        const stored =
+          getResumeById(
+            requestedResumeId,
+          );
+
+        if (stored?.template) {
+          return stored.template;
+        }
       }
 
-      if (!isNewResume) {
-        const activeId = localStorage.getItem("resumely_active_resume_id");
-        const stored = activeId ? getResumeById(activeId) : null;
-        if (stored?.data) return stored.data;
-      }
-
-      const savedDraft = localStorage.getItem("resume_builder_draft");
-      return savedDraft ? JSON.parse(savedDraft) : initialResume;
-    } catch {
-      return initialResume;
-    }
-  });
-
-  const [selectedTemplate, setSelectedTemplate] = useState(() => {
-    try {
-      if (!isNewResume && requestedResumeId) {
-        const stored = getResumeById(requestedResumeId);
-        if (stored?.template) return stored.template;
-      }
-
-      return localStorage.getItem("resumely_template") || "executive";
+      return (
+        localStorage.getItem(
+          "resumely_template",
+        ) || "executive"
+      );
     } catch {
       return "executive";
     }
@@ -610,15 +777,25 @@ function Builder() {
   const [activeSection, setActiveSection] =
     useState("personal");
 
-  const [mobileEditorOpen, setMobileEditorOpen] =
+  const [
+    mobileEditorOpen,
+    setMobileEditorOpen,
+  ] = useState(false);
+
+  const [saved, setSaved] =
     useState(false);
 
-  const [saved, setSaved] = useState(false);
-
   useEffect(() => {
-    const token = localStorage.getItem("resumely_token");
+    const token =
+      localStorage.getItem(
+        "resumely_token",
+      );
 
-    if (!token || isNewResume || !requestedResumeId) {
+    if (
+      !token ||
+      isNewResume ||
+      !requestedResumeId
+    ) {
       return;
     }
 
@@ -626,31 +803,62 @@ function Builder() {
 
     async function loadResumeFromBackend() {
       try {
-        const result = await getResumeFromApi(requestedResumeId);
-        const serverResume = result?.resume;
+        const result =
+          await getResumeFromApi(
+            requestedResumeId,
+          );
 
-        if (cancelled || !serverResume) {
+        const serverResume =
+          result?.resume;
+
+        if (
+          cancelled ||
+          !serverResume
+        ) {
           return;
         }
 
-        setResume(serverResume.data || initialResume);
-        setSelectedTemplate(serverResume.template || "executive");
-        setActiveResumeId(serverResume._id || requestedResumeId);
+        setResume(
+          serverResume.data ||
+            initialResume,
+        );
+
+        setSelectedTemplate(
+          serverResume.template ||
+            "executive",
+        );
+
+        setActiveResumeId(
+          serverResume._id ||
+            requestedResumeId,
+        );
 
         localStorage.setItem(
           "resume_builder_draft",
-          JSON.stringify(serverResume.data || initialResume),
+          JSON.stringify(
+            serverResume.data ||
+              initialResume,
+          ),
         );
+
         localStorage.setItem(
           "resumely_active_resume_id",
-          String(serverResume._id || requestedResumeId),
+          String(
+            serverResume._id ||
+              requestedResumeId,
+          ),
         );
+
         localStorage.setItem(
           "resumely_template",
-          serverResume.template || "executive",
+          serverResume.template ||
+            "executive",
         );
       } catch (error) {
-        console.error("Resume API load failed:", error);
+        console.error(
+          "Resume API load failed:",
+          error,
+        );
       }
     }
 
@@ -659,19 +867,13 @@ function Builder() {
     return () => {
       cancelled = true;
     };
-  }, [isNewResume, requestedResumeId]);
-
+  }, [
+    isNewResume,
+    requestedResumeId,
+  ]);
 
   const handleDownload = () => {
     try {
-      /*
-        Resume PDF download intentionally uses the same approach as the
-        Cover Letter builder: build the PDF directly with jsPDF.
-
-        This avoids html2canvas completely, so the browser's rendered CSS,
-        Tailwind colors, shadows, overflow and viewport size cannot break
-        the PDF download.
-      */
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "mm",
@@ -682,7 +884,8 @@ function Builder() {
       const pageWidth = 210;
       const pageHeight = 297;
       const margin = 20;
-      const contentWidth = pageWidth - margin * 2;
+      const contentWidth =
+        pageWidth - margin * 2;
 
       const templateColors = {
         executive: {
@@ -690,36 +893,43 @@ function Builder() {
           heading: "#18181b",
           muted: "#71717a",
         },
+
         modern: {
           accent: "#987542",
           heading: "#18181b",
           muted: "#71717a",
         },
+
         minimal: {
           accent: "#52525b",
           heading: "#18181b",
           muted: "#71717a",
         },
+
         corporate: {
           accent: "#1e293b",
           heading: "#0f172a",
           muted: "#64748b",
         },
+
         creative: {
           accent: "#987542",
           heading: "#18181b",
           muted: "#71717a",
         },
+
         ats: {
           accent: "#000000",
           heading: "#000000",
           muted: "#333333",
         },
+
         tech: {
           accent: "#475569",
           heading: "#0f172a",
           muted: "#64748b",
         },
+
         elegant: {
           accent: "#987542",
           heading: "#18181b",
@@ -728,34 +938,66 @@ function Builder() {
       };
 
       const colors =
-        templateColors[selectedTemplate] ||
+        templateColors[
+          selectedTemplate
+        ] ||
         templateColors.executive;
 
       const hexToRgb = (hex) => {
-        const clean = String(hex || "#18181b").replace("#", "");
+        const clean = String(
+          hex || "#18181b",
+        ).replace("#", "");
+
         const value =
           clean.length === 3
             ? clean
                 .split("")
-                .map((item) => item + item)
+                .map(
+                  (item) =>
+                    item + item,
+                )
                 .join("")
             : clean;
 
         return {
-          r: parseInt(value.substring(0, 2), 16) || 24,
-          g: parseInt(value.substring(2, 4), 16) || 24,
-          b: parseInt(value.substring(4, 6), 16) || 27,
+          r:
+            parseInt(
+              value.substring(0, 2),
+              16,
+            ) || 24,
+
+          g:
+            parseInt(
+              value.substring(2, 4),
+              16,
+            ) || 24,
+
+          b:
+            parseInt(
+              value.substring(4, 6),
+              16,
+            ) || 27,
         };
       };
 
-      const accentRgb = hexToRgb(colors.accent);
-      const headingRgb = hexToRgb(colors.heading);
-      const mutedRgb = hexToRgb(colors.muted);
+      const accentRgb =
+        hexToRgb(colors.accent);
+
+      const headingRgb =
+        hexToRgb(colors.heading);
+
+      const mutedRgb =
+        hexToRgb(colors.muted);
 
       let y = 20;
 
-      const addPageIfNeeded = (requiredHeight = 10) => {
-        if (y + requiredHeight > pageHeight - 18) {
+      const addPageIfNeeded = (
+        requiredHeight = 10,
+      ) => {
+        if (
+          y + requiredHeight >
+          pageHeight - 18
+        ) {
           pdf.addPage();
           y = margin;
           return true;
@@ -764,25 +1006,38 @@ function Builder() {
         return false;
       };
 
-      const addSectionTitle = (title) => {
+      const addSectionTitle = (
+        title,
+      ) => {
         addPageIfNeeded(16);
 
-        pdf.setFont("helvetica", "bold");
+        pdf.setFont(
+          "helvetica",
+          "bold",
+        );
+
         pdf.setFontSize(10);
+
         pdf.setTextColor(
           headingRgb.r,
           headingRgb.g,
           headingRgb.b,
         );
 
-        pdf.text(String(title).toUpperCase(), margin, y);
+        pdf.text(
+          String(title).toUpperCase(),
+          margin,
+          y,
+        );
 
         pdf.setDrawColor(
           accentRgb.r,
           accentRgb.g,
           accentRgb.b,
         );
+
         pdf.setLineWidth(0.35);
+
         pdf.line(
           margin,
           y + 2,
@@ -802,22 +1057,43 @@ function Builder() {
           spacing = 4,
         } = {},
       ) => {
-        if (!value) return;
+        if (!value) {
+          return;
+        }
 
-        const lines = pdf.splitTextToSize(
-          String(value),
-          contentWidth,
-        );
+        const lines =
+          pdf.splitTextToSize(
+            String(value),
+            contentWidth,
+          );
 
         const requiredHeight =
-          lines.length * lineHeight + spacing;
+          lines.length *
+            lineHeight +
+          spacing;
 
-        addPageIfNeeded(requiredHeight);
+        addPageIfNeeded(
+          requiredHeight,
+        );
 
-        pdf.setFont("helvetica", "normal");
+        pdf.setFont(
+          "helvetica",
+          "normal",
+        );
+
         pdf.setFontSize(fontSize);
-        pdf.setTextColor(color.r, color.g, color.b);
-        pdf.text(lines, margin, y);
+
+        pdf.setTextColor(
+          color.r,
+          color.g,
+          color.b,
+        );
+
+        pdf.text(
+          lines,
+          margin,
+          y,
+        );
 
         y += requiredHeight;
       };
@@ -828,25 +1104,37 @@ function Builder() {
         date,
         description,
       }) => {
-        const descriptionLines = description
-          ? pdf.splitTextToSize(
-              String(description),
-              contentWidth,
-            )
-          : [];
+        const descriptionLines =
+          description
+            ? pdf.splitTextToSize(
+                String(
+                  description,
+                ),
+                contentWidth,
+              )
+            : [];
 
         const requiredHeight =
           7 +
           (subtitle ? 4 : 0) +
           (date ? 4 : 0) +
           (descriptionLines.length
-            ? descriptionLines.length * 3.8 + 3
+            ? descriptionLines.length *
+                3.8 +
+              3
             : 0);
 
-        addPageIfNeeded(requiredHeight);
+        addPageIfNeeded(
+          requiredHeight,
+        );
 
-        pdf.setFont("helvetica", "bold");
+        pdf.setFont(
+          "helvetica",
+          "bold",
+        );
+
         pdf.setFontSize(9);
+
         pdf.setTextColor(
           headingRgb.r,
           headingRgb.g,
@@ -854,96 +1142,163 @@ function Builder() {
         );
 
         if (date) {
-          const safeDate = String(date);
+          const safeDate =
+            String(date);
+
           const titleWidth =
             contentWidth -
-            pdf.getTextWidth(safeDate) -
+            pdf.getTextWidth(
+              safeDate,
+            ) -
             5;
 
-          const titleLines = pdf.splitTextToSize(
-            String(title || ""),
-            Math.max(titleWidth, 40),
+          const titleLines =
+            pdf.splitTextToSize(
+              String(title || ""),
+              Math.max(
+                titleWidth,
+                40,
+              ),
+            );
+
+          pdf.text(
+            titleLines,
+            margin,
+            y,
           );
 
-          pdf.text(titleLines, margin, y);
+          pdf.setFont(
+            "helvetica",
+            "normal",
+          );
 
-          pdf.setFont("helvetica", "normal");
           pdf.setFontSize(7.5);
+
           pdf.setTextColor(
             mutedRgb.r,
             mutedRgb.g,
             mutedRgb.b,
           );
+
           pdf.text(
             safeDate,
             pageWidth - margin,
             y,
-            { align: "right" },
+            {
+              align: "right",
+            },
           );
 
-          y += titleLines.length * 4;
+          y +=
+            titleLines.length * 4;
         } else {
-          const titleLines = pdf.splitTextToSize(
-            String(title || ""),
-            contentWidth,
+          const titleLines =
+            pdf.splitTextToSize(
+              String(title || ""),
+              contentWidth,
+            );
+
+          pdf.text(
+            titleLines,
+            margin,
+            y,
           );
 
-          pdf.text(titleLines, margin, y);
-          y += titleLines.length * 4;
+          y +=
+            titleLines.length * 4;
         }
 
         if (subtitle) {
-          const subtitleLines = pdf.splitTextToSize(
-            String(subtitle),
-            contentWidth,
+          const subtitleLines =
+            pdf.splitTextToSize(
+              String(subtitle),
+              contentWidth,
+            );
+
+          pdf.setFont(
+            "helvetica",
+            "normal",
           );
 
-          pdf.setFont("helvetica", "normal");
           pdf.setFontSize(8);
+
           pdf.setTextColor(
             mutedRgb.r,
             mutedRgb.g,
             mutedRgb.b,
           );
-          pdf.text(subtitleLines, margin, y);
-          y += subtitleLines.length * 3.8;
+
+          pdf.text(
+            subtitleLines,
+            margin,
+            y,
+          );
+
+          y +=
+            subtitleLines.length *
+            3.8;
         }
 
         if (description) {
-          const lines = pdf.splitTextToSize(
-            String(description),
-            contentWidth,
+          const lines =
+            pdf.splitTextToSize(
+              String(description),
+              contentWidth,
+            );
+
+          addPageIfNeeded(
+            lines.length * 3.8 +
+              2,
           );
 
-          addPageIfNeeded(lines.length * 3.8 + 2);
+          pdf.setFont(
+            "helvetica",
+            "normal",
+          );
 
-          pdf.setFont("helvetica", "normal");
           pdf.setFontSize(8);
+
           pdf.setTextColor(
             mutedRgb.r,
             mutedRgb.g,
             mutedRgb.b,
           );
-          pdf.text(lines, margin, y);
-          y += lines.length * 3.8 + 2;
+
+          pdf.text(
+            lines,
+            margin,
+            y,
+          );
+
+          y +=
+            lines.length * 3.8 +
+            2;
         }
 
         y += 3;
       };
-
-      // =========================================================
-      // HEADER
-      // =========================================================
 
       pdf.setFillColor(
         accentRgb.r,
         accentRgb.g,
         accentRgb.b,
       );
-      pdf.rect(0, 0, pageWidth, 3, "F");
 
-      pdf.setFont("helvetica", "bold");
+      pdf.rect(
+        0,
+        0,
+        pageWidth,
+        3,
+        "F",
+      );
+
+      pdf.setFont(
+        "helvetica",
+        "bold",
+      );
+
       pdf.setFontSize(22);
+
       pdf.setTextColor(
         headingRgb.r,
         headingRgb.g,
@@ -953,23 +1308,37 @@ function Builder() {
       const fullName =
         `${resume.personal.firstName || ""} ${
           resume.personal.lastName || ""
-        }`.trim() || "Your Name";
+        }`.trim() ||
+        "Your Name";
 
-      pdf.text(fullName, margin, y + 5);
+      pdf.text(
+        fullName,
+        margin,
+        y + 5,
+      );
+
       y += 11;
 
-      pdf.setFont("helvetica", "normal");
+      pdf.setFont(
+        "helvetica",
+        "normal",
+      );
+
       pdf.setFontSize(10);
+
       pdf.setTextColor(
         accentRgb.r,
         accentRgb.g,
         accentRgb.b,
       );
+
       pdf.text(
-        resume.personal.title || "Professional Title",
+        resume.personal.title ||
+          "Professional Title",
         margin,
         y,
       );
+
       y += 6;
 
       const contact = [
@@ -982,23 +1351,39 @@ function Builder() {
         .join("   |   ");
 
       if (contact) {
-        const contactLines = pdf.splitTextToSize(
-          contact,
-          contentWidth,
-        );
+        const contactLines =
+          pdf.splitTextToSize(
+            contact,
+            contentWidth,
+          );
 
         pdf.setFontSize(7.5);
+
         pdf.setTextColor(
           mutedRgb.r,
           mutedRgb.g,
           mutedRgb.b,
         );
-        pdf.text(contactLines, margin, y);
-        y += contactLines.length * 3.5;
+
+        pdf.text(
+          contactLines,
+          margin,
+          y,
+        );
+
+        y +=
+          contactLines.length *
+          3.5;
       }
 
-      pdf.setDrawColor(225, 225, 226);
+      pdf.setDrawColor(
+        225,
+        225,
+        226,
+      );
+
       pdf.setLineWidth(0.3);
+
       pdf.line(
         margin,
         y + 2,
@@ -1008,78 +1393,94 @@ function Builder() {
 
       y += 11;
 
-      // =========================================================
-      // SUMMARY
-      // =========================================================
-
       if (resume.summary) {
-        addSectionTitle("Profile");
-        addParagraph(resume.summary);
+        addSectionTitle(
+          "Profile",
+        );
+
+        addParagraph(
+          resume.summary,
+        );
       }
 
-      // =========================================================
-      // EXPERIENCE
-      // =========================================================
+      if (
+        resume.experience?.length >
+        0
+      ) {
+        addSectionTitle(
+          "Experience",
+        );
 
-      if (resume.experience?.length > 0) {
-        addSectionTitle("Experience");
+        resume.experience.forEach(
+          (item) => {
+            addEntry({
+              title:
+                item.position ||
+                "Position",
 
-        resume.experience.forEach((item) => {
-          addEntry({
-            title: item.position || "Position",
-            subtitle: [
-              item.company,
-              item.location,
-            ]
-              .filter(Boolean)
-              .join(" | "),
-            date: [
-              item.startDate,
-              item.endDate,
-            ]
-              .filter(Boolean)
-              .join(" — "),
-            description: item.description,
-          });
-        });
+              subtitle: [
+                item.company,
+                item.location,
+              ]
+                .filter(Boolean)
+                .join(" | "),
+
+              date: [
+                item.startDate,
+                item.endDate,
+              ]
+                .filter(Boolean)
+                .join(" — "),
+
+              description:
+                item.description,
+            });
+          },
+        );
       }
 
-      // =========================================================
-      // EDUCATION
-      // =========================================================
+      if (
+        resume.education?.length >
+        0
+      ) {
+        addSectionTitle(
+          "Education",
+        );
 
-      if (resume.education?.length > 0) {
-        addSectionTitle("Education");
+        resume.education.forEach(
+          (item) => {
+            addEntry({
+              title:
+                item.degree ||
+                "Degree",
 
-        resume.education.forEach((item) => {
-          addEntry({
-            title: item.degree || "Degree",
-            subtitle: [
-              item.school,
-              item.location,
-            ]
-              .filter(Boolean)
-              .join(" | "),
-            date: [
-              item.startDate,
-              item.endDate,
-            ]
-              .filter(Boolean)
-              .join(" — "),
-          });
-        });
+              subtitle: [
+                item.school,
+                item.location,
+              ]
+                .filter(Boolean)
+                .join(" | "),
+
+              date: [
+                item.startDate,
+                item.endDate,
+              ]
+                .filter(Boolean)
+                .join(" — "),
+            });
+          },
+        );
       }
 
-      // =========================================================
-      // SKILLS
-      // =========================================================
-
-      if (resume.skills?.length > 0) {
+      if (
+        resume.skills?.length > 0
+      ) {
         addSectionTitle("Skills");
 
-        const skills = resume.skills
-          .filter(Boolean)
-          .join("  •  ");
+        const skills =
+          resume.skills
+            .filter(Boolean)
+            .join("  •  ");
 
         addParagraph(skills, {
           fontSize: 8.5,
@@ -1089,79 +1490,116 @@ function Builder() {
         });
       }
 
-      // =========================================================
-      // PROJECTS
-      // =========================================================
+      if (
+        resume.projects?.length >
+        0
+      ) {
+        addSectionTitle(
+          "Projects",
+        );
 
-      if (resume.projects?.length > 0) {
-        addSectionTitle("Projects");
+        resume.projects.forEach(
+          (item) => {
+            const projectDescription =
+              [
+                item.description,
+                item.link
+                  ? `Link: ${item.link}`
+                  : "",
+              ]
+                .filter(Boolean)
+                .join("\n");
 
-        resume.projects.forEach((item) => {
-          const projectDescription = [
-            item.description,
-            item.link ? `Link: ${item.link}` : "",
-          ]
-            .filter(Boolean)
-            .join("\n");
+            addEntry({
+              title:
+                item.name ||
+                "Project",
 
-          addEntry({
-            title: item.name || "Project",
-            description: projectDescription,
-          });
-        });
+              description:
+                projectDescription,
+            });
+          },
+        );
       }
 
-      // =========================================================
-      // CERTIFICATIONS
-      // =========================================================
+      if (
+        resume.certifications
+          ?.length > 0
+      ) {
+        addSectionTitle(
+          "Certifications",
+        );
 
-      if (resume.certifications?.length > 0) {
-        addSectionTitle("Certifications");
+        resume.certifications.forEach(
+          (item) => {
+            addEntry({
+              title:
+                item.name ||
+                "Certification",
 
-        resume.certifications.forEach((item) => {
-          addEntry({
-            title: item.name || "Certification",
-            subtitle: item.issuer || "",
-            date: item.year || "",
-          });
-        });
+              subtitle:
+                item.issuer || "",
+
+              date: item.year || "",
+            });
+          },
+        );
       }
 
-      // =========================================================
-      // LANGUAGES
-      // =========================================================
+      if (
+        resume.languages?.length >
+        0
+      ) {
+        addSectionTitle(
+          "Languages",
+        );
 
-      if (resume.languages?.length > 0) {
-        addSectionTitle("Languages");
+        const languages =
+          resume.languages
+            .filter(
+              (item) =>
+                item?.name,
+            )
+            .map((item) =>
+              item.level
+                ? `${item.name} - ${item.level}`
+                : item.name,
+            )
+            .join("  |  ");
 
-        const languages = resume.languages
-          .filter((item) => item?.name)
-          .map((item) =>
-            item.level
-              ? `${item.name} - ${item.level}`
-              : item.name,
-          )
-          .join("  |  ");
-
-        addParagraph(languages, {
-          fontSize: 8.5,
-          lineHeight: 4,
-          color: headingRgb,
-          spacing: 5,
-        });
+        addParagraph(
+          languages,
+          {
+            fontSize: 8.5,
+            lineHeight: 4,
+            color: headingRgb,
+            spacing: 5,
+          },
+        );
       }
 
-      // =========================================================
-      // FOOTER ON ALL PAGES
-      // =========================================================
+      const totalPages =
+        pdf.getNumberOfPages();
 
-      const totalPages = pdf.getNumberOfPages();
+      for (
+        let pageNumber = 1;
+        pageNumber <= totalPages;
+        pageNumber += 1
+      ) {
+        pdf.setPage(
+          pageNumber,
+        );
 
-      for (let pageNumber = 1; pageNumber <= totalPages; pageNumber += 1) {
-        pdf.setPage(pageNumber);
+        pdf.setDrawColor(
+          235,
+          235,
+          236,
+        );
 
-        pdf.setDrawColor(235, 235, 236);
-        pdf.setLineWidth(0.25);
+        pdf.setLineWidth(
+          0.25,
+        );
+
         pdf.line(
           margin,
           pageHeight - 13,
@@ -1169,9 +1607,18 @@ function Builder() {
           pageHeight - 13,
         );
 
-        pdf.setFont("helvetica", "normal");
+        pdf.setFont(
+          "helvetica",
+          "normal",
+        );
+
         pdf.setFontSize(6.5);
-        pdf.setTextColor(161, 161, 170);
+
+        pdf.setTextColor(
+          161,
+          161,
+          170,
+        );
 
         pdf.text(
           fullName,
@@ -1183,17 +1630,30 @@ function Builder() {
           `${selectedTemplate || "executive"}  |  ${pageNumber}/${totalPages}`,
           pageWidth - margin,
           pageHeight - 8,
-          { align: "right" },
+          {
+            align: "right",
+          },
         );
       }
 
       const safeName =
-        makeResumeTitle(resume)
-          .replace(/[^a-z0-9]+/gi, "-")
-          .replace(/^-+|-+$/g, "")
-          .toLowerCase() || "resume";
+        makeResumeTitle(
+          resume,
+        )
+          .replace(
+            /[^a-z0-9]+/gi,
+            "-",
+          )
+          .replace(
+            /^-+|-+$/g,
+            "",
+          )
+          .toLowerCase() ||
+        "resume";
 
-      pdf.save(`${safeName}.pdf`);
+      pdf.save(
+        `${safeName}.pdf`,
+      );
     } catch (error) {
       console.error(
         "Resume PDF download failed:",
@@ -1206,9 +1666,13 @@ function Builder() {
     }
   };
 
-  const updatePersonal = (field, value) => {
+  const updatePersonal = (
+    field,
+    value,
+  ) => {
     setResume((current) => ({
       ...current,
+
       personal: {
         ...current.personal,
         [field]: value,
@@ -1218,7 +1682,10 @@ function Builder() {
     setSaved(false);
   };
 
-  const updateResumeField = (field, value) => {
+  const updateResumeField = (
+    field,
+    value,
+  ) => {
     setResume((current) => ({
       ...current,
       [field]: value,
@@ -1227,17 +1694,24 @@ function Builder() {
     setSaved(false);
   };
 
-  const updateExperience = (id, field, value) => {
+  const updateExperience = (
+    id,
+    field,
+    value,
+  ) => {
     setResume((current) => ({
       ...current,
-      experience: current.experience.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              [field]: value,
-            }
-          : item,
-      ),
+
+      experience:
+        current.experience.map(
+          (item) =>
+            item.id === id
+              ? {
+                  ...item,
+                  [field]: value,
+                }
+              : item,
+        ),
     }));
 
     setSaved(false);
@@ -1256,38 +1730,54 @@ function Builder() {
 
     setResume((current) => ({
       ...current,
+
       experience: [
         ...current.experience,
         newExperience,
       ],
     }));
 
-    setActiveSection("experience");
+    setActiveSection(
+      "experience",
+    );
+
     setSaved(false);
   };
 
-  const removeExperience = (id) => {
+  const removeExperience = (
+    id,
+  ) => {
     setResume((current) => ({
       ...current,
-      experience: current.experience.filter(
-        (item) => item.id !== id,
-      ),
+
+      experience:
+        current.experience.filter(
+          (item) =>
+            item.id !== id,
+        ),
     }));
 
     setSaved(false);
   };
 
-  const updateEducation = (id, field, value) => {
+  const updateEducation = (
+    id,
+    field,
+    value,
+  ) => {
     setResume((current) => ({
       ...current,
-      education: current.education.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              [field]: value,
-            }
-          : item,
-      ),
+
+      education:
+        current.education.map(
+          (item) =>
+            item.id === id
+              ? {
+                  ...item,
+                  [field]: value,
+                }
+              : item,
+        ),
     }));
 
     setSaved(false);
@@ -1305,38 +1795,54 @@ function Builder() {
 
     setResume((current) => ({
       ...current,
+
       education: [
         ...current.education,
         newEducation,
       ],
     }));
 
-    setActiveSection("education");
+    setActiveSection(
+      "education",
+    );
+
     setSaved(false);
   };
 
-  const removeEducation = (id) => {
+  const removeEducation = (
+    id,
+  ) => {
     setResume((current) => ({
       ...current,
-      education: current.education.filter(
-        (item) => item.id !== id,
-      ),
+
+      education:
+        current.education.filter(
+          (item) =>
+            item.id !== id,
+        ),
     }));
 
     setSaved(false);
   };
 
-  const updateProject = (id, field, value) => {
+  const updateProject = (
+    id,
+    field,
+    value,
+  ) => {
     setResume((current) => ({
       ...current,
-      projects: current.projects.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              [field]: value,
-            }
-          : item,
-      ),
+
+      projects:
+        current.projects.map(
+          (item) =>
+            item.id === id
+              ? {
+                  ...item,
+                  [field]: value,
+                }
+              : item,
+        ),
     }));
 
     setSaved(false);
@@ -1352,38 +1858,51 @@ function Builder() {
 
     setResume((current) => ({
       ...current,
+
       projects: [
         ...current.projects,
         newProject,
       ],
     }));
 
-    setActiveSection("projects");
+    setActiveSection(
+      "projects",
+    );
+
     setSaved(false);
   };
 
   const removeProject = (id) => {
     setResume((current) => ({
       ...current,
-      projects: current.projects.filter(
-        (item) => item.id !== id,
-      ),
+
+      projects:
+        current.projects.filter(
+          (item) =>
+            item.id !== id,
+        ),
     }));
 
     setSaved(false);
   };
 
-  const updateCertification = (id, field, value) => {
+  const updateCertification = (
+    id,
+    field,
+    value,
+  ) => {
     setResume((current) => ({
       ...current,
+
       certifications:
-        current.certifications.map((item) =>
-          item.id === id
-            ? {
-                ...item,
-                [field]: value,
-              }
-            : item,
+        current.certifications.map(
+          (item) =>
+            item.id === id
+              ? {
+                  ...item,
+                  [field]: value,
+                }
+              : item,
         ),
     }));
 
@@ -1400,39 +1919,54 @@ function Builder() {
 
     setResume((current) => ({
       ...current,
+
       certifications: [
         ...current.certifications,
         newCertification,
       ],
     }));
 
-    setActiveSection("certifications");
+    setActiveSection(
+      "certifications",
+    );
+
     setSaved(false);
   };
 
-  const removeCertification = (id) => {
+  const removeCertification = (
+    id,
+  ) => {
     setResume((current) => ({
       ...current,
+
       certifications:
         current.certifications.filter(
-          (item) => item.id !== id,
+          (item) =>
+            item.id !== id,
         ),
     }));
 
     setSaved(false);
   };
 
-  const updateLanguage = (id, field, value) => {
+  const updateLanguage = (
+    id,
+    field,
+    value,
+  ) => {
     setResume((current) => ({
       ...current,
-      languages: current.languages.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              [field]: value,
-            }
-          : item,
-      ),
+
+      languages:
+        current.languages.map(
+          (item) =>
+            item.id === id
+              ? {
+                  ...item,
+                  [field]: value,
+                }
+              : item,
+        ),
     }));
 
     setSaved(false);
@@ -1447,22 +1981,31 @@ function Builder() {
 
     setResume((current) => ({
       ...current,
+
       languages: [
         ...current.languages,
         newLanguage,
       ],
     }));
 
-    setActiveSection("languages");
+    setActiveSection(
+      "languages",
+    );
+
     setSaved(false);
   };
 
-  const removeLanguage = (id) => {
+  const removeLanguage = (
+    id,
+  ) => {
     setResume((current) => ({
       ...current,
-      languages: current.languages.filter(
-        (item) => item.id !== id,
-      ),
+
+      languages:
+        current.languages.filter(
+          (item) =>
+            item.id !== id,
+        ),
     }));
 
     setSaved(false);
@@ -1471,30 +2014,46 @@ function Builder() {
   const addSkill = () => {
     setResume((current) => ({
       ...current,
+
       skills: [
         ...current.skills,
-        `New Skill ${current.skills.length + 1}`,
+        `New Skill ${
+          current.skills.length + 1
+        }`,
       ],
     }));
 
     setSaved(false);
   };
 
-  const removeSkill = (skillIndex) => {
+  const removeSkill = (
+    skillIndex,
+  ) => {
     setResume((current) => ({
       ...current,
-      skills: current.skills.filter(
-        (_, index) => index !== skillIndex,
-      ),
+
+      skills:
+        current.skills.filter(
+          (_, index) =>
+            index !== skillIndex,
+        ),
     }));
 
     setSaved(false);
   };
 
   const handleSave = async () => {
-    const now = new Date().toISOString();
-    const token = localStorage.getItem("resumely_token");
-    const title = makeResumeTitle(resume);
+    const now =
+      new Date().toISOString();
+
+    const token =
+      localStorage.getItem(
+        "resumely_token",
+      );
+
+    const title =
+      makeResumeTitle(resume);
+
     const payload = {
       title,
       template: selectedTemplate,
@@ -1504,58 +2063,114 @@ function Builder() {
     if (token) {
       try {
         const isMongoId =
-          typeof activeResumeId === "string" &&
-          /^[a-f\d]{24}$/i.test(activeResumeId);
+          typeof activeResumeId ===
+            "string" &&
+          /^[a-f\d]{24}$/i.test(
+            activeResumeId,
+          );
 
         const result = isMongoId
-          ? await updateResumeOnApi(activeResumeId, payload)
-          : await createResume(payload);
+          ? await updateResumeOnApi(
+              activeResumeId,
+              payload,
+            )
+          : await createResume(
+              payload,
+            );
 
-        const serverResume = result?.resume;
+        const serverResume =
+          result?.resume;
 
-        if (!serverResume?._id) {
-          throw new Error("Resume was not returned by the server.");
+        if (
+          !serverResume?._id
+        ) {
+          throw new Error(
+            "Resume was not returned by the server.",
+          );
         }
 
-        const recordId = serverResume._id;
+        const recordId =
+          serverResume._id;
+
         const localRecord = {
           id: recordId,
-          title: serverResume.title || title,
-          template: serverResume.template || selectedTemplate,
+          title:
+            serverResume.title ||
+            title,
+
+          template:
+            serverResume.template ||
+            selectedTemplate,
+
           progress:
             serverResume.progress ??
-            calculateResumeProgress(resume),
-          createdAt: serverResume.createdAt || now,
-          updatedAt: serverResume.updatedAt || now,
-          data: serverResume.data || resume,
+            calculateResumeProgress(
+              resume,
+            ),
+
+          createdAt:
+            serverResume.createdAt ||
+            now,
+
+          updatedAt:
+            serverResume.updatedAt ||
+            now,
+
+          data:
+            serverResume.data ||
+            resume,
         };
 
-        const existing = getResumes();
-        const withoutCurrent = existing.filter(
-          (item) => String(item.id) !== String(recordId),
-        );
+        const existing =
+          getResumes();
 
-        saveResumes([localRecord, ...withoutCurrent]);
-        setActiveResumeId(recordId);
+        const withoutCurrent =
+          existing.filter(
+            (item) =>
+              String(item.id) !==
+              String(recordId),
+          );
+
+        saveResumes([
+          localRecord,
+          ...withoutCurrent,
+        ]);
+
+        setActiveResumeId(
+          recordId,
+        );
 
         localStorage.setItem(
           "resume_builder_draft",
-          JSON.stringify(serverResume.data || resume),
+          JSON.stringify(
+            serverResume.data ||
+              resume,
+          ),
         );
+
         localStorage.setItem(
           "resumely_active_resume_id",
           String(recordId),
         );
+
         localStorage.setItem(
           "resumely_template",
-          serverResume.template || selectedTemplate,
+          serverResume.template ||
+            selectedTemplate,
         );
+
         localStorage.setItem(
           "resumely_template_name",
-          (serverResume.template || selectedTemplate)
+          (
+            serverResume.template ||
+            selectedTemplate
+          )
             .charAt(0)
             .toUpperCase() +
-            (serverResume.template || selectedTemplate).slice(1),
+            (
+              serverResume.template ||
+              selectedTemplate
+            ).slice(1),
         );
 
         setSaved(true);
@@ -1566,49 +2181,77 @@ function Builder() {
 
         return;
       } catch (error) {
-        console.error("Resume cloud save failed:", error);
+        console.error(
+          "Resume cloud save failed:",
+          error,
+        );
+
         window.alert(
           error?.message ||
             "Resume could not be saved to your account. Please try again.",
         );
+
         return;
       }
     }
 
-    // Keep local storage as a fallback for signed-out/local development use.
-    const existing = getResumes();
-    let recordId = activeResumeId;
+    const existing =
+      getResumes();
+
+    let recordId =
+      activeResumeId;
 
     if (recordId) {
-      const next = existing.map((item) =>
-        String(item.id) === String(recordId)
-          ? {
-              ...item,
-              title,
-              template: selectedTemplate,
-              progress: calculateResumeProgress(resume),
-              updatedAt: now,
-              data: resume,
-            }
-          : item,
-      );
+      const next =
+        existing.map(
+          (item) =>
+            String(item.id) ===
+            String(recordId)
+              ? {
+                  ...item,
+                  title,
+                  template:
+                    selectedTemplate,
+
+                  progress:
+                    calculateResumeProgress(
+                      resume,
+                    ),
+
+                  updatedAt: now,
+                  data: resume,
+                }
+              : item,
+        );
 
       saveResumes(next);
     } else {
-      const localId = Date.now();
+      const localId =
+        Date.now();
+
       recordId = localId;
-      setActiveResumeId(localId);
+
+      setActiveResumeId(
+        localId,
+      );
 
       saveResumes([
         {
           id: localId,
           title,
-          template: selectedTemplate,
-          progress: calculateResumeProgress(resume),
+          template:
+            selectedTemplate,
+
+          progress:
+            calculateResumeProgress(
+              resume,
+            ),
+
           createdAt: now,
           updatedAt: now,
           data: resume,
         },
+
         ...existing,
       ]);
     }
@@ -1617,14 +2260,23 @@ function Builder() {
       "resume_builder_draft",
       JSON.stringify(resume),
     );
+
     localStorage.setItem(
       "resumely_active_resume_id",
       String(recordId),
     );
-    localStorage.setItem("resumely_template", selectedTemplate);
+
+    localStorage.setItem(
+      "resumely_template",
+      selectedTemplate,
+    );
+
     localStorage.setItem(
       "resumely_template_name",
-      selectedTemplate.charAt(0).toUpperCase() + selectedTemplate.slice(1),
+      selectedTemplate
+        .charAt(0)
+        .toUpperCase() +
+        selectedTemplate.slice(1),
     );
 
     setSaved(true);
@@ -1687,249 +2339,366 @@ function Builder() {
             -webkit-print-color-adjust: exact !important;
           }
         }
+
+        @media (max-width: 639px) {
+          .resume-builder-preview {
+            -webkit-overflow-scrolling: touch;
+          }
+        }
       `}</style>
 
-      <div className="min-h-screen bg-[#f3f3f0] text-zinc-950">
-      {/* =====================================================
-          TOP BAR
-      ====================================================== */}
+      <div className="min-h-screen min-w-0 overflow-x-hidden bg-[#f3f3f0] text-zinc-950">
+        {/* =====================================================
+            TOP BAR
+        ====================================================== */}
 
-      <header className="sticky top-0 z-50 border-b border-stone-200 bg-white/95 backdrop-blur">
-        <div className="flex h-[68px] items-center justify-between px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3">
-            <Link
-              to="/dashboard/resumes"
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-stone-200 text-zinc-600 transition hover:bg-stone-100"
-              title="Back to resumes"
-            >
-              <ArrowLeft size={17} />
-            </Link>
+        <header className="sticky top-0 z-50 border-b border-stone-200 bg-white/95 backdrop-blur">
+          <div className="flex h-[64px] min-w-0 items-center justify-between gap-2 px-3 sm:h-[68px] sm:px-6 lg:px-8">
+            {/* LEFT */}
+            <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+              <Link
+                to="/dashboard/resumes"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-stone-200 text-zinc-600 transition hover:bg-stone-100"
+                title="Back to resumes"
+              >
+                <ArrowLeft size={17} />
+              </Link>
 
-            <div className="hidden h-6 w-px bg-stone-200 sm:block" />
+              <div className="hidden h-6 w-px bg-stone-200 sm:block" />
 
-            <div>
-              <div className="flex items-center gap-2">
-                <FileText
-                  size={15}
-                  className="text-[#987542]"
-                />
+              <div className="min-w-0">
+                <div className="flex min-w-0 items-center gap-2">
+                  <FileText
+                    size={15}
+                    className="shrink-0 text-[#987542]"
+                  />
 
-                <span className="max-w-[260px] truncate text-sm font-semibold text-zinc-900">
-                  {makeResumeTitle(resume)}
+                  <span className="max-w-[125px] truncate text-xs font-semibold text-zinc-900 xs:max-w-[180px] sm:max-w-[260px] sm:text-sm">
+                    {makeResumeTitle(
+                      resume,
+                    )}
+                  </span>
+                </div>
+
+                <p className="mt-0.5 hidden text-[10px] text-zinc-400 sm:block">
+                  Professional resume
+                </p>
+              </div>
+            </div>
+
+            {/* RIGHT */}
+            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+              <Link
+                to="/templates"
+                className="hidden items-center gap-1.5 rounded-lg border border-stone-200 bg-white px-3 py-2 text-xs font-medium text-zinc-600 transition hover:bg-stone-50 md:flex"
+                title="Change template"
+              >
+                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#987542]" />
+
+                <span className="capitalize">
+                  {selectedTemplate}
                 </span>
-              </div>
 
-              <p className="mt-0.5 hidden text-[10px] text-zinc-400 sm:block">
-                Professional resume
-              </p>
+                <span className="text-zinc-400">
+                  · Change
+                </span>
+              </Link>
+
+              {saved && (
+                <span className="hidden items-center gap-1.5 text-xs font-medium text-emerald-600 sm:flex">
+                  <Check size={14} />
+                  Saved
+                </span>
+              )}
+
+              <button
+                type="button"
+                onClick={handleSave}
+                className="flex h-9 shrink-0 items-center gap-2 rounded-lg border border-stone-200 bg-white px-2.5 text-xs font-medium text-zinc-700 transition hover:bg-stone-50 sm:px-3"
+              >
+                <Save size={15} />
+
+                <span className="hidden sm:inline">
+                  Save
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDownload}
+                className="flex h-9 shrink-0 items-center gap-2 rounded-lg bg-zinc-950 px-2.5 text-xs font-medium text-white transition hover:bg-zinc-800 sm:px-3"
+              >
+                <Download size={15} />
+
+                <span className="hidden sm:inline">
+                  Download
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() =>
+                  setMobileEditorOpen(
+                    true,
+                  )
+                }
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-stone-200 text-zinc-600 transition hover:bg-stone-50 lg:hidden"
+                title="Open editor"
+              >
+                <Menu size={17} />
+              </button>
             </div>
           </div>
+        </header>
 
-          <div className="flex items-center gap-2">
-            <Link
-              to="/templates"
-              className="hidden items-center gap-1.5 rounded-lg border border-stone-200 bg-white px-3 py-2 text-xs font-medium text-zinc-600 transition hover:bg-stone-50 sm:flex"
-              title="Change template"
-            >
-              <span className="h-1.5 w-1.5 rounded-full bg-[#987542]" />
-              <span className="capitalize">{selectedTemplate}</span>
-              <span className="text-zinc-400">· Change</span>
-            </Link>
+        {/* =====================================================
+            BUILDER BODY
+        ====================================================== */}
 
-            {saved && (
-              <span className="hidden items-center gap-1.5 text-xs font-medium text-emerald-600 sm:flex">
-                <Check size={14} />
-                Saved
-              </span>
-            )}
+        <div className="flex min-h-[calc(100vh-64px)] min-w-0 sm:min-h-[calc(100vh-68px)]">
+          {/* ===================================================
+              DESKTOP EDITOR
+          ==================================================== */}
 
-            <button
-              type="button"
-              onClick={handleSave}
-              className="flex h-9 items-center gap-2 rounded-lg border border-stone-200 bg-white px-3 text-xs font-medium text-zinc-700 transition hover:bg-stone-50"
-            >
-              <Save size={15} />
-              <span className="hidden sm:inline">
-                Save
-              </span>
-            </button>
+          <aside className="hidden w-[360px] shrink-0 border-r border-stone-200 bg-white lg:block xl:w-[390px]">
+            <div className="sticky top-[64px] h-[calc(100vh-64px)] overflow-y-auto overscroll-contain xl:top-[68px] xl:h-[calc(100vh-68px)]">
+              <div className="border-b border-stone-200 px-4 py-5 sm:px-5">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <h2 className="text-sm font-semibold text-zinc-950">
+                      Resume Editor
+                    </h2>
 
-            <button
-              type="button"
-              onClick={handleDownload}
-              className="flex h-9 items-center gap-2 rounded-lg bg-zinc-950 px-3 text-xs font-medium text-white transition hover:bg-zinc-800"
-            >
-              <Download size={15} />
-              <span className="hidden sm:inline">
-                Download
-              </span>
-            </button>
+                    <p className="mt-1 text-xs text-zinc-500">
+                      Build your resume section by section.
+                    </p>
+                  </div>
 
-            <button
-              type="button"
-              onClick={() => setMobileEditorOpen(true)}
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-stone-200 text-zinc-600 lg:hidden"
-              title="Open editor"
-            >
-              <Menu size={17} />
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* =====================================================
-          BUILDER BODY
-      ====================================================== */}
-
-      <div className="flex min-h-[calc(100vh-68px)]">
-        {/* ===================================================
-            DESKTOP EDITOR
-        ==================================================== */}
-
-        <aside className="hidden w-[390px] shrink-0 border-r border-stone-200 bg-white lg:block">
-          <div className="sticky top-[68px] h-[calc(100vh-68px)] overflow-y-auto">
-            <div className="border-b border-stone-200 px-5 py-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-sm font-semibold text-zinc-950">
-                    Resume Editor
-                  </h2>
-
-                  <p className="mt-1 text-xs text-zinc-500">
-                    Build your resume section by section.
-                  </p>
+                  <div className="shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-medium text-emerald-700">
+                    Draft
+                  </div>
                 </div>
-
-                <div className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-medium text-emerald-700">
-                  Draft
-                </div>
-              </div>
-            </div>
-
-            <EditorPanel
-              resume={resume}
-              activeSection={activeSection}
-              setActiveSection={setActiveSection}
-              updatePersonal={updatePersonal}
-              updateResumeField={updateResumeField}
-              updateExperience={updateExperience}
-              addExperience={addExperience}
-              removeExperience={removeExperience}
-              updateEducation={updateEducation}
-              addEducation={addEducation}
-              removeEducation={removeEducation}
-              updateProject={updateProject}
-              addProject={addProject}
-              removeProject={removeProject}
-              updateCertification={updateCertification}
-              addCertification={addCertification}
-              removeCertification={removeCertification}
-              updateLanguage={updateLanguage}
-              addLanguage={addLanguage}
-              removeLanguage={removeLanguage}
-              addSkill={addSkill}
-              removeSkill={removeSkill}
-            />
-          </div>
-        </aside>
-
-        {/* ===================================================
-            MOBILE EDITOR
-        ==================================================== */}
-
-        {mobileEditorOpen && (
-          <>
-            <button
-              type="button"
-              aria-label="Close editor"
-              onClick={() => setMobileEditorOpen(false)}
-              className="fixed inset-0 z-[60] bg-zinc-950/30 lg:hidden"
-            />
-
-            <aside className="fixed bottom-0 left-0 top-0 z-[70] w-[92%] max-w-[390px] overflow-y-auto bg-white shadow-2xl lg:hidden">
-              <div className="sticky top-0 z-10 flex h-[68px] items-center justify-between border-b border-stone-200 bg-white px-5">
-                <div>
-                  <h2 className="text-sm font-semibold">
-                    Resume Editor
-                  </h2>
-
-                  <p className="text-[10px] text-zinc-400">
-                    Edit your resume
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setMobileEditorOpen(false)}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-stone-100 text-zinc-600"
-                >
-                  <X size={17} />
-                </button>
               </div>
 
               <EditorPanel
                 resume={resume}
-                activeSection={activeSection}
-                setActiveSection={setActiveSection}
-                updatePersonal={updatePersonal}
-                updateResumeField={updateResumeField}
-                updateExperience={updateExperience}
-                addExperience={addExperience}
-                removeExperience={removeExperience}
-                updateEducation={updateEducation}
-                addEducation={addEducation}
-                removeEducation={removeEducation}
-                updateProject={updateProject}
-                addProject={addProject}
-                removeProject={removeProject}
-                updateCertification={updateCertification}
-                addCertification={addCertification}
-                removeCertification={removeCertification}
-                updateLanguage={updateLanguage}
-                addLanguage={addLanguage}
-                removeLanguage={removeLanguage}
+                activeSection={
+                  activeSection
+                }
+                setActiveSection={
+                  setActiveSection
+                }
+                updatePersonal={
+                  updatePersonal
+                }
+                updateResumeField={
+                  updateResumeField
+                }
+                updateExperience={
+                  updateExperience
+                }
+                addExperience={
+                  addExperience
+                }
+                removeExperience={
+                  removeExperience
+                }
+                updateEducation={
+                  updateEducation
+                }
+                addEducation={
+                  addEducation
+                }
+                removeEducation={
+                  removeEducation
+                }
+                updateProject={
+                  updateProject
+                }
+                addProject={
+                  addProject
+                }
+                removeProject={
+                  removeProject
+                }
+                updateCertification={
+                  updateCertification
+                }
+                addCertification={
+                  addCertification
+                }
+                removeCertification={
+                  removeCertification
+                }
+                updateLanguage={
+                  updateLanguage
+                }
+                addLanguage={
+                  addLanguage
+                }
+                removeLanguage={
+                  removeLanguage
+                }
                 addSkill={addSkill}
-                removeSkill={removeSkill}
-              />
-            </aside>
-          </>
-        )}
-
-        {/* ===================================================
-            PREVIEW
-        ==================================================== */}
-
-        <main className="min-w-0 flex-1 overflow-y-auto">
-          <div className="min-h-full px-4 py-7 sm:px-8 lg:px-10 lg:py-10">
-            <div className="mx-auto mb-5 flex max-w-[760px] items-center justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#987542]">
-                  Live Preview
-                </p>
-
-                <p className="mt-1 text-xs text-zinc-400">
-                  Changes appear instantly
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2 rounded-lg border border-stone-200 bg-white px-3 py-2 text-xs text-zinc-500 shadow-sm">
-                <Eye size={14} />
-                A4 Preview
-              </div>
-            </div>
-
-            <div
-              id="resume-download-area"
-              className="mx-auto w-full max-w-[760px] bg-white"
-            >
-              <TemplateRenderer
-                resume={resume}
-                template={selectedTemplate}
+                removeSkill={
+                  removeSkill
+                }
               />
             </div>
-          </div>
-        </main>
-      </div>
+          </aside>
+
+          {/* ===================================================
+              MOBILE / TABLET EDITOR
+          ==================================================== */}
+
+          {mobileEditorOpen && (
+            <>
+              <button
+                type="button"
+                aria-label="Close editor"
+                onClick={() =>
+                  setMobileEditorOpen(
+                    false,
+                  )
+                }
+                className="fixed inset-0 z-[60] bg-zinc-950/30 backdrop-blur-[1px] lg:hidden"
+              />
+
+              <aside className="fixed bottom-0 left-0 top-0 z-[70] flex w-[92vw] max-w-[390px] flex-col overflow-hidden bg-white shadow-2xl lg:hidden">
+                <div className="flex h-[64px] shrink-0 items-center justify-between gap-3 border-b border-stone-200 bg-white px-4 sm:h-[68px] sm:px-5">
+                  <div className="min-w-0">
+                    <h2 className="text-sm font-semibold">
+                      Resume Editor
+                    </h2>
+
+                    <p className="text-[10px] text-zinc-400">
+                      Edit your resume
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setMobileEditorOpen(
+                        false,
+                      )
+                    }
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-stone-100 text-zinc-600 transition hover:bg-stone-200"
+                    aria-label="Close editor"
+                  >
+                    <X size={17} />
+                  </button>
+                </div>
+
+                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+                  <EditorPanel
+                    resume={resume}
+                    activeSection={
+                      activeSection
+                    }
+                    setActiveSection={
+                      setActiveSection
+                    }
+                    updatePersonal={
+                      updatePersonal
+                    }
+                    updateResumeField={
+                      updateResumeField
+                    }
+                    updateExperience={
+                      updateExperience
+                    }
+                    addExperience={
+                      addExperience
+                    }
+                    removeExperience={
+                      removeExperience
+                    }
+                    updateEducation={
+                      updateEducation
+                    }
+                    addEducation={
+                      addEducation
+                    }
+                    removeEducation={
+                      removeEducation
+                    }
+                    updateProject={
+                      updateProject
+                    }
+                    addProject={
+                      addProject
+                    }
+                    removeProject={
+                      removeProject
+                    }
+                    updateCertification={
+                      updateCertification
+                    }
+                    addCertification={
+                      addCertification
+                    }
+                    removeCertification={
+                      removeCertification
+                    }
+                    updateLanguage={
+                      updateLanguage
+                    }
+                    addLanguage={
+                      addLanguage
+                    }
+                    removeLanguage={
+                      removeLanguage
+                    }
+                    addSkill={addSkill}
+                    removeSkill={
+                      removeSkill
+                    }
+                  />
+                </div>
+              </aside>
+            </>
+          )}
+
+          {/* ===================================================
+              PREVIEW
+          ==================================================== */}
+
+          <main className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto">
+            <div className="min-h-full px-3 py-5 sm:px-6 sm:py-7 lg:px-10 lg:py-10">
+              <div className="mx-auto mb-5 flex w-full max-w-[760px] items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#987542] sm:text-xs">
+                    Live Preview
+                  </p>
+
+                  <p className="mt-1 text-[10px] text-zinc-400 sm:text-xs">
+                    Changes appear instantly
+                  </p>
+                </div>
+
+                <div className="flex shrink-0 items-center gap-2 rounded-lg border border-stone-200 bg-white px-2.5 py-2 text-[10px] text-zinc-500 shadow-sm sm:px-3 sm:text-xs">
+                  <Eye size={14} />
+                  <span>A4 Preview</span>
+                </div>
+              </div>
+
+              <div className="resume-builder-preview mx-auto w-full max-w-[760px] overflow-x-auto overscroll-x-contain pb-4">
+                <div
+                  id="resume-download-area"
+                  className="mx-auto w-full min-w-0 max-w-[760px] bg-white"
+                >
+                  <TemplateRenderer
+                    resume={resume}
+                    template={
+                      selectedTemplate
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
       </div>
     </>
   );
@@ -1960,36 +2729,49 @@ function EditorPanel({
   removeSkill,
 }) {
   return (
-    <div className="p-5">
-      {/* Section navigation */}
+    <div className="p-4 sm:p-5">
+      {/* =================================================
+          SECTION NAVIGATION
+      ================================================== */}
+
       <div className="mb-6 space-y-1">
-        {sectionMeta.map((section) => {
-          const Icon = section.icon;
-          const isActive =
-            activeSection === section.id;
+        {sectionMeta.map(
+          (section) => {
+            const Icon =
+              section.icon;
 
-          return (
-            <button
-              key={section.id}
-              type="button"
-              onClick={() =>
-                setActiveSection(section.id)
-              }
-              className={[
-                "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition",
-                isActive
-                  ? "bg-zinc-950 text-white"
-                  : "text-zinc-600 hover:bg-stone-100",
-              ].join(" ")}
-            >
-              <Icon size={16} />
+            const isActive =
+              activeSection ===
+              section.id;
 
-              <span className="text-xs font-medium">
-                {section.label}
-              </span>
-            </button>
-          );
-        })}
+            return (
+              <button
+                key={section.id}
+                type="button"
+                onClick={() =>
+                  setActiveSection(
+                    section.id,
+                  )
+                }
+                className={[
+                  "flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition",
+                  isActive
+                    ? "bg-zinc-950 text-white"
+                    : "text-zinc-600 hover:bg-stone-100",
+                ].join(" ")}
+              >
+                <Icon
+                  size={16}
+                  className="shrink-0"
+                />
+
+                <span className="min-w-0 truncate text-xs font-medium">
+                  {section.label}
+                </span>
+              </button>
+            );
+          },
+        )}
       </div>
 
       <div className="border-t border-stone-200 pt-6">
@@ -1997,7 +2779,8 @@ function EditorPanel({
             PERSONAL
         ================================================== */}
 
-        {activeSection === "personal" && (
+        {activeSection ===
+          "personal" && (
           <section>
             <SectionHeader
               icon={User}
@@ -2006,10 +2789,13 @@ function EditorPanel({
             />
 
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
                 <InputField
                   label="First name"
-                  value={resume.personal.firstName}
+                  value={
+                    resume.personal
+                      .firstName
+                  }
                   onChange={(value) =>
                     updatePersonal(
                       "firstName",
@@ -2021,7 +2807,10 @@ function EditorPanel({
 
                 <InputField
                   label="Last name"
-                  value={resume.personal.lastName}
+                  value={
+                    resume.personal
+                      .lastName
+                  }
                   onChange={(value) =>
                     updatePersonal(
                       "lastName",
@@ -2034,7 +2823,10 @@ function EditorPanel({
 
               <InputField
                 label="Professional title"
-                value={resume.personal.title}
+                value={
+                  resume.personal
+                    .title
+                }
                 onChange={(value) =>
                   updatePersonal(
                     "title",
@@ -2047,7 +2839,10 @@ function EditorPanel({
               <InputField
                 label="Email"
                 type="email"
-                value={resume.personal.email}
+                value={
+                  resume.personal
+                    .email
+                }
                 onChange={(value) =>
                   updatePersonal(
                     "email",
@@ -2059,7 +2854,10 @@ function EditorPanel({
 
               <InputField
                 label="Phone"
-                value={resume.personal.phone}
+                value={
+                  resume.personal
+                    .phone
+                }
                 onChange={(value) =>
                   updatePersonal(
                     "phone",
@@ -2071,7 +2869,10 @@ function EditorPanel({
 
               <InputField
                 label="Location"
-                value={resume.personal.location}
+                value={
+                  resume.personal
+                    .location
+                }
                 onChange={(value) =>
                   updatePersonal(
                     "location",
@@ -2083,7 +2884,10 @@ function EditorPanel({
 
               <InputField
                 label="Website"
-                value={resume.personal.website}
+                value={
+                  resume.personal
+                    .website
+                }
                 onChange={(value) =>
                   updatePersonal(
                     "website",
@@ -2100,7 +2904,8 @@ function EditorPanel({
             SUMMARY
         ================================================== */}
 
-        {activeSection === "summary" && (
+        {activeSection ===
+          "summary" && (
           <section>
             <SectionHeader
               icon={FileText}
@@ -2110,7 +2915,9 @@ function EditorPanel({
 
             <TextareaField
               label="Summary"
-              value={resume.summary}
+              value={
+                resume.summary
+              }
               onChange={(value) =>
                 updateResumeField(
                   "summary",
@@ -2132,30 +2939,38 @@ function EditorPanel({
             EXPERIENCE
         ================================================== */}
 
-        {activeSection === "experience" && (
+        {activeSection ===
+          "experience" && (
           <section>
             <SectionHeader
-              icon={BriefcaseBusiness}
+              icon={
+                BriefcaseBusiness
+              }
               title="Experience"
               description="Add your professional work history."
             />
 
             <div className="space-y-5">
               {resume.experience.map(
-                (item, index) => (
+                (
+                  item,
+                  index,
+                ) => (
                   <div
                     key={item.id}
-                    className="rounded-xl border border-stone-200 bg-stone-50 p-4"
+                    className="rounded-xl border border-stone-200 bg-stone-50 p-3.5 sm:p-4"
                   >
-                    <div className="mb-4 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
+                    <div className="mb-4 flex items-center justify-between gap-3">
+                      <div className="flex min-w-0 items-center gap-2">
                         <GripVertical
                           size={14}
-                          className="text-zinc-300"
+                          className="shrink-0 text-zinc-300"
                         />
 
-                        <span className="text-[11px] font-semibold text-zinc-700">
-                          Experience {index + 1}
+                        <span className="truncate text-[11px] font-semibold text-zinc-700">
+                          Experience{" "}
+                          {index +
+                            1}
                         </span>
                       </div>
 
@@ -2166,18 +2981,24 @@ function EditorPanel({
                             item.id,
                           )
                         }
-                        className="text-zinc-400 hover:text-red-600"
+                        className="shrink-0 text-zinc-400 hover:text-red-600"
                         title="Remove experience"
                       >
-                        <Trash2 size={14} />
+                        <Trash2
+                          size={14}
+                        />
                       </button>
                     </div>
 
                     <div className="space-y-3">
                       <InputField
                         label="Position"
-                        value={item.position}
-                        onChange={(value) =>
+                        value={
+                          item.position
+                        }
+                        onChange={(
+                          value,
+                        ) =>
                           updateExperience(
                             item.id,
                             "position",
@@ -2189,8 +3010,12 @@ function EditorPanel({
 
                       <InputField
                         label="Company"
-                        value={item.company}
-                        onChange={(value) =>
+                        value={
+                          item.company
+                        }
+                        onChange={(
+                          value,
+                        ) =>
                           updateExperience(
                             item.id,
                             "company",
@@ -2202,8 +3027,12 @@ function EditorPanel({
 
                       <InputField
                         label="Location"
-                        value={item.location}
-                        onChange={(value) =>
+                        value={
+                          item.location
+                        }
+                        onChange={(
+                          value,
+                        ) =>
                           updateExperience(
                             item.id,
                             "location",
@@ -2213,11 +3042,15 @@ function EditorPanel({
                         placeholder="Gurugram, India"
                       />
 
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
                         <InputField
                           label="Start"
-                          value={item.startDate}
-                          onChange={(value) =>
+                          value={
+                            item.startDate
+                          }
+                          onChange={(
+                            value,
+                          ) =>
                             updateExperience(
                               item.id,
                               "startDate",
@@ -2229,8 +3062,12 @@ function EditorPanel({
 
                         <InputField
                           label="End"
-                          value={item.endDate}
-                          onChange={(value) =>
+                          value={
+                            item.endDate
+                          }
+                          onChange={(
+                            value,
+                          ) =>
                             updateExperience(
                               item.id,
                               "endDate",
@@ -2243,8 +3080,12 @@ function EditorPanel({
 
                       <TextareaField
                         label="Description"
-                        value={item.description}
-                        onChange={(value) =>
+                        value={
+                          item.description
+                        }
+                        onChange={(
+                          value,
+                        ) =>
                           updateExperience(
                             item.id,
                             "description",
@@ -2262,8 +3103,10 @@ function EditorPanel({
 
             <button
               type="button"
-              onClick={addExperience}
-              className="mt-4 flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-stone-300 text-xs font-medium text-zinc-600 transition hover:border-zinc-900 hover:bg-stone-50"
+              onClick={
+                addExperience
+              }
+              className="mt-4 flex min-h-10 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-stone-300 px-3 py-2 text-xs font-medium text-zinc-600 transition hover:border-zinc-900 hover:bg-stone-50"
             >
               <Plus size={15} />
               Add Experience
@@ -2275,7 +3118,8 @@ function EditorPanel({
             EDUCATION
         ================================================== */}
 
-        {activeSection === "education" && (
+        {activeSection ===
+          "education" && (
           <section>
             <SectionHeader
               icon={GraduationCap}
@@ -2285,14 +3129,18 @@ function EditorPanel({
 
             <div className="space-y-5">
               {resume.education.map(
-                (item, index) => (
+                (
+                  item,
+                  index,
+                ) => (
                   <div
                     key={item.id}
-                    className="rounded-xl border border-stone-200 bg-stone-50 p-4"
+                    className="rounded-xl border border-stone-200 bg-stone-50 p-3.5 sm:p-4"
                   >
-                    <div className="mb-4 flex items-center justify-between">
-                      <span className="text-[11px] font-semibold text-zinc-700">
-                        Education {index + 1}
+                    <div className="mb-4 flex items-center justify-between gap-3">
+                      <span className="truncate text-[11px] font-semibold text-zinc-700">
+                        Education{" "}
+                        {index + 1}
                       </span>
 
                       <button
@@ -2302,17 +3150,23 @@ function EditorPanel({
                             item.id,
                           )
                         }
-                        className="text-zinc-400 hover:text-red-600"
+                        className="shrink-0 text-zinc-400 hover:text-red-600"
                       >
-                        <Trash2 size={14} />
+                        <Trash2
+                          size={14}
+                        />
                       </button>
                     </div>
 
                     <div className="space-y-3">
                       <InputField
                         label="Degree"
-                        value={item.degree}
-                        onChange={(value) =>
+                        value={
+                          item.degree
+                        }
+                        onChange={(
+                          value,
+                        ) =>
                           updateEducation(
                             item.id,
                             "degree",
@@ -2324,8 +3178,12 @@ function EditorPanel({
 
                       <InputField
                         label="School / University"
-                        value={item.school}
-                        onChange={(value) =>
+                        value={
+                          item.school
+                        }
+                        onChange={(
+                          value,
+                        ) =>
                           updateEducation(
                             item.id,
                             "school",
@@ -2337,8 +3195,12 @@ function EditorPanel({
 
                       <InputField
                         label="Location"
-                        value={item.location}
-                        onChange={(value) =>
+                        value={
+                          item.location
+                        }
+                        onChange={(
+                          value,
+                        ) =>
                           updateEducation(
                             item.id,
                             "location",
@@ -2348,11 +3210,15 @@ function EditorPanel({
                         placeholder="New Delhi, India"
                       />
 
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
                         <InputField
                           label="Start"
-                          value={item.startDate}
-                          onChange={(value) =>
+                          value={
+                            item.startDate
+                          }
+                          onChange={(
+                            value,
+                          ) =>
                             updateEducation(
                               item.id,
                               "startDate",
@@ -2364,8 +3230,12 @@ function EditorPanel({
 
                         <InputField
                           label="End"
-                          value={item.endDate}
-                          onChange={(value) =>
+                          value={
+                            item.endDate
+                          }
+                          onChange={(
+                            value,
+                          ) =>
                             updateEducation(
                               item.id,
                               "endDate",
@@ -2383,8 +3253,10 @@ function EditorPanel({
 
             <button
               type="button"
-              onClick={addEducation}
-              className="mt-4 flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-stone-300 text-xs font-medium text-zinc-600 transition hover:border-zinc-900 hover:bg-stone-50"
+              onClick={
+                addEducation
+              }
+              className="mt-4 flex min-h-10 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-stone-300 px-3 py-2 text-xs font-medium text-zinc-600 transition hover:border-zinc-900 hover:bg-stone-50"
             >
               <Plus size={15} />
               Add Education
@@ -2396,7 +3268,8 @@ function EditorPanel({
             SKILLS
         ================================================== */}
 
-        {activeSection === "skills" && (
+        {activeSection ===
+          "skills" && (
           <section>
             <SectionHeader
               icon={Code2}
@@ -2406,16 +3279,22 @@ function EditorPanel({
 
             <div className="space-y-2">
               {resume.skills.map(
-                (skill, index) => (
+                (
+                  skill,
+                  index,
+                ) => (
                   <div
                     key={`${skill}-${index}`}
-                    className="flex items-center gap-2"
+                    className="flex min-w-0 items-center gap-2"
                   >
                     <input
                       value={skill}
-                      onChange={(event) => {
+                      onChange={(
+                        event,
+                      ) => {
                         const value =
-                          event.target.value;
+                          event.target
+                            .value;
 
                         setResumeSkills(
                           value,
@@ -2428,7 +3307,9 @@ function EditorPanel({
                     <button
                       type="button"
                       onClick={() =>
-                        removeSkill(index)
+                        removeSkill(
+                          index,
+                        )
                       }
                       className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-zinc-400 hover:bg-red-50 hover:text-red-600"
                     >
@@ -2442,7 +3323,7 @@ function EditorPanel({
             <button
               type="button"
               onClick={addSkill}
-              className="mt-4 flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-stone-300 text-xs font-medium text-zinc-600 hover:border-zinc-900 hover:bg-stone-50"
+              className="mt-4 flex min-h-10 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-stone-300 px-3 py-2 text-xs font-medium text-zinc-600 hover:border-zinc-900 hover:bg-stone-50"
             >
               <Plus size={15} />
               Add Skill
@@ -2454,7 +3335,8 @@ function EditorPanel({
             PROJECTS
         ================================================== */}
 
-        {activeSection === "projects" && (
+        {activeSection ===
+          "projects" && (
           <section>
             <SectionHeader
               icon={FolderKanban}
@@ -2464,14 +3346,18 @@ function EditorPanel({
 
             <div className="space-y-5">
               {resume.projects.map(
-                (item, index) => (
+                (
+                  item,
+                  index,
+                ) => (
                   <div
                     key={item.id}
-                    className="rounded-xl border border-stone-200 bg-stone-50 p-4"
+                    className="rounded-xl border border-stone-200 bg-stone-50 p-3.5 sm:p-4"
                   >
-                    <div className="mb-4 flex items-center justify-between">
-                      <span className="text-[11px] font-semibold text-zinc-700">
-                        Project {index + 1}
+                    <div className="mb-4 flex items-center justify-between gap-3">
+                      <span className="truncate text-[11px] font-semibold text-zinc-700">
+                        Project{" "}
+                        {index + 1}
                       </span>
 
                       <button
@@ -2481,17 +3367,23 @@ function EditorPanel({
                             item.id,
                           )
                         }
-                        className="text-zinc-400 hover:text-red-600"
+                        className="shrink-0 text-zinc-400 hover:text-red-600"
                       >
-                        <Trash2 size={14} />
+                        <Trash2
+                          size={14}
+                        />
                       </button>
                     </div>
 
                     <div className="space-y-3">
                       <InputField
                         label="Project name"
-                        value={item.name}
-                        onChange={(value) =>
+                        value={
+                          item.name
+                        }
+                        onChange={(
+                          value,
+                        ) =>
                           updateProject(
                             item.id,
                             "name",
@@ -2503,8 +3395,12 @@ function EditorPanel({
 
                       <InputField
                         label="Project link"
-                        value={item.link}
-                        onChange={(value) =>
+                        value={
+                          item.link
+                        }
+                        onChange={(
+                          value,
+                        ) =>
                           updateProject(
                             item.id,
                             "link",
@@ -2516,8 +3412,12 @@ function EditorPanel({
 
                       <TextareaField
                         label="Description"
-                        value={item.description}
-                        onChange={(value) =>
+                        value={
+                          item.description
+                        }
+                        onChange={(
+                          value,
+                        ) =>
                           updateProject(
                             item.id,
                             "description",
@@ -2536,7 +3436,7 @@ function EditorPanel({
             <button
               type="button"
               onClick={addProject}
-              className="mt-4 flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-stone-300 text-xs font-medium text-zinc-600 hover:border-zinc-900 hover:bg-stone-50"
+              className="mt-4 flex min-h-10 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-stone-300 px-3 py-2 text-xs font-medium text-zinc-600 hover:border-zinc-900 hover:bg-stone-50"
             >
               <Plus size={15} />
               Add Project
@@ -2548,7 +3448,8 @@ function EditorPanel({
             CERTIFICATIONS
         ================================================== */}
 
-        {activeSection === "certifications" && (
+        {activeSection ===
+          "certifications" && (
           <section>
             <SectionHeader
               icon={Award}
@@ -2558,14 +3459,18 @@ function EditorPanel({
 
             <div className="space-y-5">
               {resume.certifications.map(
-                (item, index) => (
+                (
+                  item,
+                  index,
+                ) => (
                   <div
                     key={item.id}
-                    className="rounded-xl border border-stone-200 bg-stone-50 p-4"
+                    className="rounded-xl border border-stone-200 bg-stone-50 p-3.5 sm:p-4"
                   >
-                    <div className="mb-4 flex items-center justify-between">
-                      <span className="text-[11px] font-semibold text-zinc-700">
-                        Certification {index + 1}
+                    <div className="mb-4 flex items-center justify-between gap-3">
+                      <span className="truncate text-[11px] font-semibold text-zinc-700">
+                        Certification{" "}
+                        {index + 1}
                       </span>
 
                       <button
@@ -2575,17 +3480,23 @@ function EditorPanel({
                             item.id,
                           )
                         }
-                        className="text-zinc-400 hover:text-red-600"
+                        className="shrink-0 text-zinc-400 hover:text-red-600"
                       >
-                        <Trash2 size={14} />
+                        <Trash2
+                          size={14}
+                        />
                       </button>
                     </div>
 
                     <div className="space-y-3">
                       <InputField
                         label="Certification"
-                        value={item.name}
-                        onChange={(value) =>
+                        value={
+                          item.name
+                        }
+                        onChange={(
+                          value,
+                        ) =>
                           updateCertification(
                             item.id,
                             "name",
@@ -2597,8 +3508,12 @@ function EditorPanel({
 
                       <InputField
                         label="Issuer"
-                        value={item.issuer}
-                        onChange={(value) =>
+                        value={
+                          item.issuer
+                        }
+                        onChange={(
+                          value,
+                        ) =>
                           updateCertification(
                             item.id,
                             "issuer",
@@ -2610,8 +3525,12 @@ function EditorPanel({
 
                       <InputField
                         label="Year"
-                        value={item.year}
-                        onChange={(value) =>
+                        value={
+                          item.year
+                        }
+                        onChange={(
+                          value,
+                        ) =>
                           updateCertification(
                             item.id,
                             "year",
@@ -2628,8 +3547,10 @@ function EditorPanel({
 
             <button
               type="button"
-              onClick={addCertification}
-              className="mt-4 flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-stone-300 text-xs font-medium text-zinc-600 hover:border-zinc-900 hover:bg-stone-50"
+              onClick={
+                addCertification
+              }
+              className="mt-4 flex min-h-10 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-stone-300 px-3 py-2 text-xs font-medium text-zinc-600 hover:border-zinc-900 hover:bg-stone-50"
             >
               <Plus size={15} />
               Add Certification
@@ -2641,7 +3562,8 @@ function EditorPanel({
             LANGUAGES
         ================================================== */}
 
-        {activeSection === "languages" && (
+        {activeSection ===
+          "languages" && (
           <section>
             <SectionHeader
               icon={Languages}
@@ -2651,14 +3573,18 @@ function EditorPanel({
 
             <div className="space-y-4">
               {resume.languages.map(
-                (item, index) => (
+                (
+                  item,
+                  index,
+                ) => (
                   <div
                     key={item.id}
-                    className="rounded-xl border border-stone-200 bg-stone-50 p-4"
+                    className="rounded-xl border border-stone-200 bg-stone-50 p-3.5 sm:p-4"
                   >
-                    <div className="mb-4 flex items-center justify-between">
-                      <span className="text-[11px] font-semibold text-zinc-700">
-                        Language {index + 1}
+                    <div className="mb-4 flex items-center justify-between gap-3">
+                      <span className="truncate text-[11px] font-semibold text-zinc-700">
+                        Language{" "}
+                        {index + 1}
                       </span>
 
                       <button
@@ -2668,17 +3594,23 @@ function EditorPanel({
                             item.id,
                           )
                         }
-                        className="text-zinc-400 hover:text-red-600"
+                        className="shrink-0 text-zinc-400 hover:text-red-600"
                       >
-                        <Trash2 size={14} />
+                        <Trash2
+                          size={14}
+                        />
                       </button>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
                       <InputField
                         label="Language"
-                        value={item.name}
-                        onChange={(value) =>
+                        value={
+                          item.name
+                        }
+                        onChange={(
+                          value,
+                        ) =>
                           updateLanguage(
                             item.id,
                             "name",
@@ -2690,8 +3622,12 @@ function EditorPanel({
 
                       <InputField
                         label="Level"
-                        value={item.level}
-                        onChange={(value) =>
+                        value={
+                          item.level
+                        }
+                        onChange={(
+                          value,
+                        ) =>
                           updateLanguage(
                             item.id,
                             "level",
@@ -2708,8 +3644,10 @@ function EditorPanel({
 
             <button
               type="button"
-              onClick={addLanguage}
-              className="mt-4 flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-stone-300 text-xs font-medium text-zinc-600 hover:border-zinc-900 hover:bg-stone-50"
+              onClick={
+                addLanguage
+              }
+              className="mt-4 flex min-h-10 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-stone-300 px-3 py-2 text-xs font-medium text-zinc-600 hover:border-zinc-900 hover:bg-stone-50"
             >
               <Plus size={15} />
               Add Language
@@ -2720,11 +3658,20 @@ function EditorPanel({
     </div>
   );
 
-  function setResumeSkills(value, index) {
-    const nextSkills = [...resume.skills];
+  function setResumeSkills(
+    value,
+    index,
+  ) {
+    const nextSkills = [
+      ...resume.skills,
+    ];
+
     nextSkills[index] = value;
 
-    updateResumeField("skills", nextSkills);
+    updateResumeField(
+      "skills",
+      nextSkills,
+    );
   }
 }
 

@@ -81,7 +81,6 @@ const steps = [
 
 /* =========================================================
    SMALL ICON FALLBACK
-   Keeps the benefits section self-contained.
 ========================================================= */
 
 function PenLineFallback(props) {
@@ -99,13 +98,16 @@ function ResumePreview({
 }) {
   return (
     <div
-      className={`relative overflow-hidden ${className}`}
-      style={{ height: `${1060 * scale}px` }}
+      className={`relative w-full overflow-hidden ${className}`}
+      style={{
+        height: `${1060 * scale}px`,
+      }}
     >
       <div
         className="absolute left-1/2 top-0"
         style={{
           width: "760px",
+          maxWidth: "760px",
           transform: `translateX(-50%) scale(${scale})`,
           transformOrigin: "top center",
         }}
@@ -125,15 +127,15 @@ function ResumePreview({
 
 function TemplateCard({ template, index, onUse }) {
   return (
-    <div className="group relative">
-      <div className="relative overflow-hidden rounded-[4px] border border-[#dedbd4] bg-[#e9e7e1] p-4 shadow-[0_25px_70px_rgba(24,24,27,0.10)] transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-[0_35px_90px_rgba(24,24,27,0.16)] sm:p-5">
+    <div className="group relative min-w-0">
+      <div className="relative overflow-hidden rounded-[4px] border border-[#dedbd4] bg-[#e9e7e1] p-3 shadow-[0_25px_70px_rgba(24,24,27,0.10)] transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-[0_35px_90px_rgba(24,24,27,0.16)] sm:p-4 lg:p-5">
         {/* Card top */}
-        <div className="mb-5 flex items-center justify-between">
-          <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-zinc-400">
+        <div className="mb-4 flex min-w-0 items-center justify-between gap-3 sm:mb-5">
+          <span className="shrink-0 text-[9px] font-bold uppercase tracking-[0.18em] text-zinc-400">
             {String(index + 1).padStart(2, "0")}
           </span>
 
-          <span className="rounded-full border border-black/5 bg-white/80 px-3 py-1.5 text-[8px] font-semibold text-zinc-500 backdrop-blur">
+          <span className="max-w-[60%] truncate rounded-full border border-black/5 bg-white/80 px-3 py-1.5 text-[8px] font-semibold text-zinc-500 backdrop-blur">
             {template.category}
           </span>
         </div>
@@ -141,7 +143,7 @@ function TemplateCard({ template, index, onUse }) {
         {/* Resume */}
         <Link
           to={`/templates/${template.id}`}
-          className="block overflow-hidden rounded-[3px] bg-white"
+          className="block w-full overflow-hidden rounded-[3px] bg-white"
         >
           <ResumePreview
             templateId={template.id}
@@ -151,8 +153,8 @@ function TemplateCard({ template, index, onUse }) {
         </Link>
 
         {/* Bottom actions */}
-        <div className="mt-5 flex items-end justify-between gap-4 px-1">
-          <div className="min-w-0">
+        <div className="mt-4 flex min-w-0 items-end justify-between gap-3 px-1 sm:mt-5 sm:gap-4">
+          <div className="min-w-0 flex-1">
             <h3 className="truncate text-sm font-semibold text-zinc-950">
               {template.name}
             </h3>
@@ -165,9 +167,10 @@ function TemplateCard({ template, index, onUse }) {
           <button
             type="button"
             onClick={() => onUse(template)}
-            className="group/button flex h-9 shrink-0 items-center gap-2 rounded-full bg-zinc-950 px-3.5 text-[9px] font-bold text-white transition-all duration-300 hover:bg-[#a47d45]"
+            className="group/button flex h-9 shrink-0 items-center gap-2 rounded-full bg-zinc-950 px-3 text-[9px] font-bold text-white transition-all duration-300 hover:bg-[#a47d45] sm:px-3.5"
           >
             Use
+
             <ArrowRight
               size={12}
               className="transition-transform duration-300 group-hover/button:translate-x-0.5"
@@ -185,14 +188,14 @@ function TemplateCard({ template, index, onUse }) {
 
 function FeaturedTemplate({ template, index, onUse }) {
   return (
-    <div className="group relative min-w-[300px] sm:min-w-[350px] lg:min-w-[390px]">
-      <div className="relative overflow-hidden rounded-[4px] border border-white/10 bg-[#e9e7e1] p-5 shadow-[0_35px_90px_rgba(0,0,0,0.35)] transition-all duration-500 group-hover:-translate-y-3 group-hover:shadow-[0_45px_110px_rgba(0,0,0,0.5)]">
-        <div className="mb-5 flex items-center justify-between">
+    <div className="group relative w-[280px] min-w-[280px] sm:w-[330px] sm:min-w-[330px] lg:w-[390px] lg:min-w-[390px]">
+      <div className="relative overflow-hidden rounded-[4px] border border-white/10 bg-[#e9e7e1] p-4 shadow-[0_35px_90px_rgba(0,0,0,0.35)] transition-all duration-500 group-hover:-translate-y-3 group-hover:shadow-[0_45px_110px_rgba(0,0,0,0.5)] sm:p-5">
+        <div className="mb-4 flex items-center justify-between gap-3 sm:mb-5">
           <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-zinc-500">
             0{index + 1}
           </span>
 
-          <span className="rounded-full bg-white/80 px-3 py-1.5 text-[8px] font-semibold text-zinc-500">
+          <span className="max-w-[55%] truncate rounded-full bg-white/80 px-3 py-1.5 text-[8px] font-semibold text-zinc-500">
             {template.category}
           </span>
         </div>
@@ -209,9 +212,9 @@ function FeaturedTemplate({ template, index, onUse }) {
         </Link>
       </div>
 
-      <div className="mt-5 flex items-center justify-between px-1">
-        <div>
-          <div className="text-sm font-semibold text-white">
+      <div className="mt-4 flex min-w-0 items-center justify-between gap-3 px-1 sm:mt-5">
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-sm font-semibold text-white">
             {template.name}
           </div>
 
@@ -220,7 +223,7 @@ function FeaturedTemplate({ template, index, onUse }) {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <Link
             to={`/templates/${template.id}`}
             className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-white transition-all hover:border-white/30 hover:bg-white hover:text-zinc-950"
@@ -232,7 +235,7 @@ function FeaturedTemplate({ template, index, onUse }) {
           <button
             type="button"
             onClick={() => onUse(template)}
-            className="rounded-full bg-white px-4 py-2 text-[9px] font-bold text-zinc-950 transition hover:bg-[#c6a36c]"
+            className="rounded-full bg-white px-3.5 py-2 text-[9px] font-bold text-zinc-950 transition hover:bg-[#c6a36c] sm:px-4"
           >
             Use
           </button>
@@ -257,7 +260,10 @@ function Templates() {
       template.id,
     );
 
-    localStorage.setItem("resumely_template", template.id);
+    localStorage.setItem(
+      "resumely_template",
+      template.id,
+    );
 
     localStorage.setItem(
       "resumely_template_name",
@@ -289,77 +295,119 @@ function Templates() {
   };
 
   return (
-    <div className="overflow-hidden bg-[#f7f6f2] text-zinc-950">
+    <div className="min-w-0 overflow-x-hidden bg-[#f7f6f2] text-zinc-950">
       {/* =====================================================
           01 — HERO
       ====================================================== */}
 
       <section className="relative overflow-hidden border-b border-[#dedbd4] bg-[#f3f5f8]">
-        <div className="pointer-events-none absolute -left-32 top-10 h-[460px] w-[460px] rounded-full bg-[#b89968]/10 blur-3xl" />
+        <div className="pointer-events-none absolute -left-32 top-10 h-[300px] w-[300px] rounded-full bg-[#b89968]/10 blur-3xl sm:h-[460px] sm:w-[460px]" />
 
-        <div className="pointer-events-none absolute right-[-180px] top-[-140px] h-[560px] w-[560px] rounded-full bg-white/80 blur-3xl" />
+        <div className="pointer-events-none absolute right-[-180px] top-[-140px] hidden h-[560px] w-[560px] rounded-full bg-white/80 blur-3xl sm:block" />
 
-        <div className="relative mx-auto max-w-[1450px] px-5 py-16 sm:px-8 sm:py-20 lg:px-12 lg:py-24">
+        <div className="relative mx-auto max-w-[1450px] px-4 py-12 sm:px-8 sm:py-20 lg:px-12 lg:py-24">
           {/* Top bar */}
-          <div className="mb-16 flex items-center justify-between sm:mb-20">
-            <div className="flex items-center gap-3 text-xs font-semibold tracking-[-0.01em]">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-950 text-white shadow-lg">
+          <div className="mb-12 flex items-center justify-between sm:mb-20">
+            <div className="flex min-w-0 items-center gap-3 text-xs font-semibold tracking-[-0.01em]">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-zinc-950 text-white shadow-lg">
                 <LayoutTemplate size={16} />
               </span>
 
-              <span>Resume Templates</span>
+              <span className="truncate">
+                Resume Templates
+              </span>
             </div>
 
             <Link
               to="/templates"
-              className="hidden items-center gap-2 text-xs font-semibold text-zinc-500 transition hover:text-zinc-950 sm:flex"
+              className="hidden shrink-0 items-center gap-2 text-xs font-semibold text-zinc-500 transition hover:text-zinc-950 sm:flex"
             >
               Explore all templates
+
               <ArrowRight size={14} />
             </Link>
           </div>
 
           {/* Hero grid */}
-          <div className="grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20">
-            {/* Layered resume previews */}
-            <div className="relative mx-auto h-[560px] w-full max-w-[650px] sm:h-[650px]">
+          <div className="grid min-w-0 items-center gap-12 md:gap-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20">
+            {/* =================================================
+                LAYERED RESUME PREVIEWS
+            ================================================== */}
+
+            <div className="relative mx-auto h-[390px] w-full max-w-[500px] sm:h-[540px] sm:max-w-[600px] lg:h-[650px] lg:max-w-[650px]">
               {/* Back card */}
-              <div className="absolute left-[7%] top-[7%] h-[74%] w-[43%] rotate-[-14deg] overflow-hidden rounded-[8px] border border-zinc-200 bg-white shadow-[0_35px_80px_rgba(24,24,27,0.12)]">
+              <div className="absolute left-[2%] top-[8%] h-[70%] w-[43%] rotate-[-10deg] overflow-hidden rounded-[6px] border border-zinc-200 bg-white shadow-[0_25px_60px_rgba(24,24,27,0.12)] sm:left-[5%] sm:top-[7%] sm:h-[74%] sm:rotate-[-14deg]">
                 <ResumePreview
-                  templateId={featuredTemplates[1]?.id || "modern"}
-                  scale={0.45}
+                  templateId={
+                    featuredTemplates[1]?.id || "modern"
+                  }
+                  scale={0.31}
+                  className="sm:hidden"
                 />
+
+                <div className="hidden sm:block">
+                  <ResumePreview
+                    templateId={
+                      featuredTemplates[1]?.id || "modern"
+                    }
+                    scale={0.42}
+                  />
+                </div>
               </div>
 
               {/* Middle card */}
-              <div className="absolute left-[25%] top-[1%] z-10 h-[78%] w-[47%] rotate-[-5deg] overflow-hidden rounded-[8px] border border-zinc-200 bg-white shadow-[0_35px_80px_rgba(24,24,27,0.15)]">
+              <div className="absolute left-[20%] top-[2%] z-10 h-[74%] w-[48%] rotate-[-4deg] overflow-hidden rounded-[6px] border border-zinc-200 bg-white shadow-[0_30px_70px_rgba(24,24,27,0.15)] sm:left-[25%] sm:top-[1%] sm:h-[78%] sm:rotate-[-5deg]">
                 <ResumePreview
-                  templateId={featuredTemplates[2]?.id || "minimal"}
-                  scale={0.46}
+                  templateId={
+                    featuredTemplates[2]?.id || "minimal"
+                  }
+                  scale={0.33}
+                  className="sm:hidden"
                 />
+
+                <div className="hidden sm:block">
+                  <ResumePreview
+                    templateId={
+                      featuredTemplates[2]?.id || "minimal"
+                    }
+                    scale={0.43}
+                  />
+                </div>
               </div>
 
               {/* Main card */}
-              <div className="absolute left-[34%] top-[14%] z-20 h-[78%] w-[51%] rotate-[7deg] overflow-hidden rounded-[8px] border border-zinc-200 bg-white shadow-[0_45px_100px_rgba(24,24,27,0.20)]">
+              <div className="absolute left-[29%] top-[12%] z-20 h-[75%] w-[53%] rotate-[5deg] overflow-hidden rounded-[6px] border border-zinc-200 bg-white shadow-[0_35px_80px_rgba(24,24,27,0.20)] sm:left-[34%] sm:top-[14%] sm:h-[78%] sm:rotate-[7deg]">
                 <ResumePreview
-                  templateId={featuredTemplates[0]?.id || "executive"}
-                  scale={0.48}
+                  templateId={
+                    featuredTemplates[0]?.id || "executive"
+                  }
+                  scale={0.35}
+                  className="sm:hidden"
                 />
+
+                <div className="hidden sm:block">
+                  <ResumePreview
+                    templateId={
+                      featuredTemplates[0]?.id || "executive"
+                    }
+                    scale={0.45}
+                  />
+                </div>
               </div>
 
               {/* Floating badge */}
-              <div className="absolute bottom-[4%] left-[5%] z-30 rounded-2xl border border-white/80 bg-zinc-950 px-5 py-4 text-white shadow-[0_25px_60px_rgba(24,24,27,0.25)]">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#a47d45]/15 text-[#d5b47c]">
-                    <FileCheck2 size={17} />
+              <div className="absolute bottom-[2%] left-0 z-30 rounded-2xl border border-white/80 bg-zinc-950 px-3 py-3 text-white shadow-[0_20px_50px_rgba(24,24,27,0.25)] sm:bottom-[4%] sm:left-[5%] sm:px-5 sm:py-4">
+                <div className="flex items-center gap-2.5 sm:gap-3">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#a47d45]/15 text-[#d5b47c] sm:h-9 sm:w-9">
+                    <FileCheck2 size={16} />
                   </div>
 
-                  <div>
-                    <div className="text-[10px] font-bold">
+                  <div className="min-w-0">
+                    <div className="text-[9px] font-bold sm:text-[10px]">
                       Resume ready
                     </div>
 
-                    <div className="mt-0.5 text-[8px] text-zinc-500">
+                    <div className="mt-0.5 whitespace-nowrap text-[7px] text-zinc-500 sm:text-[8px]">
                       Polished. Personal. Professional.
                     </div>
                   </div>
@@ -367,18 +415,23 @@ function Templates() {
               </div>
             </div>
 
-            {/* Hero copy */}
-            <div className="max-w-[650px]">
-              <div className="inline-flex items-center gap-2 rounded-full border border-[#d9d5cd] bg-white/85 px-3.5 py-2 text-[10px] font-bold uppercase tracking-[0.19em] text-zinc-500 shadow-sm backdrop-blur">
+            {/* =================================================
+                HERO COPY
+            ================================================== */}
+
+            <div className="min-w-0 max-w-[650px]">
+              <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-[#d9d5cd] bg-white/85 px-3 py-2 text-[9px] font-bold uppercase tracking-[0.15em] text-zinc-500 shadow-sm backdrop-blur sm:px-3.5 sm:text-[10px] sm:tracking-[0.19em]">
                 <Sparkles
                   size={12}
-                  className="text-[#a47d45]"
+                  className="shrink-0 text-[#a47d45]"
                 />
 
-                Designed for better first impressions
+                <span className="truncate">
+                  Designed for better first impressions
+                </span>
               </div>
 
-              <h1 className="mt-7 text-[52px] font-semibold leading-[0.94] tracking-[-0.065em] text-zinc-950 sm:text-[70px] lg:text-[78px]">
+              <h1 className="mt-6 text-[42px] font-semibold leading-[0.96] tracking-[-0.06em] text-zinc-950 sm:mt-7 sm:text-[62px] md:text-[70px] lg:text-[78px]">
                 Your experience
                 <br />
                 deserves a
@@ -388,16 +441,16 @@ function Templates() {
                 </span>
               </h1>
 
-              <p className="mt-8 max-w-[590px] text-[15px] leading-7 text-zinc-600 sm:text-lg sm:leading-8">
+              <p className="mt-7 max-w-[590px] text-[14px] leading-6 text-zinc-600 sm:mt-8 sm:text-lg sm:leading-8">
                 Choose a professionally structured resume template,
                 customize your content and create an application that
                 looks as strong as the experience behind it.
               </p>
 
-              <div className="mt-9 flex flex-wrap items-center gap-3">
+              <div className="mt-8 flex flex-col gap-3 xs:flex-row sm:mt-9 sm:flex-wrap">
                 <a
                   href="#templates"
-                  className="group inline-flex h-12 items-center gap-3 rounded-xl bg-zinc-950 px-7 py-3.5 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(24,24,27,0.18)] transition duration-300 hover:bg-[#a47d45]"
+                  className="group inline-flex min-h-12 items-center justify-center gap-3 rounded-xl bg-zinc-950 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(24,24,27,0.18)] transition duration-300 hover:bg-[#a47d45] sm:px-7"
                 >
                   <span className="text-white">
                     Explore templates
@@ -405,19 +458,19 @@ function Templates() {
 
                   <ArrowRight
                     size={16}
-                    className="text-white transition-transform duration-300 group-hover:translate-x-1"
+                    className="shrink-0 text-white transition-transform duration-300 group-hover:translate-x-1"
                   />
                 </a>
 
                 <Link
                   to="/builder?new=1"
-                  className="inline-flex h-12 items-center gap-2 rounded-xl border border-[#d4d0c7] bg-white px-7 py-3.5 text-sm font-semibold text-zinc-900 transition hover:border-[#a47d45] hover:bg-[#faf8f3]"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[#d4d0c7] bg-white px-6 py-3.5 text-sm font-semibold text-zinc-900 transition hover:border-[#a47d45] hover:bg-[#faf8f3] sm:px-7"
                 >
                   Build my resume
                 </Link>
               </div>
 
-              <div className="mt-8 flex flex-wrap gap-x-7 gap-y-3 text-[11px] font-medium text-zinc-500">
+              <div className="mt-7 flex flex-wrap gap-x-5 gap-y-3 text-[10px] font-medium text-zinc-500 sm:mt-8 sm:gap-x-7 sm:text-[11px]">
                 {[
                   "Professional layouts",
                   "Live resume editing",
@@ -429,7 +482,7 @@ function Templates() {
                   >
                     <Check
                       size={13}
-                      className="text-[#a47d45]"
+                      className="shrink-0 text-[#a47d45]"
                     />
 
                     {item}
@@ -446,7 +499,7 @@ function Templates() {
       ====================================================== */}
 
       <section className="border-b border-[#dedbd4] bg-white">
-        <div className="mx-auto grid max-w-[1200px] divide-y divide-[#e8e5df] px-5 sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4 lg:px-8">
+        <div className="mx-auto grid max-w-[1200px] divide-y divide-[#e8e5df] px-4 sm:grid-cols-2 sm:divide-x sm:divide-y-0 sm:px-8 lg:grid-cols-4 lg:px-8">
           {[
             [
               "01",
@@ -471,7 +524,7 @@ function Templates() {
           ].map(([number, title, text]) => (
             <div
               key={number}
-              className="px-5 py-9 sm:px-8 lg:py-12"
+              className="px-4 py-7 sm:px-8 sm:py-9 lg:py-12"
             >
               <div className="text-[10px] font-bold tracking-[0.2em] text-[#a47d45]">
                 {number}
@@ -493,9 +546,9 @@ function Templates() {
           03 — STORY
       ====================================================== */}
 
-      <section className="bg-[#f7f6f2] py-24 sm:py-32 lg:py-40">
-        <div className="mx-auto grid max-w-[1200px] items-center gap-16 px-5 sm:px-8 lg:grid-cols-[0.8fr_1fr] lg:gap-24">
-          <div>
+      <section className="bg-[#f7f6f2] py-20 sm:py-28 lg:py-40">
+        <div className="mx-auto grid max-w-[1200px] items-center gap-12 px-4 sm:px-8 md:gap-16 lg:grid-cols-[0.8fr_1fr] lg:gap-24">
+          <div className="min-w-0">
             <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#a47d45]">
               More than a pretty document
             </div>
@@ -521,6 +574,7 @@ function Templates() {
               className="group mt-8 inline-flex items-center gap-2 text-sm font-semibold text-zinc-950"
             >
               Find your template
+
               <ArrowRight
                 size={15}
                 className="transition-transform group-hover:translate-x-1"
@@ -528,29 +582,49 @@ function Templates() {
             </a>
           </div>
 
-          <div className="relative">
+          <div className="relative min-w-0">
             <div className="absolute -inset-5 rounded-[30px] bg-[#e7dfd1]/50 blur-2xl" />
 
-            <div className="relative grid grid-cols-2 gap-4">
-              <div className="mt-12">
-                <div className="rounded-2xl border border-[#dedbd4] bg-white p-4 shadow-[0_20px_50px_rgba(24,24,27,0.08)]">
+            <div className="relative grid grid-cols-2 gap-3 sm:gap-4">
+              <div className="mt-8 sm:mt-12">
+                <div className="overflow-hidden rounded-2xl border border-[#dedbd4] bg-white p-2.5 shadow-[0_20px_50px_rgba(24,24,27,0.08)] sm:p-4">
                   <ResumePreview
                     templateId={
                       featuredTemplates[2]?.id || "minimal"
                     }
-                    scale={0.36}
+                    scale={0.32}
+                    className="sm:hidden"
                   />
+
+                  <div className="hidden sm:block">
+                    <ResumePreview
+                      templateId={
+                        featuredTemplates[2]?.id || "minimal"
+                      }
+                      scale={0.36}
+                    />
+                  </div>
                 </div>
               </div>
 
               <div>
-                <div className="rounded-2xl border border-[#dedbd4] bg-[#efede7] p-4">
+                <div className="overflow-hidden rounded-2xl border border-[#dedbd4] bg-[#efede7] p-2.5 sm:p-4">
                   <ResumePreview
                     templateId={
                       featuredTemplates[3]?.id || "corporate"
                     }
-                    scale={0.36}
+                    scale={0.32}
+                    className="sm:hidden"
                   />
+
+                  <div className="hidden sm:block">
+                    <ResumePreview
+                      templateId={
+                        featuredTemplates[3]?.id || "corporate"
+                      }
+                      scale={0.36}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -562,10 +636,10 @@ function Templates() {
           04 — PREMIUM FEATURED TEMPLATES
       ====================================================== */}
 
-      <section className="overflow-hidden bg-zinc-950 py-24 text-white sm:py-32 lg:py-40">
-        <div className="mx-auto max-w-[1450px] px-5 sm:px-8 lg:px-12">
-          <div className="grid items-end gap-12 lg:grid-cols-[0.62fr_1.38fr] lg:gap-20">
-            <div className="max-w-[520px]">
+      <section className="overflow-hidden bg-zinc-950 py-20 text-white sm:py-28 lg:py-40">
+        <div className="mx-auto max-w-[1450px] px-4 sm:px-8 lg:px-12">
+          <div className="grid min-w-0 items-end gap-12 lg:grid-cols-[0.62fr_1.38fr] lg:gap-20">
+            <div className="min-w-0 max-w-[520px]">
               <div className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#c6a36c]">
                 Premium resume templates
               </div>
@@ -588,7 +662,7 @@ function Templates() {
 
               <a
                 href="#templates"
-                className="group mt-8 inline-flex items-center gap-3 rounded-xl bg-white px-5 py-3.5 text-sm font-semibold text-zinc-950 transition hover:bg-[#c6a36c]"
+                className="group mt-8 inline-flex min-h-11 items-center gap-3 rounded-xl bg-white px-5 py-3.5 text-sm font-semibold text-zinc-950 transition hover:bg-[#c6a36c]"
               >
                 <span className="text-black">
                   Browse all templates
@@ -600,7 +674,7 @@ function Templates() {
                 />
               </a>
 
-              <div className="mt-28">
+              <div className="mt-16 sm:mt-28">
                 <div className="flex items-center gap-1 text-[#c6a36c]">
                   {[1, 2, 3, 4].map((item) => (
                     <Star
@@ -629,7 +703,7 @@ function Templates() {
             <div className="relative min-w-0">
               <div className="pointer-events-none absolute -right-32 top-10 h-[360px] w-[360px] rounded-full bg-[#a47d45]/10 blur-3xl" />
 
-              <div className="relative flex gap-6 overflow-x-auto overflow-y-visible pb-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="relative flex max-w-full gap-5 overflow-x-auto overflow-y-visible pb-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-6">
                 {featuredTemplates.slice(0, 5).map(
                   (template, index) => (
                     <FeaturedTemplate
@@ -650,10 +724,10 @@ function Templates() {
           05 — BENEFITS
       ====================================================== */}
 
-      <section className="border-y border-[#dedbd4] bg-white py-24 sm:py-32">
-        <div className="mx-auto max-w-[1200px] px-5 sm:px-8">
+      <section className="border-y border-[#dedbd4] bg-white py-20 sm:py-28">
+        <div className="mx-auto max-w-[1200px] px-4 sm:px-8">
           <div className="grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-20">
-            <div>
+            <div className="min-w-0">
               <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#a47d45]">
                 Built around your career
               </div>
@@ -671,17 +745,17 @@ function Templates() {
               </p>
             </div>
 
-            <div className="grid gap-px overflow-hidden rounded-2xl border border-[#dedbd4] bg-[#dedbd4] sm:grid-cols-2">
+            <div className="grid min-w-0 gap-px overflow-hidden rounded-2xl border border-[#dedbd4] bg-[#dedbd4] sm:grid-cols-2">
               {benefits.map((item) => {
                 const Icon = item.icon;
 
                 return (
                   <div
                     key={item.number}
-                    className="bg-white p-7 transition hover:bg-[#faf9f6] sm:p-9"
+                    className="min-w-0 bg-white p-6 transition hover:bg-[#faf9f6] sm:p-9"
                   >
-                    <div className="flex items-start justify-between">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#f3eee5] text-[#987542]">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#f3eee5] text-[#987542]">
                         <Icon size={18} />
                       </div>
 
@@ -711,9 +785,9 @@ function Templates() {
 
       <section
         id="templates"
-        className="bg-[#f7f6f2] py-24 sm:py-32 lg:py-40"
+        className="bg-[#f7f6f2] py-20 sm:py-28 lg:py-40"
       >
-        <div className="mx-auto max-w-[1450px] px-5 sm:px-8 lg:px-12">
+        <div className="mx-auto max-w-[1450px] px-4 sm:px-8 lg:px-12">
           <div className="mx-auto max-w-[760px] text-center">
             <div className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#a47d45]">
               The complete collection
@@ -734,7 +808,7 @@ function Templates() {
           </div>
 
           {/* Category pills */}
-          <div className="mt-12 flex flex-wrap justify-center gap-2">
+          <div className="mt-10 flex flex-wrap justify-center gap-2 sm:mt-12">
             {[
               "All templates",
               "Professional",
@@ -747,7 +821,7 @@ function Templates() {
             ].map((category, index) => (
               <span
                 key={category}
-                className={`rounded-full border px-4 py-2 text-[9px] font-semibold ${
+                className={`rounded-full border px-3.5 py-2 text-[9px] font-semibold sm:px-4 ${
                   index === 0
                     ? "border-zinc-950 bg-zinc-950 text-white"
                     : "border-[#d8d4cc] bg-white text-zinc-500"
@@ -759,7 +833,7 @@ function Templates() {
           </div>
 
           {/* Grid */}
-          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="mt-12 grid min-w-0 gap-4 sm:mt-14 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
             {TEMPLATE_META.map((template, index) => (
               <TemplateCard
                 key={template.id}
@@ -776,10 +850,10 @@ function Templates() {
           07 — EDITOR EXPERIENCE
       ====================================================== */}
 
-      <section className="bg-zinc-950 py-24 text-white sm:py-32 lg:py-40">
-        <div className="mx-auto max-w-[1200px] px-5 sm:px-8">
-          <div className="grid items-center gap-16 lg:grid-cols-[0.8fr_1.2fr] lg:gap-24">
-            <div>
+      <section className="overflow-hidden bg-zinc-950 py-20 text-white sm:py-28 lg:py-40">
+        <div className="mx-auto max-w-[1200px] px-4 sm:px-8">
+          <div className="grid min-w-0 items-center gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-24">
+            <div className="min-w-0">
               <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#c6a36c]">
                 A better resume experience
               </div>
@@ -797,7 +871,7 @@ function Templates() {
 
               <Link
                 to="/builder?new=1"
-                className="group mt-9 inline-flex items-center gap-3 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-[#c6a36c]"
+                className="group mt-9 inline-flex min-h-11 items-center gap-3 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-[#c6a36c]"
               >
                 <span className="text-black">
                   Open resume builder
@@ -811,23 +885,23 @@ function Templates() {
             </div>
 
             {/* Fake editor visual */}
-            <div className="relative">
+            <div className="relative min-w-0">
               <div className="absolute -inset-8 rounded-[40px] bg-[#c6a36c]/10 blur-3xl" />
 
-              <div className="relative overflow-hidden rounded-[24px] border border-white/10 bg-[#18181b] p-3 shadow-[0_40px_100px_rgba(0,0,0,0.4)]">
-                <div className="flex h-10 items-center gap-2 border-b border-white/10 px-3">
+              <div className="relative overflow-hidden rounded-[20px] border border-white/10 bg-[#18181b] p-2.5 shadow-[0_40px_100px_rgba(0,0,0,0.4)] sm:rounded-[24px] sm:p-3">
+                <div className="flex h-9 items-center gap-2 border-b border-white/10 px-2 sm:h-10 sm:px-3">
                   <span className="h-2 w-2 rounded-full bg-white/20" />
                   <span className="h-2 w-2 rounded-full bg-white/20" />
                   <span className="h-2 w-2 rounded-full bg-white/20" />
 
-                  <div className="ml-auto rounded-md border border-white/10 px-3 py-1 text-[8px] text-zinc-500">
+                  <div className="ml-auto rounded-md border border-white/10 px-2.5 py-1 text-[7px] text-zinc-500 sm:px-3 sm:text-[8px]">
                     Resume Builder
                   </div>
                 </div>
 
-                <div className="grid min-h-[450px] gap-3 p-3 sm:grid-cols-[0.7fr_1fr]">
+                <div className="grid min-h-[430px] min-w-0 gap-3 p-2 sm:min-h-[450px] sm:p-3 md:grid-cols-[0.7fr_1fr]">
                   {/* Editor side */}
-                  <div className="rounded-xl border border-white/10 bg-[#111113] p-4">
+                  <div className="min-w-0 rounded-xl border border-white/10 bg-[#111113] p-3 sm:p-4">
                     <div className="text-[8px] font-bold uppercase tracking-[0.18em] text-zinc-600">
                       Your details
                     </div>
@@ -842,16 +916,16 @@ function Templates() {
                     ].map((item, index) => (
                       <div
                         key={item}
-                        className="mt-4"
+                        className="mt-3 sm:mt-4"
                       >
                         <div className="mb-1.5 text-[7px] text-zinc-600">
                           {item}
                         </div>
 
                         <div
-                          className={`rounded-md border border-white/5 bg-white/[0.025] px-3 py-2 text-[8px] leading-4 text-zinc-500 ${
+                          className={`overflow-hidden rounded-md border border-white/5 bg-white/[0.025] px-2.5 py-2 text-[7px] leading-4 text-zinc-500 sm:px-3 sm:text-[8px] ${
                             index > 1
-                              ? "min-h-14"
+                              ? "min-h-12 sm:min-h-14"
                               : "min-h-7"
                           }`}
                         >
@@ -871,14 +945,14 @@ function Templates() {
                   </div>
 
                   {/* Preview side */}
-                  <div className="flex items-center justify-center rounded-xl bg-[#e7e4dd] p-5">
+                  <div className="flex min-w-0 items-center justify-center overflow-hidden rounded-xl bg-[#e7e4dd] p-3 sm:p-5">
                     <div className="w-full max-w-[310px] overflow-hidden rounded-sm shadow-[0_25px_60px_rgba(0,0,0,0.25)]">
                       <ResumePreview
                         templateId={
                           featuredTemplates[0]?.id ||
                           "executive"
                         }
-                        scale={0.39}
+                        scale={0.34}
                       />
                     </div>
                   </div>
@@ -893,8 +967,8 @@ function Templates() {
           08 — PROCESS
       ====================================================== */}
 
-      <section className="border-b border-[#dedbd4] bg-white py-24 sm:py-32 lg:py-40">
-        <div className="mx-auto max-w-[1200px] px-5 sm:px-8">
+      <section className="border-b border-[#dedbd4] bg-white py-20 sm:py-28 lg:py-40">
+        <div className="mx-auto max-w-[1200px] px-4 sm:px-8">
           <div className="max-w-[680px]">
             <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#a47d45]">
               How it works
@@ -910,24 +984,24 @@ function Templates() {
             </h2>
           </div>
 
-          <div className="mt-16 grid gap-px overflow-hidden rounded-2xl border border-[#dedbd4] bg-[#dedbd4] md:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-12 grid min-w-0 gap-px overflow-hidden rounded-2xl border border-[#dedbd4] bg-[#dedbd4] sm:mt-16 md:grid-cols-2 lg:grid-cols-4">
             {steps.map((step) => (
               <div
                 key={step.number}
-                className="group bg-white p-7 transition hover:bg-[#faf9f6] sm:p-9"
+                className="group min-w-0 bg-white p-6 transition hover:bg-[#faf9f6] sm:p-9"
               >
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-3">
                   <span className="text-[11px] font-bold tracking-[0.18em] text-[#a47d45]">
                     {step.number}
                   </span>
 
                   <ArrowRight
                     size={15}
-                    className="text-zinc-300 transition group-hover:translate-x-1 group-hover:text-zinc-950"
+                    className="shrink-0 text-zinc-300 transition group-hover:translate-x-1 group-hover:text-zinc-950"
                   />
                 </div>
 
-                <h3 className="mt-14 text-base font-semibold tracking-[-0.02em]">
+                <h3 className="mt-10 text-base font-semibold tracking-[-0.02em] sm:mt-14">
                   {step.title}
                 </h3>
 
@@ -944,8 +1018,8 @@ function Templates() {
           09 — QUOTE
       ====================================================== */}
 
-      <section className="border-y border-[#dedbd4] bg-white py-24 sm:py-32">
-        <div className="mx-auto max-w-[1000px] px-5 text-center sm:px-8">
+      <section className="border-y border-[#dedbd4] bg-white py-20 sm:py-28">
+        <div className="mx-auto max-w-[1000px] px-4 text-center sm:px-8">
           <Quote
             size={28}
             className="mx-auto text-[#b08d57]"
@@ -966,10 +1040,10 @@ function Templates() {
           10 — FEATURES
       ====================================================== */}
 
-      <section className="bg-[#f7f6f2] py-24 sm:py-32">
-        <div className="mx-auto max-w-[1200px] px-5 sm:px-8">
-          <div className="grid gap-5 md:grid-cols-2">
-            <div className="rounded-2xl border border-[#dedbd4] bg-white p-8 sm:p-10">
+      <section className="bg-[#f7f6f2] py-20 sm:py-28">
+        <div className="mx-auto max-w-[1200px] px-4 sm:px-8">
+          <div className="grid min-w-0 gap-5 md:grid-cols-2">
+            <div className="min-w-0 rounded-2xl border border-[#dedbd4] bg-white p-6 sm:p-10">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#f3eee5] text-[#987542]">
                 <LayoutTemplate size={18} />
               </div>
@@ -996,7 +1070,7 @@ function Templates() {
                   >
                     <Check
                       size={14}
-                      className="text-[#987542]"
+                      className="shrink-0 text-[#987542]"
                     />
 
                     {item}
@@ -1005,7 +1079,7 @@ function Templates() {
               </div>
             </div>
 
-            <div className="rounded-2xl bg-zinc-950 p-8 text-white sm:p-10">
+            <div className="min-w-0 rounded-2xl bg-zinc-950 p-6 text-white sm:p-10">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 text-[#c6a36c]">
                 <Wand2 size={18} />
               </div>
@@ -1043,10 +1117,10 @@ function Templates() {
           11 — FINAL CTA
       ====================================================== */}
 
-      <section className="relative overflow-hidden bg-zinc-950 py-28 text-white sm:py-36">
-        <div className="pointer-events-none absolute left-1/2 top-0 h-[500px] w-[700px] -translate-x-1/2 rounded-full bg-[#a47d45]/10 blur-3xl" />
+      <section className="relative overflow-hidden bg-zinc-950 py-24 text-white sm:py-32 lg:py-36">
+        <div className="pointer-events-none absolute left-1/2 top-0 h-[400px] w-[500px] -translate-x-1/2 rounded-full bg-[#a47d45]/10 blur-3xl sm:h-[500px] sm:w-[700px]" />
 
-        <div className="relative mx-auto max-w-[900px] px-5 text-center sm:px-8">
+        <div className="relative mx-auto max-w-[900px] px-4 text-center sm:px-8">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.05]">
             <Zap
               size={19}
@@ -1058,7 +1132,7 @@ function Templates() {
             Make your next application count
           </div>
 
-          <h2 className="mt-5 text-5xl font-semibold leading-[0.98] tracking-[-0.06em] sm:text-6xl lg:text-7xl">
+          <h2 className="mt-5 text-4xl font-semibold leading-[0.98] tracking-[-0.06em] sm:text-6xl lg:text-7xl">
             Your experience,
             <br />
             <span className="text-zinc-500">
@@ -1072,10 +1146,10 @@ function Templates() {
             confidence.
           </p>
 
-          <div className="mt-9 flex flex-wrap justify-center gap-3">
+          <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row sm:flex-wrap">
             <Link
               to="/builder?new=1"
-              className="group inline-flex h-12 items-center gap-3 rounded-xl bg-white px-6 text-sm font-semibold text-black transition hover:bg-[#c6a36c]"
+              className="group inline-flex min-h-12 items-center justify-center gap-3 rounded-xl bg-white px-6 text-sm font-semibold text-black transition hover:bg-[#c6a36c]"
             >
               <span className="text-black">
                 Start building
@@ -1089,20 +1163,20 @@ function Templates() {
 
             <a
               href="#templates"
-              className="inline-flex h-12 items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-6 text-sm font-semibold text-white transition hover:bg-white/10"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-6 text-sm font-semibold text-white transition hover:bg-white/10"
             >
               Explore templates
             </a>
           </div>
 
-          <div className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-3 text-[10px] text-zinc-500">
+          <div className="mt-8 flex flex-wrap justify-center gap-x-4 gap-y-3 text-[10px] text-zinc-500 sm:gap-x-6">
             <span>{TEMPLATE_META.length} resume designs</span>
 
-            <span>•</span>
+            <span className="hidden sm:inline">•</span>
 
             <span>Professional layouts</span>
 
-            <span>•</span>
+            <span className="hidden sm:inline">•</span>
 
             <span>Live editing</span>
           </div>

@@ -149,8 +149,9 @@ function DashboardLayout() {
           onClick={() => setMobileOpen(false)}
           className={({ isActive }) =>
             [
-              "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200",
-
+              "group relative flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5",
+              "text-[13px] font-medium transition-all duration-200",
+              "whitespace-nowrap",
               isActive
                 ? "bg-[#f3ede3] text-zinc-950 shadow-[0_1px_2px_rgba(0,0,0,0.03)]"
                 : "text-zinc-600 hover:bg-[#f3f1ec] hover:text-zinc-950",
@@ -180,13 +181,13 @@ function DashboardLayout() {
               </span>
 
               {/* Label */}
-              <span className="flex-1">
+              <span className="min-w-0 flex-1 truncate">
                 {item.label}
               </span>
 
               {/* Active dot */}
               {isActive && (
-                <span className="h-1.5 w-1.5 rounded-full bg-[#ae8954]" />
+                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#ae8954]" />
               )}
             </>
           )}
@@ -195,10 +196,11 @@ function DashboardLayout() {
     });
 
   return (
-    <div className="min-h-screen bg-[#f7f5f0] text-zinc-950">
+    <div className="min-h-screen overflow-x-hidden bg-[#f7f5f0] text-zinc-950">
       {/* =====================================================
-          MOBILE OVERLAY
+          MOBILE / TABLET OVERLAY
       ====================================================== */}
+
       {mobileOpen && (
         <button
           type="button"
@@ -211,9 +213,12 @@ function DashboardLayout() {
       {/* =====================================================
           SIDEBAR
       ====================================================== */}
+
       <aside
         className={[
-          "fixed inset-y-0 left-0 z-50 flex w-[270px] flex-col border-r border-[#e7e2d9] bg-[#fbfaf7] transition-transform duration-300",
+          "fixed inset-y-0 left-0 z-50 flex h-[100dvh] w-[270px] flex-col",
+          "border-r border-[#e7e2d9] bg-[#fbfaf7]",
+          "transition-transform duration-300 ease-out",
           mobileOpen
             ? "translate-x-0"
             : "-translate-x-full lg:translate-x-0",
@@ -222,17 +227,18 @@ function DashboardLayout() {
         {/* ===================================================
             BRAND
         ==================================================== */}
-        <div className="flex h-[76px] shrink-0 items-center justify-between border-b border-[#e7e2d9] px-5">
+
+        <div className="flex h-[64px] shrink-0 items-center justify-between border-b border-[#e7e2d9] px-4 sm:h-[72px] sm:px-5 lg:h-[76px]">
           <NavLink
             to="/dashboard"
             onClick={() => setMobileOpen(false)}
-            className="flex items-center gap-3"
+            className="flex min-w-0 items-center gap-3"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#111111] text-sm font-bold text-white">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#111111] text-sm font-bold text-white">
               R
             </div>
 
-            <div className="text-[18px] font-semibold tracking-[-0.035em]">
+            <div className="truncate text-[18px] font-semibold tracking-[-0.035em]">
               Resume
               <span className="text-[#ae8954]">ly</span>
             </div>
@@ -241,7 +247,8 @@ function DashboardLayout() {
           <button
             type="button"
             onClick={() => setMobileOpen(false)}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-400 hover:bg-[#efede8] hover:text-zinc-900 lg:hidden"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-[#efede8] hover:text-zinc-900 lg:hidden"
+            aria-label="Close navigation"
           >
             <X size={18} />
           </button>
@@ -250,88 +257,97 @@ function DashboardLayout() {
         {/* ===================================================
             NAVIGATION
         ==================================================== */}
-        <div className="flex-1 overflow-y-auto px-4 py-7">
-          {/* Workspace */}
-          <p className="px-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-400">
-            Workspace
-          </p>
 
-          <nav className="mt-3 space-y-1">
-            {renderNavigation(navigation)}
-          </nav>
+        <div className="flex min-h-0 flex-1 flex-col px-3 py-5 sm:px-4 sm:py-6 lg:py-7">
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-0.5">
+            {/* Workspace */}
+            <p className="px-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-400">
+              Workspace
+            </p>
 
-          <div className="my-7 h-px bg-[#e7e2d9]" />
+            <nav className="mt-3 space-y-1">
+              {renderNavigation(navigation)}
+            </nav>
 
-          {/* Account */}
-          <p className="px-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-400">
-            Account
-          </p>
+            <div className="my-6 h-px bg-[#e7e2d9] sm:my-7" />
 
-          <nav className="mt-3 space-y-1">
-            {renderNavigation(accountNavigation)}
-          </nav>
-        </div>
+            {/* Account */}
+            <p className="px-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-400">
+              Account
+            </p>
 
-        {/* ===================================================
-            USER / LOGOUT
-        ==================================================== */}
-        <div className="shrink-0 border-t border-[#e7e2d9] p-4">
-          <div className="mb-2 flex items-center gap-3 rounded-xl bg-[#f2efe9] p-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#111111] text-[11px] font-semibold text-white">
-              {initials || "U"}
-            </div>
-
-            <div className="min-w-0">
-              <p className="truncate text-xs font-semibold text-zinc-900">
-                {displayName}
-              </p>
-
-              <p className="truncate text-[10px] text-zinc-500">
-                {currentUser?.email || "Account"}
-              </p>
-            </div>
+            <nav className="mt-3 space-y-1">
+              {renderNavigation(accountNavigation)}
+            </nav>
           </div>
 
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium text-zinc-500 transition hover:bg-red-50 hover:text-red-600"
-          >
-            <LogOut
-              size={17}
-              className="text-zinc-400 transition group-hover:text-red-500"
-            />
+          {/* =================================================
+              USER / LOGOUT
+          ================================================== */}
 
-            <span>Logout</span>
-          </button>
+          <div className="mt-4 shrink-0 border-t border-[#e7e2d9] pt-4">
+            <div className="mb-2 flex min-w-0 items-center gap-3 rounded-xl bg-[#f2efe9] p-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#111111] text-[11px] font-semibold text-white">
+                {initials || "U"}
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-xs font-semibold text-zinc-900">
+                  {displayName}
+                </p>
+
+                <p className="truncate text-[10px] text-zinc-500">
+                  {currentUser?.email || "Account"}
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="group flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium text-zinc-500 transition hover:bg-red-50 hover:text-red-600"
+            >
+              <LogOut
+                size={17}
+                className="shrink-0 text-zinc-400 transition group-hover:text-red-500"
+              />
+
+              <span>Logout</span>
+            </button>
+          </div>
         </div>
       </aside>
 
       {/* =====================================================
           MAIN CONTENT
       ====================================================== */}
+
       <div className="min-h-screen lg:pl-[270px]">
         {/* ===================================================
             TOPBAR
         ==================================================== */}
-        <header className="sticky top-0 z-30 h-[76px] border-b border-[#e7e2d9] bg-[#fbfaf7]/95 backdrop-blur">
-          <div className="flex h-full items-center justify-between px-4 sm:px-6 lg:px-9">
-            <div className="flex items-center gap-3">
-              {/* Mobile menu */}
+
+        <header className="sticky top-0 z-30 h-[64px] border-b border-[#e7e2d9] bg-[#fbfaf7]/95 backdrop-blur sm:h-[72px] lg:h-[76px]">
+          <div className="flex h-full min-w-0 items-center justify-between gap-3 px-3 sm:px-5 lg:px-7 xl:px-9">
+            {/* LEFT */}
+            <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+              {/* Mobile / Tablet menu */}
               <button
                 type="button"
                 onClick={() => setMobileOpen(true)}
-                className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#e7e2d9] bg-white text-zinc-600 lg:hidden"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#e7e2d9] bg-white text-zinc-600 transition hover:bg-[#efede8] lg:hidden"
+                aria-label="Open navigation"
               >
                 <Menu size={19} />
               </button>
 
-              <div className="hidden sm:block">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#ae8954]">
+              {/* Page title */}
+              <div className="min-w-0">
+                <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#ae8954] sm:text-[10px]">
                   {meta.eyebrow}
                 </p>
 
-                <p className="mt-0.5 text-sm font-semibold text-zinc-900">
+                <p className="mt-0.5 truncate text-sm font-semibold text-zinc-900 sm:text-base">
                   {meta.title}
                 </p>
               </div>
@@ -340,12 +356,13 @@ function DashboardLayout() {
             {/* =================================================
                 RIGHT SIDE
             ================================================== */}
-            <div className="flex items-center gap-2">
+
+            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
               {/* Notifications */}
               <button
                 type="button"
                 aria-label="Notifications"
-                className="relative flex h-10 w-10 items-center justify-center rounded-xl text-zinc-500 transition hover:bg-[#efede8] hover:text-zinc-900"
+                className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-zinc-500 transition hover:bg-[#efede8] hover:text-zinc-900"
               >
                 <Bell size={19} strokeWidth={1.7} />
 
@@ -359,9 +376,11 @@ function DashboardLayout() {
                   onClick={() =>
                     setProfileOpen((value) => !value)
                   }
-                  className="flex items-center gap-2 rounded-xl p-1.5 transition hover:bg-[#efede8]"
+                  className="flex items-center gap-1.5 rounded-xl p-1.5 transition hover:bg-[#efede8] sm:gap-2"
+                  aria-expanded={profileOpen}
+                  aria-label="Open profile menu"
                 >
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#111111] text-[11px] font-semibold text-white">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#111111] text-[11px] font-semibold text-white">
                     {initials || "U"}
                   </span>
 
@@ -371,17 +390,20 @@ function DashboardLayout() {
                   />
                 </button>
 
-                {/* Profile dropdown */}
+                {/* =================================================
+                    PROFILE DROPDOWN
+                ================================================== */}
+
                 {profileOpen && (
                   <>
                     <button
                       type="button"
-                      aria-label="Close menu"
+                      aria-label="Close profile menu"
                       onClick={() => setProfileOpen(false)}
                       className="fixed inset-0 z-10 cursor-default"
                     />
 
-                    <div className="absolute right-0 top-12 z-20 w-56 overflow-hidden rounded-2xl border border-[#e7e2d9] bg-white p-1.5 shadow-[0_18px_50px_rgba(0,0,0,0.10)]">
+                    <div className="absolute right-0 top-12 z-20 w-[calc(100vw-24px)] max-w-56 overflow-hidden rounded-2xl border border-[#e7e2d9] bg-white p-1.5 shadow-[0_18px_50px_rgba(0,0,0,0.10)] sm:w-56">
                       <div className="px-3 py-2.5">
                         <p className="truncate text-xs font-semibold">
                           {displayName}
@@ -401,7 +423,7 @@ function DashboardLayout() {
                           setProfileOpen(false);
                           navigate("/dashboard/profile");
                         }}
-                        className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-medium text-zinc-600 hover:bg-[#f6f3ee] hover:text-zinc-950"
+                        className="flex min-h-10 w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-medium text-zinc-600 transition hover:bg-[#f6f3ee] hover:text-zinc-950"
                       >
                         <UserRound size={15} />
                         Profile
@@ -414,7 +436,7 @@ function DashboardLayout() {
                           setProfileOpen(false);
                           navigate("/dashboard/settings");
                         }}
-                        className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-medium text-zinc-600 hover:bg-[#f6f3ee] hover:text-zinc-950"
+                        className="flex min-h-10 w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-medium text-zinc-600 transition hover:bg-[#f6f3ee] hover:text-zinc-950"
                       >
                         <Settings size={15} />
                         Settings
@@ -424,7 +446,7 @@ function DashboardLayout() {
                       <button
                         type="button"
                         onClick={handleLogout}
-                        className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-medium text-red-500 hover:bg-red-50"
+                        className="flex min-h-10 w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-medium text-red-500 transition hover:bg-red-50"
                       >
                         <LogOut size={15} />
                         Logout
@@ -440,8 +462,9 @@ function DashboardLayout() {
         {/* ===================================================
             PAGE CONTENT
         ==================================================== */}
-        <main className="px-4 py-7 sm:px-6 lg:px-9 lg:py-9">
-          <div className="mx-auto w-full max-w-[1450px]">
+
+        <main className="min-w-0 px-3 py-5 sm:px-5 sm:py-7 md:px-6 lg:px-7 lg:py-8 xl:px-9 xl:py-9">
+          <div className="mx-auto w-full max-w-[1450px] min-w-0">
             <Outlet />
           </div>
         </main>

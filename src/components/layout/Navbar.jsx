@@ -48,30 +48,29 @@ function Navbar({
 
   if (dashboard) {
     return (
-      <header className="sticky top-0 z-50 h-[72px] border-b border-stone-200/80 bg-white/95 backdrop-blur-xl">
-        <div className="flex h-full items-center justify-between px-4 sm:px-6">
-          
+      <header className="sticky top-0 z-50 h-[64px] sm:h-[72px] border-b border-stone-200/80 bg-white/95 backdrop-blur-xl">
+        <div className="flex h-full items-center justify-between px-3 sm:px-6">
           {/* LEFT */}
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             <button
               type="button"
               onClick={onMenuClick}
-              className="flex h-10 w-10 items-center justify-center rounded-xl text-zinc-700 transition-colors hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/10 lg:hidden"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-zinc-700 transition-colors hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/10 lg:hidden"
               aria-label="Open navigation"
             >
               <Menu size={20} />
             </button>
 
-            <div className="lg:hidden">
+            <div className="min-w-0 lg:hidden">
               <Logo compact />
             </div>
           </div>
 
           {/* RIGHT */}
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <button
               type="button"
-              className="relative flex h-10 w-10 items-center justify-center rounded-xl text-zinc-600 transition-colors hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/10"
+              className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-zinc-600 transition-colors hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/10"
               aria-label="Notifications"
             >
               <Bell size={19} />
@@ -79,7 +78,7 @@ function Navbar({
               <span className="absolute right-2.5 top-2.5 h-1.5 w-1.5 rounded-full bg-[#b08d57]" />
             </button>
 
-            <div className="ml-1 flex h-9 w-9 items-center justify-center rounded-full bg-zinc-950 text-xs font-semibold text-white">
+            <div className="ml-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-zinc-950 text-xs font-semibold text-white sm:ml-1">
               AS
             </div>
           </div>
@@ -96,8 +95,7 @@ function Navbar({
     <>
       <header className="sticky top-0 z-50 border-b border-stone-200/70 bg-[#f8f8f6]/95 backdrop-blur-xl">
         <div className="page-container">
-          <div className="flex min-h-[72px] items-center justify-between gap-6">
-
+          <div className="flex min-h-[64px] items-center justify-between gap-3 sm:min-h-[72px] sm:gap-6">
             {/* =================================================
                 LOGO
             ================================================= */}
@@ -116,7 +114,7 @@ function Navbar({
             ================================================= */}
 
             <nav
-              className="hidden items-center gap-6 lg:flex xl:gap-8"
+              className="hidden items-center gap-5 lg:flex xl:gap-8"
               aria-label="Main navigation"
             >
               {publicLinks.map((item) => (
@@ -148,8 +146,7 @@ function Navbar({
                 DESKTOP ACTIONS
             ================================================= */}
 
-            <div className="hidden items-center gap-2 sm:flex">
-              
+            <div className="hidden shrink-0 items-center gap-2 sm:flex">
               {/* LOGIN */}
               <Link
                 to="/login"
@@ -177,7 +174,7 @@ function Navbar({
             <button
               type="button"
               onClick={() => setMobileOpen(true)}
-              className="flex h-10 w-10 items-center justify-center rounded-xl text-zinc-700 transition-colors hover:bg-stone-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950/10 sm:hidden"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-zinc-700 transition-colors hover:bg-stone-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950/10 sm:hidden"
               aria-label="Open menu"
               aria-expanded={mobileOpen}
             >
@@ -202,17 +199,16 @@ function Navbar({
           />
 
           {/* MENU CARD */}
-          <div className="fixed left-4 right-4 top-4 z-[80] overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-[0_25px_80px_rgba(24,24,27,0.18)] sm:hidden">
-
+          <div className="fixed left-3 right-3 top-3 z-[80] max-h-[calc(100dvh-24px)] overflow-y-auto overscroll-contain rounded-2xl border border-stone-200 bg-white shadow-[0_25px_80px_rgba(24,24,27,0.18)] sm:left-4 sm:right-4 sm:top-4 sm:max-h-[calc(100dvh-32px)] sm:hidden">
             {/* =================================================
                 MOBILE HEADER
             ================================================= */}
 
-            <div className="flex items-center justify-between p-5">
+            <div className="flex items-center justify-between gap-3 p-4 sm:p-5">
               <Link
                 to="/"
                 onClick={closeMobile}
-                className="rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950/10"
+                className="min-w-0 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950/10"
                 aria-label="Resumely home"
               >
                 <Logo />
@@ -221,7 +217,7 @@ function Navbar({
               <button
                 type="button"
                 onClick={closeMobile}
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-stone-100 text-zinc-600 transition-colors hover:bg-stone-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950/10"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-stone-100 text-zinc-600 transition-colors hover:bg-stone-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950/10"
                 aria-label="Close menu"
               >
                 <X size={18} />
@@ -233,7 +229,7 @@ function Navbar({
             ================================================= */}
 
             <nav
-              className="space-y-1 px-5"
+              className="space-y-1 px-4 sm:px-5"
               aria-label="Mobile navigation"
             >
               {publicLinks.map((item) => (
@@ -243,7 +239,7 @@ function Navbar({
                   onClick={closeMobile}
                   className={({ isActive }) =>
                     [
-                      "flex h-11 items-center rounded-xl px-3",
+                      "flex min-h-11 items-center rounded-xl px-3 py-2",
                       "text-sm font-medium",
                       "transition-all duration-200",
                       "focus:outline-none focus-visible:ring-2",
@@ -264,13 +260,12 @@ function Navbar({
                 MOBILE ACTIONS
             ================================================= */}
 
-            <div className="mt-5 grid grid-cols-2 gap-2 border-t border-stone-200 p-5">
-
+            <div className="mt-5 grid grid-cols-1 gap-2 border-t border-stone-200 p-4 sm:grid-cols-2 sm:p-5">
               {/* LOGIN */}
               <Link
                 to="/login"
                 onClick={closeMobile}
-                className="flex h-11 items-center justify-center rounded-xl border border-stone-200 bg-white text-sm font-medium text-zinc-800 transition-all hover:bg-stone-50 hover:border-stone-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950/10"
+                className="flex min-h-11 items-center justify-center rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm font-medium text-zinc-800 transition-all hover:border-stone-300 hover:bg-stone-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950/10"
               >
                 Login
               </Link>
@@ -279,11 +274,10 @@ function Navbar({
               <Link
                 to="/register"
                 onClick={closeMobile}
-                className="flex h-11 items-center justify-center rounded-xl bg-zinc-950 text-sm font-medium text-white transition-all hover:bg-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950/10"
+                className="flex min-h-11 items-center justify-center rounded-xl bg-zinc-950 px-3 py-2 text-sm font-medium text-white transition-all hover:bg-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950/10"
               >
                 Create Resume
               </Link>
-
             </div>
           </div>
         </>

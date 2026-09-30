@@ -245,9 +245,9 @@ const faqs = [
 
 function SectionLabel({ children }) {
   return (
-    <div className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-600 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
-      <span className="h-1.5 w-1.5 rounded-full bg-[#b08d57]" />
-      {children}
+    <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-600 shadow-[0_1px_2px_rgba(0,0,0,0.02)] sm:text-[11px] sm:tracking-[0.16em]">
+      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#b08d57]" />
+      <span>{children}</span>
     </div>
   );
 }
@@ -283,7 +283,6 @@ function ResumeMiniPreview({
   );
 }
 
-
 function CoverLetterMiniPreview({ template }) {
   const isDark = template.layout === "executive";
   const isMinimal = template.layout === "minimal";
@@ -292,7 +291,7 @@ function CoverLetterMiniPreview({ template }) {
   const isProfessional = template.layout === "professional";
 
   return (
-    <div className="relative aspect-[0.707] w-full overflow-hidden bg-[#efede8] border border-stone-200 shadow-[0_18px_50px_rgba(24,24,27,0.10)]">
+    <div className="relative aspect-[0.707] w-full overflow-hidden border border-stone-200 bg-[#efede8] shadow-[0_18px_50px_rgba(24,24,27,0.10)]">
       <div
         className="absolute left-0 top-0 origin-top-left"
         style={{
@@ -308,14 +307,18 @@ function CoverLetterMiniPreview({ template }) {
           {!isMinimal && !isDark && (
             <div
               className="absolute left-0 top-0 h-[9px] w-full"
-              style={{ backgroundColor: template.accent }}
+              style={{
+                backgroundColor: template.accent,
+              }}
             />
           )}
 
           {isProfessional && (
             <div
               className="absolute left-0 top-[9px] h-full w-[12px]"
-              style={{ backgroundColor: template.accent }}
+              style={{
+                backgroundColor: template.accent,
+              }}
             />
           )}
 
@@ -323,15 +326,21 @@ function CoverLetterMiniPreview({ template }) {
             <header
               className={[
                 "border-b pb-8",
-                isDark ? "border-white/15" : "border-zinc-200",
+                isDark
+                  ? "border-white/15"
+                  : "border-zinc-200",
                 isElegant ? "text-center" : "",
               ].join(" ")}
             >
               <h3
                 className={[
                   "text-[34px] font-bold tracking-[-0.045em]",
-                  isClassic || isElegant ? "font-serif" : "",
-                  isDark ? "text-white" : "text-zinc-950",
+                  isClassic || isElegant
+                    ? "font-serif"
+                    : "",
+                  isDark
+                    ? "text-white"
+                    : "text-zinc-950",
                 ].join(" ")}
               >
                 Alex Morgan
@@ -340,7 +349,9 @@ function CoverLetterMiniPreview({ template }) {
               <p
                 className={[
                   "mt-2 text-[14px] font-medium",
-                  isDark ? "text-[#d8c09b]" : "text-zinc-500",
+                  isDark
+                    ? "text-[#d8c09b]"
+                    : "text-zinc-500",
                 ].join(" ")}
               >
                 Senior Product Manager
@@ -350,7 +361,9 @@ function CoverLetterMiniPreview({ template }) {
                 className={[
                   "mt-5 flex flex-wrap gap-x-7 gap-y-2 text-[11px]",
                   isElegant ? "justify-center" : "",
-                  isDark ? "text-zinc-400" : "text-zinc-500",
+                  isDark
+                    ? "text-zinc-400"
+                    : "text-zinc-500",
                 ].join(" ")}
               >
                 <span>alex.morgan@email.com</span>
@@ -362,64 +375,98 @@ function CoverLetterMiniPreview({ template }) {
             <main
               className={[
                 "mt-10 text-[13px] leading-[1.85]",
-                isDark ? "text-zinc-300" : "text-zinc-600",
+                isDark
+                  ? "text-zinc-300"
+                  : "text-zinc-600",
               ].join(" ")}
             >
               <div className="flex items-start justify-between gap-10">
                 <div>
-                  <p className={isDark ? "font-semibold text-white" : "font-semibold text-zinc-950"}>
+                  <p
+                    className={
+                      isDark
+                        ? "font-semibold text-white"
+                        : "font-semibold text-zinc-950"
+                    }
+                  >
                     Hiring Manager
                   </p>
+
                   <p>Northstar Technologies</p>
                   <p>San Francisco, CA</p>
                 </div>
-                <p className={isDark ? "text-zinc-500" : "text-zinc-400"}>
+
+                <p
+                  className={
+                    isDark
+                      ? "text-zinc-500"
+                      : "text-zinc-400"
+                  }
+                >
                   October 12, 2026
                 </p>
               </div>
 
               <p
                 className="mt-9 text-[14px] font-bold"
-                style={{ color: template.accent }}
+                style={{
+                  color: template.accent,
+                }}
               >
                 Application for Senior Product Manager
               </p>
 
-              <p className={["mt-9", isDark ? "text-white" : "text-zinc-950"].join(" ")}>
+              <p
+                className={[
+                  "mt-9",
+                  isDark
+                    ? "text-white"
+                    : "text-zinc-950",
+                ].join(" ")}
+              >
                 Dear Hiring Manager,
               </p>
 
               <p className="mt-6">
-                I am writing to express my interest in the Senior Product Manager
-                position at Northstar Technologies. My experience building digital
-                products and leading cross-functional teams aligns closely with
-                this opportunity.
+                I am writing to express my interest in the
+                Senior Product Manager position at Northstar
+                Technologies. My experience building digital
+                products and leading cross-functional teams
+                aligns closely with this opportunity.
               </p>
 
               <p className="mt-6">
-                Throughout my career, I have translated customer problems into
-                measurable product outcomes while partnering closely with design,
+                Throughout my career, I have translated
+                customer problems into measurable product
+                outcomes while partnering closely with design,
                 engineering and business teams.
               </p>
 
               <p className="mt-6">
-                I would welcome the opportunity to bring this experience to your
-                team and contribute to meaningful product growth.
+                I would welcome the opportunity to bring this
+                experience to your team and contribute to
+                meaningful product growth.
               </p>
 
               <p className="mt-6">
-                Thank you for your time and consideration. I look forward to
-                discussing the opportunity with you.
+                Thank you for your time and consideration. I
+                look forward to discussing the opportunity with
+                you.
               </p>
 
               <div className="mt-10">
                 <p>Sincerely,</p>
+
                 <p
                   className={[
                     "mt-7 text-[20px] font-semibold",
-                    isClassic || isElegant ? "font-serif" : "",
+                    isClassic || isElegant
+                      ? "font-serif"
+                      : "",
                   ].join(" ")}
-                  style={{ color: template.accent }}
+                  style={{
+                    color: template.accent,
+                  }}
                 >
                   Alex Morgan
                 </p>
@@ -429,10 +476,12 @@ function CoverLetterMiniPreview({ template }) {
             <footer
               className={[
                 "absolute bottom-8 left-[72px] right-[72px] border-t pt-4 text-[9px] uppercase tracking-[0.16em]",
-                isDark ? "border-white/10 text-zinc-500" : "border-zinc-100 text-zinc-400",
+                isDark
+                  ? "border-white/10 text-zinc-500"
+                  : "border-zinc-100 text-zinc-400",
               ].join(" ")}
             >
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-4">
                 <span>Alex Morgan</span>
                 <span>{template.name}</span>
               </div>
@@ -448,39 +497,51 @@ function BuilderPreview() {
   return (
     <div className="relative mx-auto w-full max-w-[620px]">
       <motion.div
-        initial={{ opacity: 0, y: 25, rotate: 1 }}
-        animate={{ opacity: 1, y: 0, rotate: 0 }}
+        initial={{
+          opacity: 0,
+          y: 25,
+          rotate: 1,
+        }}
+        animate={{
+          opacity: 1,
+          y: 0,
+          rotate: 0,
+        }}
         transition={{
           duration: 0.7,
           ease: [0.22, 1, 0.36, 1],
         }}
         className="relative z-10 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-[0_30px_90px_rgba(24,24,27,0.14)]"
       >
-        <div className="flex h-11 items-center justify-between border-b border-stone-200 px-4">
-          <div className="flex items-center gap-1.5">
+        <div className="flex min-h-[44px] items-center justify-between gap-2 border-b border-stone-200 px-3 sm:h-11 sm:px-4">
+          <div className="flex shrink-0 items-center gap-1.5">
             <span className="h-2.5 w-2.5 rounded-full bg-stone-200" />
             <span className="h-2.5 w-2.5 rounded-full bg-stone-200" />
             <span className="h-2.5 w-2.5 rounded-full bg-stone-200" />
           </div>
 
-          <div className="hidden items-center gap-2 rounded-lg border border-stone-200 px-3 py-1.5 sm:flex">
-            <FileText size={12} className="text-zinc-400" />
-            <span className="text-[10px] font-medium text-zinc-600">
+          <div className="hidden min-w-0 items-center gap-2 rounded-lg border border-stone-200 px-3 py-1.5 sm:flex">
+            <FileText
+              size={12}
+              className="shrink-0 text-zinc-400"
+            />
+
+            <span className="truncate text-[10px] font-medium text-zinc-600">
               Alex Morgan — Resume
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             <span className="hidden text-[10px] text-zinc-400 sm:block">
               Saved
             </span>
 
-            <div className="h-6 w-6 rounded-full bg-zinc-950" />
+            <div className="h-6 w-6 shrink-0 rounded-full bg-zinc-950" />
           </div>
         </div>
 
-        <div className="grid min-h-[390px] grid-cols-[43%_57%] bg-[#f5f5f3]">
-          <div className="border-r border-stone-200 bg-white p-4 sm:p-5">
+        <div className="grid min-h-0 grid-cols-1 bg-[#f5f5f3] sm:grid-cols-[43%_57%] sm:min-h-[390px]">
+          <div className="border-b border-stone-200 bg-white p-4 sm:border-b-0 sm:border-r sm:p-5">
             <div className="mb-4 flex items-center justify-between">
               <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-500">
                 Content
@@ -488,13 +549,13 @@ function BuilderPreview() {
 
               <button
                 type="button"
-                className="flex h-6 w-6 items-center justify-center rounded-md bg-zinc-100 text-zinc-500"
+                className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-zinc-100 text-zinc-500"
               >
                 <Plus size={12} />
               </button>
             </div>
 
-            <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-2 sm:block sm:space-y-2">
               {[
                 "Personal Information",
                 "Summary",
@@ -506,14 +567,14 @@ function BuilderPreview() {
                 <div
                   key={item}
                   className={[
-                    "rounded-lg border px-3 py-2.5",
+                    "rounded-lg border px-2.5 py-2.5 sm:px-3",
                     index === 0
                       ? "border-zinc-900 bg-zinc-950 text-white"
                       : "border-stone-200 bg-white text-zinc-600",
                   ].join(" ")}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-medium">
+                  <div className="flex min-w-0 items-center justify-between gap-2">
+                    <span className="truncate text-[9px] font-medium sm:text-[10px]">
                       {item}
                     </span>
 
@@ -521,8 +582,8 @@ function BuilderPreview() {
                       size={12}
                       className={
                         index === 0
-                          ? "text-white/60"
-                          : "text-zinc-300"
+                          ? "shrink-0 text-white/60"
+                          : "shrink-0 text-zinc-300"
                       }
                     />
                   </div>
@@ -532,6 +593,7 @@ function BuilderPreview() {
 
             <div className="mt-5 rounded-xl border border-stone-200 bg-stone-50 p-3">
               <div className="mb-2 h-1.5 w-16 rounded-full bg-zinc-800" />
+
               <div className="space-y-1.5">
                 <div className="h-1.5 w-full rounded-full bg-zinc-200" />
                 <div className="h-1.5 w-4/5 rounded-full bg-zinc-200" />
@@ -540,25 +602,25 @@ function BuilderPreview() {
             </div>
           </div>
 
-          <div className="flex items-start justify-center overflow-hidden p-4 sm:p-6">
-            <div className="w-[88%] max-w-[300px]">
+          <div className="flex min-w-0 items-start justify-center overflow-hidden p-4 sm:p-6">
+            <div className="w-full max-w-[300px]">
               <ResumeMiniPreview />
             </div>
           </div>
         </div>
 
-        <div className="flex h-11 items-center justify-between border-t border-stone-200 bg-white px-4">
-          <div className="flex items-center gap-2">
+        <div className="flex min-h-[44px] flex-wrap items-center justify-between gap-2 border-t border-stone-200 bg-white px-3 py-2 sm:h-11 sm:flex-nowrap sm:px-4 sm:py-0">
+          <div className="flex min-w-0 items-center gap-2">
             <span className="text-[10px] text-zinc-400">
               Template
             </span>
 
-            <span className="text-[10px] font-semibold text-zinc-700">
+            <span className="truncate text-[10px] font-semibold text-zinc-700">
               Executive
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
             <button
               type="button"
               className="rounded-md px-2 py-1 text-[10px] font-medium text-zinc-500"
@@ -577,8 +639,14 @@ function BuilderPreview() {
       </motion.div>
 
       <motion.div
-        initial={{ opacity: 0, x: 30 }}
-        animate={{ opacity: 1, x: 0 }}
+        initial={{
+          opacity: 0,
+          x: 30,
+        }}
+        animate={{
+          opacity: 1,
+          x: 0,
+        }}
         transition={{
           delay: 0.45,
           duration: 0.6,
@@ -586,14 +654,15 @@ function BuilderPreview() {
         className="absolute -right-4 top-[18%] z-20 hidden w-[150px] rounded-xl border border-stone-200 bg-white p-3 shadow-[0_15px_45px_rgba(24,24,27,0.12)] sm:block lg:-right-10"
       >
         <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
             <Check size={14} />
           </div>
 
-          <div>
-            <p className="text-[10px] font-semibold text-zinc-900">
+          <div className="min-w-0">
+            <p className="truncate text-[10px] font-semibold text-zinc-900">
               Resume score
             </p>
+
             <p className="text-[9px] text-zinc-400">
               Looking polished
             </p>
@@ -606,8 +675,14 @@ function BuilderPreview() {
       </motion.div>
 
       <motion.div
-        initial={{ opacity: 0, x: -25 }}
-        animate={{ opacity: 1, x: 0 }}
+        initial={{
+          opacity: 0,
+          x: -25,
+        }}
+        animate={{
+          opacity: 1,
+          x: 0,
+        }}
         transition={{
           delay: 0.6,
           duration: 0.6,
@@ -615,14 +690,15 @@ function BuilderPreview() {
         className="absolute -bottom-5 -left-4 z-20 hidden w-[170px] rounded-xl border border-stone-200 bg-white p-3 shadow-[0_15px_45px_rgba(24,24,27,0.12)] sm:block lg:-left-9"
       >
         <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#b08d57]/10 text-[#8a6938]">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#b08d57]/10 text-[#8a6938]">
             <Palette size={14} />
           </div>
 
-          <div>
+          <div className="min-w-0">
             <p className="text-[10px] font-semibold text-zinc-900">
               Live customization
             </p>
+
             <p className="text-[9px] text-zinc-400">
               Changes update instantly
             </p>
@@ -647,25 +723,34 @@ function TemplateCard({ template, index }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
+      initial={{
+        opacity: 0,
+        y: 20,
+      }}
+      whileInView={{
+        opacity: 1,
+        y: 0,
+      }}
+      viewport={{
+        once: true,
+        amount: 0.2,
+      }}
       transition={{
         duration: 0.45,
         delay: Math.min(index * 0.05, 0.25),
       }}
-      className="group"
+      className="group min-w-0"
     >
       <Link
         to={`/templates/${template.name.toLowerCase()}`}
         className="block"
       >
-        <div className="relative overflow-hidden rounded-2xl border border-stone-200 bg-stone-100 p-4 transition-all duration-300 group-hover:-translate-y-1 group-hover:border-stone-300 group-hover:shadow-[0_18px_45px_rgba(24,24,27,0.10)] sm:p-5">
+        <div className="relative overflow-hidden rounded-2xl border border-stone-200 bg-stone-100 p-3.5 transition-all duration-300 group-hover:-translate-y-1 group-hover:border-stone-300 group-hover:shadow-[0_18px_45px_rgba(24,24,27,0.10)] sm:p-5">
           <ResumeMiniPreview
             variant={variants[template.layout]}
           />
 
-          <div className="pointer-events-none absolute inset-x-4 bottom-4 flex translate-y-2 items-center justify-between rounded-xl border border-white/70 bg-white/95 px-3 py-2.5 opacity-0 shadow-lg backdrop-blur transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 sm:inset-x-5 sm:bottom-5">
+          <div className="pointer-events-none absolute inset-x-3.5 bottom-3.5 flex translate-y-2 items-center justify-between rounded-xl border border-white/70 bg-white/95 px-3 py-2.5 opacity-0 shadow-lg backdrop-blur transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 sm:inset-x-5 sm:bottom-5">
             <span className="text-xs font-semibold text-zinc-900">
               Use template
             </span>
@@ -674,19 +759,19 @@ function TemplateCard({ template, index }) {
           </div>
         </div>
 
-        <div className="mt-4 flex items-start justify-between gap-4">
-          <div>
+        <div className="mt-4 flex items-start justify-between gap-3">
+          <div className="min-w-0">
             <h3 className="text-sm font-semibold text-zinc-900">
               {template.name}
             </h3>
 
-            <p className="mt-1 text-xs text-zinc-500">
+            <p className="mt-1 truncate text-xs text-zinc-500">
               {template.category}
             </p>
           </div>
 
           <span
-            className="mt-0.5 h-2.5 w-2.5 rounded-full border border-white shadow-sm"
+            className="mt-0.5 h-2.5 w-2.5 shrink-0 rounded-full border border-white shadow-sm"
             style={{
               backgroundColor: template.accent,
             }}
@@ -703,10 +788,10 @@ function FAQItem({ item, isOpen, onToggle }) {
       <button
         type="button"
         onClick={onToggle}
-        className="focus-ring flex w-full items-center justify-between gap-6 py-5 text-left"
+        className="focus-ring flex w-full items-center justify-between gap-4 py-5 text-left sm:gap-6"
         aria-expanded={isOpen}
       >
-        <span className="text-sm font-semibold text-zinc-900 sm:text-[15px]">
+        <span className="min-w-0 text-sm font-semibold text-zinc-900 sm:text-[15px]">
           {item.question}
         </span>
 
@@ -739,7 +824,7 @@ function FAQItem({ item, isOpen, onToggle }) {
             }}
             className="overflow-hidden"
           >
-            <p className="max-w-3xl pb-5 pr-10 text-sm leading-6 text-zinc-500">
+            <p className="max-w-3xl pb-5 pr-0 text-sm leading-6 text-zinc-500 sm:pr-10">
               {item.answer}
             </p>
           </motion.div>
@@ -753,18 +838,18 @@ function Home() {
   const [openFaq, setOpenFaq] = useState(0);
 
   return (
-    <div className="overflow-hidden bg-[#f8f8f6] text-zinc-950">
+    <div className="min-w-0 overflow-hidden bg-[#f8f8f6] text-zinc-950">
       {/* =========================================================
           HERO
       ========================================================= */}
 
       <section className="relative border-b border-stone-200/70">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute left-1/2 top-0 h-[520px] w-[900px] -translate-x-1/2 rounded-full bg-[#b08d57]/[0.045] blur-3xl" />
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute left-1/2 top-0 h-[420px] w-[80vw] max-w-[900px] -translate-x-1/2 rounded-full bg-[#b08d57]/[0.045] blur-3xl sm:h-[520px]" />
         </div>
 
-        <div className="relative mx-auto max-w-[1440px] px-5 pb-20 pt-16 sm:px-8 sm:pb-24 sm:pt-20 lg:px-12 lg:pb-28 lg:pt-24">
-          <div className="grid items-center gap-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12 xl:gap-20">
+        <div className="relative mx-auto max-w-[1440px] px-4 pb-16 pt-12 sm:px-8 sm:pb-24 sm:pt-20 lg:px-12 lg:pb-28 lg:pt-24">
+          <div className="grid min-w-0 items-center gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12 xl:gap-20">
             <motion.div
               initial={{
                 opacity: 0,
@@ -777,28 +862,31 @@ function Home() {
               transition={{
                 duration: 0.65,
               }}
-              className="max-w-2xl"
+              className="min-w-0 max-w-2xl"
             >
               <SectionLabel>
                 Premium resume builder
               </SectionLabel>
 
-              <h1 className="mt-6 text-balance text-[48px] font-semibold leading-[0.98] tracking-[-0.055em] text-zinc-950 sm:text-[62px] lg:text-[70px] xl:text-[78px]">
+              <h1 className="mt-6 max-w-3xl text-[42px] font-semibold leading-[1] tracking-[-0.055em] text-zinc-950 sm:text-[62px] sm:leading-[0.98] lg:text-[70px] xl:text-[78px]">
                 Build a resume
-                <br />
+                <br className="hidden sm:block" />
                 <span className="text-zinc-400">
                   that gets noticed.
                 </span>
               </h1>
 
-              <p className="mt-7 max-w-xl text-base leading-7 text-zinc-500 sm:text-lg sm:leading-8">
+              <p className="mt-6 max-w-xl text-sm leading-6 text-zinc-500 sm:mt-7 sm:text-lg sm:leading-8">
                 Create a polished, professional resume with beautifully
                 designed templates, a distraction-free editor and a live
                 preview that updates as you build.
               </p>
 
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Link to="/register">
+              <div className="mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row">
+                <Link
+                  to="/register"
+                  className="w-full sm:w-auto"
+                >
                   <Button
                     size="xl"
                     className="w-full sm:w-auto"
@@ -808,7 +896,10 @@ function Home() {
                   </Button>
                 </Link>
 
-                <Link to="/templates">
+                <Link
+                  to="/templates"
+                  className="w-full sm:w-auto"
+                >
                   <Button
                     variant="secondary"
                     size="xl"
@@ -819,11 +910,11 @@ function Home() {
                 </Link>
               </div>
 
-              <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 text-xs text-zinc-500">
+              <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3 text-xs text-zinc-500 sm:mt-8 sm:gap-x-6">
                 <div className="flex items-center gap-2">
                   <Check
                     size={14}
-                    className="text-emerald-600"
+                    className="shrink-0 text-emerald-600"
                   />
                   Premium templates
                 </div>
@@ -831,7 +922,7 @@ function Home() {
                 <div className="flex items-center gap-2">
                   <Check
                     size={14}
-                    className="text-emerald-600"
+                    className="shrink-0 text-emerald-600"
                   />
                   Live preview
                 </div>
@@ -839,14 +930,14 @@ function Home() {
                 <div className="flex items-center gap-2">
                   <Check
                     size={14}
-                    className="text-emerald-600"
+                    className="shrink-0 text-emerald-600"
                   />
                   Multiple resumes
                 </div>
               </div>
             </motion.div>
 
-            <div className="relative pt-2 lg:pt-8">
+            <div className="relative min-w-0 pt-2 lg:pt-8">
               <BuilderPreview />
             </div>
           </div>
@@ -858,7 +949,7 @@ function Home() {
       ========================================================= */}
 
       <section className="border-b border-stone-200 bg-white">
-        <div className="mx-auto grid max-w-[1440px] divide-y divide-stone-200 px-5 sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:px-8 lg:px-12">
+        <div className="mx-auto grid max-w-[1440px] divide-y divide-stone-200 px-4 sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:px-8 lg:px-12">
           {[
             {
               value: "01",
@@ -878,14 +969,14 @@ function Home() {
           ].map((item) => (
             <div
               key={item.value}
-              className="flex items-center gap-4 py-5 sm:px-7 sm:py-7"
+              className="flex min-w-0 items-center gap-4 py-5 sm:px-7 sm:py-7"
             >
-              <span className="text-lg font-semibold tracking-tight text-zinc-300">
+              <span className="shrink-0 text-lg font-semibold tracking-tight text-zinc-300">
                 {item.value}
               </span>
 
-              <div>
-                <p className="text-sm font-semibold text-zinc-900">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-zinc-900">
                   {item.title}
                 </p>
 
@@ -902,26 +993,26 @@ function Home() {
           PRODUCT PREVIEW
       ========================================================= */}
 
-      <section className="bg-white py-20 sm:py-24 lg:py-32">
-        <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
-          <div className="grid items-center gap-12 lg:grid-cols-[0.75fr_1.25fr] lg:gap-20">
-            <div className="max-w-xl">
+      <section className="bg-white py-16 sm:py-24 lg:py-32">
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-8 lg:px-12">
+          <div className="grid min-w-0 items-center gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:gap-20">
+            <div className="min-w-0 max-w-xl">
               <SectionLabel>
                 The workspace
               </SectionLabel>
 
-              <h2 className="mt-5 text-balance text-4xl font-semibold tracking-[-0.045em] text-zinc-950 sm:text-5xl">
+              <h2 className="mt-5 text-3xl font-semibold tracking-[-0.045em] text-zinc-950 sm:text-5xl">
                 Everything you need.
-                <br />
+                <br className="hidden sm:block" />
                 Nothing you don't.
               </h2>
 
-              <p className="mt-5 text-base leading-7 text-zinc-500">
+              <p className="mt-5 text-sm leading-6 text-zinc-500 sm:text-base sm:leading-7">
                 A focused resume workspace that keeps your content,
                 customization and final document in one place.
               </p>
 
-              <div className="mt-8 space-y-4">
+              <div className="mt-7 space-y-4 sm:mt-8">
                 {[
                   "Structured editing sections",
                   "Live A4 resume preview",
@@ -945,7 +1036,7 @@ function Home() {
 
               <Link
                 to="/register"
-                className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-zinc-950 hover:text-[#8a6938]"
+                className="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-zinc-950 hover:text-[#8a6938] sm:mt-8"
               >
                 Start building
                 <ArrowRight size={15} />
@@ -968,7 +1059,7 @@ function Home() {
               transition={{
                 duration: 0.6,
               }}
-              className="rounded-2xl border border-stone-200 bg-[#f5f5f3] p-3 shadow-[0_25px_70px_rgba(24,24,27,0.08)] sm:p-5"
+              className="min-w-0 rounded-2xl border border-stone-200 bg-[#f5f5f3] p-2.5 shadow-[0_25px_70px_rgba(24,24,27,0.08)] sm:p-5"
             >
               <BuilderPreview />
             </motion.div>
@@ -982,22 +1073,22 @@ function Home() {
 
       <section
         id="templates"
-        className="scroll-mt-20 border-y border-stone-200 bg-[#f8f8f6] py-20 sm:py-24 lg:py-32"
+        className="scroll-mt-20 border-y border-stone-200 bg-[#f8f8f6] py-16 sm:py-24 lg:py-32"
       >
-        <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-8 lg:px-12">
           <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
-            <div className="max-w-2xl">
+            <div className="min-w-0 max-w-2xl">
               <SectionLabel>
                 Template collection
               </SectionLabel>
 
-              <h2 className="mt-5 text-balance text-4xl font-semibold tracking-[-0.045em] text-zinc-950 sm:text-5xl">
+              <h2 className="mt-5 text-3xl font-semibold tracking-[-0.045em] text-zinc-950 sm:text-5xl">
                 A design for every
-                <br />
+                <br className="hidden sm:block" />
                 professional chapter.
               </h2>
 
-              <p className="mt-5 max-w-xl text-base leading-7 text-zinc-500">
+              <p className="mt-5 max-w-xl text-sm leading-6 text-zinc-500 sm:text-base sm:leading-7">
                 Eight distinct starting points, each built with a different
                 visual hierarchy instead of simply changing colors.
               </p>
@@ -1005,14 +1096,14 @@ function Home() {
 
             <Link
               to="/templates"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-900 hover:text-[#8a6938]"
+              className="inline-flex shrink-0 items-center gap-2 text-sm font-semibold text-zinc-900 hover:text-[#8a6938]"
             >
               View all templates
               <ArrowRight size={15} />
             </Link>
           </div>
 
-          <div className="mt-12 grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-10 grid gap-x-4 gap-y-9 sm:mt-12 sm:grid-cols-2 sm:gap-x-5 sm:gap-y-10 lg:grid-cols-4">
             {templates.map((template, index) => (
               <TemplateCard
                 key={template.name}
@@ -1024,28 +1115,28 @@ function Home() {
         </div>
       </section>
 
-
       {/* =========================================================
           COVER LETTER TEMPLATES
       ========================================================= */}
+
       <section
         id="cover-letter-templates"
-        className="border-y border-stone-200 bg-white py-20 sm:py-24 lg:py-32"
+        className="border-y border-stone-200 bg-white py-16 sm:py-24 lg:py-32"
       >
-        <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-8 lg:px-12">
           <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
-            <div className="max-w-2xl">
+            <div className="min-w-0 max-w-2xl">
               <SectionLabel>
                 Cover letter collection
               </SectionLabel>
 
-              <h2 className="mt-5 text-balance text-4xl font-semibold tracking-[-0.045em] text-zinc-950 sm:text-5xl">
+              <h2 className="mt-5 text-3xl font-semibold tracking-[-0.045em] text-zinc-950 sm:text-5xl">
                 Match your cover letter
-                <br />
+                <br className="hidden sm:block" />
                 to your resume.
               </h2>
 
-              <p className="mt-5 max-w-xl text-base leading-7 text-zinc-500">
+              <p className="mt-5 max-w-xl text-sm leading-6 text-zinc-500 sm:text-base sm:leading-7">
                 Professional cover letter layouts with real typography,
                 spacing and content structure — designed to work alongside
                 your resume.
@@ -1054,54 +1145,69 @@ function Home() {
 
             <Link
               to="/cover-letter-templates"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-900 hover:text-[#8a6938]"
+              className="inline-flex shrink-0 items-center gap-2 text-sm font-semibold text-zinc-900 hover:text-[#8a6938]"
             >
               View all cover letter templates
               <ArrowRight size={15} />
             </Link>
           </div>
 
-          <div className="mt-12 grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid gap-x-4 gap-y-9 sm:mt-12 sm:grid-cols-2 sm:gap-x-5 sm:gap-y-10 lg:grid-cols-3">
             {coverLetterTemplates.map((template, index) => (
               <motion.div
                 key={template.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
+                initial={{
+                  opacity: 0,
+                  y: 20,
+                }}
+                whileInView={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                viewport={{
+                  once: true,
+                  amount: 0.2,
+                }}
                 transition={{
                   duration: 0.45,
                   delay: Math.min(index * 0.05, 0.2),
                 }}
-                className="group"
+                className="group min-w-0"
               >
                 <Link
-                  to={`/cover-letter-templates`}
+                  to="/cover-letter-templates"
                   className="block"
                 >
-                  <div className="relative overflow-hidden rounded-2xl border border-stone-200 bg-stone-100 p-4 transition-all duration-300 group-hover:-translate-y-1 group-hover:border-stone-300 group-hover:shadow-[0_18px_45px_rgba(24,24,27,0.10)] sm:p-5">
-                    <CoverLetterMiniPreview template={template} />
+                  <div className="relative overflow-hidden rounded-2xl border border-stone-200 bg-stone-100 p-3.5 transition-all duration-300 group-hover:-translate-y-1 group-hover:border-stone-300 group-hover:shadow-[0_18px_45px_rgba(24,24,27,0.10)] sm:p-5">
+                    <CoverLetterMiniPreview
+                      template={template}
+                    />
 
-                    <div className="pointer-events-none absolute inset-x-4 bottom-4 flex translate-y-2 items-center justify-between rounded-xl border border-white/70 bg-white/95 px-3 py-2.5 opacity-0 shadow-lg backdrop-blur transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 sm:inset-x-5 sm:bottom-5">
+                    <div className="pointer-events-none absolute inset-x-3.5 bottom-3.5 flex translate-y-2 items-center justify-between rounded-xl border border-white/70 bg-white/95 px-3 py-2.5 opacity-0 shadow-lg backdrop-blur transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 sm:inset-x-5 sm:bottom-5">
                       <span className="text-xs font-semibold text-zinc-900">
                         Use template
                       </span>
+
                       <ArrowRight size={14} />
                     </div>
                   </div>
 
-                  <div className="mt-4 flex items-start justify-between gap-4">
-                    <div>
+                  <div className="mt-4 flex items-start justify-between gap-3">
+                    <div className="min-w-0">
                       <h3 className="text-sm font-semibold text-zinc-900">
                         {template.name}
                       </h3>
-                      <p className="mt-1 text-xs text-zinc-500">
+
+                      <p className="mt-1 truncate text-xs text-zinc-500">
                         {template.category}
                       </p>
                     </div>
 
                     <span
-                      className="mt-0.5 h-2.5 w-2.5 rounded-full border border-white shadow-sm"
-                      style={{ backgroundColor: template.accent }}
+                      className="mt-0.5 h-2.5 w-2.5 shrink-0 rounded-full border border-white shadow-sm"
+                      style={{
+                        backgroundColor: template.accent,
+                      }}
                     />
                   </div>
                 </Link>
@@ -1117,27 +1223,27 @@ function Home() {
 
       <section
         id="features"
-        className="scroll-mt-20 bg-white py-20 sm:py-24 lg:py-32"
+        className="scroll-mt-20 bg-white py-16 sm:py-24 lg:py-32"
       >
-        <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-8 lg:px-12">
           <div className="max-w-2xl">
             <SectionLabel>
               Built around you
             </SectionLabel>
 
-            <h2 className="mt-5 text-balance text-4xl font-semibold tracking-[-0.045em] text-zinc-950 sm:text-5xl">
+            <h2 className="mt-5 text-3xl font-semibold tracking-[-0.045em] text-zinc-950 sm:text-5xl">
               Less formatting.
               <br />
               More focus.
             </h2>
 
-            <p className="mt-5 text-base leading-7 text-zinc-500">
+            <p className="mt-5 text-sm leading-6 text-zinc-500 sm:text-base sm:leading-7">
               The product takes care of the presentation so you can focus on
               the experience, skills and achievements that make you valuable.
             </p>
           </div>
 
-          <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-stone-200 bg-stone-200 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-stone-200 bg-stone-200 sm:mt-12 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((feature, index) => {
               const Icon = feature.icon;
 
@@ -1160,10 +1266,13 @@ function Home() {
                     duration: 0.4,
                     delay: Math.min(index * 0.04, 0.2),
                   }}
-                  className="group bg-white p-7 transition-colors hover:bg-stone-50 sm:p-8"
+                  className="group min-w-0 bg-white p-6 transition-colors hover:bg-stone-50 sm:p-8"
                 >
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-stone-100 text-zinc-700 transition-colors group-hover:bg-zinc-950 group-hover:text-white">
-                    <Icon size={20} strokeWidth={1.7} />
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-stone-100 text-zinc-700 transition-colors group-hover:bg-zinc-950 group-hover:text-white">
+                    <Icon
+                      size={20}
+                      strokeWidth={1.7}
+                    />
                   </div>
 
                   <h3 className="mt-6 text-base font-semibold text-zinc-950">
@@ -1186,36 +1295,36 @@ function Home() {
 
       <section
         id="how-it-works"
-        className="scroll-mt-20 border-y border-stone-200 bg-[#f8f8f6] py-20 sm:py-24 lg:py-32"
+        className="scroll-mt-20 border-y border-stone-200 bg-[#f8f8f6] py-16 sm:py-24 lg:py-32"
       >
-        <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
-          <div className="grid gap-12 lg:grid-cols-[0.7fr_1.3fr] lg:gap-20">
-            <div>
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-8 lg:px-12">
+          <div className="grid min-w-0 gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-20">
+            <div className="min-w-0">
               <SectionLabel>
                 Simple process
               </SectionLabel>
 
-              <h2 className="mt-5 text-balance text-4xl font-semibold tracking-[-0.045em] text-zinc-950 sm:text-5xl">
+              <h2 className="mt-5 text-3xl font-semibold tracking-[-0.045em] text-zinc-950 sm:text-5xl">
                 From blank page
-                <br />
+                <br className="hidden sm:block" />
                 to ready to apply.
               </h2>
 
-              <p className="mt-5 max-w-md text-base leading-7 text-zinc-500">
+              <p className="mt-5 max-w-md text-sm leading-6 text-zinc-500 sm:text-base sm:leading-7">
                 A straightforward workflow designed to keep you moving instead
                 of making you fight with document formatting.
               </p>
 
               <Link
                 to="/register"
-                className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-zinc-950"
+                className="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-zinc-950 sm:mt-8"
               >
                 Build your resume
                 <ArrowRight size={15} />
               </Link>
             </div>
 
-            <div className="divide-y divide-stone-200 border-y border-stone-200">
+            <div className="min-w-0 divide-y divide-stone-200 border-y border-stone-200">
               {steps.map((step, index) => (
                 <motion.div
                   key={step.number}
@@ -1235,13 +1344,13 @@ function Home() {
                     duration: 0.45,
                     delay: index * 0.05,
                   }}
-                  className="grid gap-5 py-7 sm:grid-cols-[70px_1fr] sm:py-9"
+                  className="grid gap-3 py-6 sm:grid-cols-[70px_1fr] sm:gap-5 sm:py-9"
                 >
                   <span className="text-sm font-semibold text-[#b08d57]">
                     {step.number}
                   </span>
 
-                  <div>
+                  <div className="min-w-0">
                     <h3 className="text-lg font-semibold tracking-tight text-zinc-950">
                       {step.title}
                     </h3>
@@ -1261,31 +1370,31 @@ function Home() {
           RESUME EXAMPLES
       ========================================================= */}
 
-      <section className="bg-white py-20 sm:py-24 lg:py-32">
-        <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
+      <section className="bg-white py-16 sm:py-24 lg:py-32">
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-8 lg:px-12">
           <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
-            <div className="max-w-2xl">
+            <div className="min-w-0 max-w-2xl">
               <SectionLabel>
                 Resume examples
               </SectionLabel>
 
-              <h2 className="mt-5 text-balance text-4xl font-semibold tracking-[-0.045em] text-zinc-950 sm:text-5xl">
+              <h2 className="mt-5 text-3xl font-semibold tracking-[-0.045em] text-zinc-950 sm:text-5xl">
                 Built for real career paths.
               </h2>
 
-              <p className="mt-5 text-base leading-7 text-zinc-500">
+              <p className="mt-5 text-sm leading-6 text-zinc-500 sm:text-base sm:leading-7">
                 Different careers need different visual priorities. Your
                 resume should reflect the role you're applying for.
               </p>
             </div>
 
-            <div className="hidden items-center gap-2 text-xs text-zinc-400 sm:flex">
+            <div className="hidden shrink-0 items-center gap-2 text-xs text-zinc-400 sm:flex">
               <Globe2 size={14} />
               Professional layouts
             </div>
           </div>
 
-          <div className="mt-12 grid gap-6 lg:grid-cols-3">
+          <div className="mt-10 grid gap-5 sm:mt-12 lg:grid-cols-3">
             {examples.map((example, index) => (
               <motion.div
                 key={example.role}
@@ -1305,9 +1414,9 @@ function Home() {
                   duration: 0.45,
                   delay: index * 0.06,
                 }}
-                className="group overflow-hidden rounded-2xl border border-stone-200 bg-[#f5f5f3]"
+                className="group min-w-0 overflow-hidden rounded-2xl border border-stone-200 bg-[#f5f5f3]"
               >
-                <div className="relative mx-auto max-w-[360px] px-7 pt-7">
+                <div className="relative mx-auto max-w-[360px] px-5 pt-5 sm:px-7 sm:pt-7">
                   <ResumeMiniPreview
                     variant={
                       index === 1
@@ -1318,12 +1427,12 @@ function Home() {
                     }
                   />
 
-                  <div className="pointer-events-none absolute inset-x-7 bottom-0 h-20 bg-gradient-to-t from-[#f5f5f3] to-transparent" />
+                  <div className="pointer-events-none absolute inset-x-5 bottom-0 h-20 bg-gradient-to-t from-[#f5f5f3] to-transparent sm:inset-x-7" />
                 </div>
 
                 <div className="border-t border-stone-200 bg-white p-5">
                   <div className="flex items-start justify-between gap-4">
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-xs font-medium uppercase tracking-[0.12em] text-[#987542]">
                         {example.category}
                       </p>
@@ -1339,7 +1448,7 @@ function Home() {
 
                     <ArrowRight
                       size={16}
-                      className="mt-1 text-zinc-400 transition-transform group-hover:translate-x-1"
+                      className="mt-1 shrink-0 text-zinc-400 transition-transform group-hover:translate-x-1"
                     />
                   </div>
                 </div>
@@ -1353,27 +1462,27 @@ function Home() {
           CUSTOMIZATION
       ========================================================= */}
 
-      <section className="border-y border-stone-200 bg-zinc-950 py-20 text-white sm:py-24 lg:py-32">
-        <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
-          <div className="grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
-            <div>
+      <section className="border-y border-stone-200 bg-zinc-950 py-16 text-white sm:py-24 lg:py-32">
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-8 lg:px-12">
+          <div className="grid min-w-0 items-center gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
+            <div className="min-w-0">
               <SectionLabel>
                 Make it yours
               </SectionLabel>
 
-              <h2 className="mt-5 text-balance text-4xl font-semibold tracking-[-0.045em] sm:text-5xl">
+              <h2 className="mt-5 text-3xl font-semibold tracking-[-0.045em] sm:text-5xl">
                 Your experience.
                 <br />
                 Your visual identity.
               </h2>
 
-              <p className="mt-5 max-w-xl text-base leading-7 text-zinc-400">
+              <p className="mt-5 max-w-xl text-sm leading-6 text-zinc-400 sm:text-base sm:leading-7">
                 Fine-tune the presentation without manually rebuilding your
                 document. Typography, spacing and accent details are designed
                 to work together.
               </p>
 
-              <div className="mt-8 grid gap-3 sm:grid-cols-2">
+              <div className="mt-7 grid gap-3 sm:mt-8 sm:grid-cols-2">
                 {[
                   "Accent colors",
                   "Typography",
@@ -1388,17 +1497,18 @@ function Home() {
                   >
                     <Check
                       size={15}
-                      className="text-[#c6a36c]"
+                      className="shrink-0 text-[#c6a36c]"
                     />
-                    {item}
+
+                    <span>{item}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 sm:p-6">
-              <div className="rounded-xl border border-white/10 bg-white/[0.04] p-4">
-                <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
+            <div className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.04] p-3 sm:p-6">
+              <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3 sm:p-4">
+                <div className="flex flex-col gap-4 border-b border-white/10 pb-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="text-xs font-semibold text-white">
                       Appearance
@@ -1429,7 +1539,7 @@ function Home() {
 
                 <div className="grid gap-4 pt-5 sm:grid-cols-2">
                   <div className="rounded-xl border border-white/10 bg-black/10 p-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-3">
                       <span className="text-[10px] text-zinc-500">
                         Font
                       </span>
@@ -1445,7 +1555,7 @@ function Home() {
                   </div>
 
                   <div className="rounded-xl border border-white/10 bg-black/10 p-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-3">
                       <span className="text-[10px] text-zinc-500">
                         Spacing
                       </span>
@@ -1471,11 +1581,11 @@ function Home() {
                   </div>
                 </div>
 
-                <div className="mt-4 rounded-xl border border-white/10 bg-white p-5">
+                <div className="mt-4 rounded-xl border border-white/10 bg-white p-4 sm:p-5">
                   <div className="h-3 w-1/2 bg-zinc-900" />
                   <div className="mt-2 h-1.5 w-1/3 bg-zinc-300" />
 
-                  <div className="mt-7 grid grid-cols-2 gap-6">
+                  <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div className="space-y-2">
                       <div className="h-1.5 w-1/3 bg-zinc-800" />
                       <div className="h-1.5 w-full bg-zinc-200" />
@@ -1503,48 +1613,48 @@ function Home() {
 
       <section
         id="pricing"
-        className="scroll-mt-20 bg-[#f8f8f6] py-20 sm:py-24 lg:py-32"
+        className="scroll-mt-20 bg-[#f8f8f6] py-16 sm:py-24 lg:py-32"
       >
-        <div className="mx-auto max-w-[1100px] px-5 sm:px-8">
+        <div className="mx-auto max-w-[1100px] px-4 sm:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <SectionLabel>
               Simple pricing
             </SectionLabel>
 
-            <h2 className="mt-5 text-balance text-4xl font-semibold tracking-[-0.045em] text-zinc-950 sm:text-5xl">
+            <h2 className="mt-5 text-3xl font-semibold tracking-[-0.045em] text-zinc-950 sm:text-5xl">
               Start building without complexity.
             </h2>
 
-            <p className="mt-5 text-base leading-7 text-zinc-500">
+            <p className="mt-5 text-sm leading-6 text-zinc-500 sm:text-base sm:leading-7">
               A clean pricing experience can be connected to the real
               subscription system later. For now, this section is purely
               frontend.
             </p>
           </div>
 
-          <div className="mx-auto mt-12 max-w-md">
-            <div className="relative overflow-hidden rounded-2xl border border-zinc-900 bg-zinc-950 p-7 text-white shadow-[0_25px_70px_rgba(24,24,27,0.15)] sm:p-8">
+          <div className="mx-auto mt-10 max-w-md sm:mt-12">
+            <div className="relative overflow-hidden rounded-2xl border border-zinc-900 bg-zinc-950 p-6 text-white shadow-[0_25px_70px_rgba(24,24,27,0.15)] sm:p-8">
               <div className="absolute right-0 top-0 h-48 w-48 rounded-full bg-[#b08d57]/10 blur-3xl" />
 
               <div className="relative">
-                <div className="flex items-center justify-between">
-                  <div>
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
                     <p className="text-sm font-semibold">
                       Professional
                     </p>
 
-                    <p className="mt-1 text-xs text-zinc-500">
+                    <p className="mt-1 text-xs leading-5 text-zinc-500">
                       Everything you need to build confidently.
                     </p>
                   </div>
 
                   <Sparkles
                     size={20}
-                    className="text-[#c6a36c]"
+                    className="shrink-0 text-[#c6a36c]"
                   />
                 </div>
 
-                <div className="mt-7 flex items-end gap-2">
+                <div className="mt-7 flex flex-wrap items-end gap-2">
                   <span className="text-5xl font-semibold tracking-[-0.05em]">
                     —
                   </span>
@@ -1568,58 +1678,64 @@ function Home() {
                     >
                       <Check
                         size={15}
-                        className="text-[#c6a36c]"
+                        className="shrink-0 text-[#c6a36c]"
                       />
-                      {item}
+
+                      <span>{item}</span>
                     </div>
                   ))}
                 </div>
 
                 <Link
-  to="/register"
-  className="
-    group
-    mt-8
-    flex
-    h-12
-    items-center
-    justify-center
-    gap-2
-    rounded-xl
-    border
-    border-white/25
-    bg-black
-    text-sm
-    font-semibold
-    !text-white
-    shadow-[0_10px_30px_rgba(0,0,0,0.18)]
-    transition-all
-    duration-200
-    hover:border-[#ae8954]
-    hover:bg-[#ae8954]
-    hover:!text-white
-    active:scale-[0.98]
-  "
->
-  <span className="!text-white">
-    Create Your Resume
-  </span>
+                  to="/register"
+                  className="
+                    group
+                    mt-8
+                    flex
+                    min-h-12
+                    w-full
+                    items-center
+                    justify-center
+                    gap-2
+                    rounded-xl
+                    border
+                    border-white/25
+                    bg-black
+                    px-4
+                    py-3
+                    text-center
+                    text-sm
+                    font-semibold
+                    !text-white
+                    shadow-[0_10px_30px_rgba(0,0,0,0.18)]
+                    transition-all
+                    duration-200
+                    hover:border-[#ae8954]
+                    hover:bg-[#ae8954]
+                    hover:!text-white
+                    active:scale-[0.98]
+                  "
+                >
+                  <span className="!text-white">
+                    Create Your Resume
+                  </span>
 
-  <ArrowRight
-    size={15}
-    strokeWidth={2}
-    className="
-      shrink-0
-      !text-white
-      transition-transform
-      duration-200
-      group-hover:translate-x-1
-    "
-  />
-</Link>
+                  <ArrowRight
+                    size={15}
+                    strokeWidth={2}
+                    className="
+                      shrink-0
+                      !text-white
+                      transition-transform
+                      duration-200
+                      group-hover:translate-x-1
+                    "
+                  />
+                </Link>
 
-                <p className="mt-4 text-center text-[11px] text-zinc-600">
-                  No payment functionality is connected in this frontend stage.
+                <p className="mt-4 text-center text-[11px] leading-5 text-zinc-600">
+                  No payment functionality is connected in this frontend
+                  stage.
                 </p>
               </div>
             </div>
@@ -1633,24 +1749,24 @@ function Home() {
 
       <section
         id="faq"
-        className="scroll-mt-20 border-t border-stone-200 bg-white py-20 sm:py-24 lg:py-32"
+        className="scroll-mt-20 border-t border-stone-200 bg-white py-16 sm:py-24 lg:py-32"
       >
-        <div className="mx-auto max-w-[900px] px-5 sm:px-8">
+        <div className="mx-auto max-w-[900px] px-4 sm:px-8">
           <div className="text-center">
             <SectionLabel>
               FAQ
             </SectionLabel>
 
-            <h2 className="mt-5 text-4xl font-semibold tracking-[-0.045em] text-zinc-950 sm:text-5xl">
+            <h2 className="mt-5 text-3xl font-semibold tracking-[-0.045em] text-zinc-950 sm:text-5xl">
               Questions, answered.
             </h2>
 
-            <p className="mx-auto mt-5 max-w-xl text-base leading-7 text-zinc-500">
+            <p className="mx-auto mt-5 max-w-xl text-sm leading-6 text-zinc-500 sm:text-base sm:leading-7">
               Everything you need to know about the product experience.
             </p>
           </div>
 
-          <div className="mt-12 border-t border-stone-200">
+          <div className="mt-10 border-t border-stone-200 sm:mt-12">
             {faqs.map((item, index) => (
               <FAQItem
                 key={item.question}
@@ -1671,8 +1787,8 @@ function Home() {
           CTA
       ========================================================= */}
 
-      <section className="bg-[#f8f8f6] px-5 py-20 sm:px-8 sm:py-24 lg:px-12 lg:py-32">
-        <div className="mx-auto max-w-[1380px] overflow-hidden rounded-3xl bg-zinc-950 px-6 py-14 text-center text-white sm:px-10 sm:py-20 lg:px-16">
+      <section className="bg-[#f8f8f6] px-4 py-16 sm:px-8 sm:py-24 lg:px-12 lg:py-32">
+        <div className="mx-auto max-w-[1380px] overflow-hidden rounded-2xl bg-zinc-950 px-5 py-12 text-center text-white sm:rounded-3xl sm:px-10 sm:py-20 lg:px-16">
           <div className="mx-auto max-w-3xl">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10">
               <FileText
@@ -1681,9 +1797,9 @@ function Home() {
               />
             </div>
 
-            <h2 className="mt-7 text-balance text-4xl font-semibold tracking-[-0.05em] sm:text-5xl lg:text-6xl">
+            <h2 className="mt-7 text-3xl font-semibold tracking-[-0.05em] sm:text-5xl lg:text-6xl">
               Your next opportunity
-              <br />
+              <br className="hidden sm:block" />
               deserves a better resume.
             </h2>
 
@@ -1693,7 +1809,10 @@ function Home() {
             </p>
 
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-              <Link to="/register">
+              <Link
+                to="/register"
+                className="w-full sm:w-auto"
+              >
                 <Button
                   variant="secondary"
                   size="xl"
@@ -1704,7 +1823,10 @@ function Home() {
                 </Button>
               </Link>
 
-              <a href="#templates">
+              <a
+                href="#templates"
+                className="w-full sm:w-auto"
+              >
                 <Button
                   size="xl"
                   className="w-full border border-white/15 bg-white/10 text-white hover:bg-white/15 sm:w-auto"
@@ -1722,19 +1844,22 @@ function Home() {
       ========================================================= */}
 
       <footer className="border-t border-stone-200 bg-white">
-        <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-12 lg:py-14">
-          <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
-            <div className="max-w-sm">
+        <div className="mx-auto max-w-[1440px] px-4 py-10 sm:px-8 sm:py-12 lg:px-12 lg:py-14">
+          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+            <div className="min-w-0 max-w-sm sm:col-span-2 lg:col-span-1">
               <Link
                 to="/"
                 className="inline-flex items-center gap-3"
               >
-                <span className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-zinc-950 text-sm font-bold text-white">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-zinc-950 text-sm font-bold text-white">
                   R
                 </span>
 
                 <span className="text-[17px] font-semibold tracking-tight">
-                  Resume<span className="text-[#b08d57]">ly</span>
+                  Resume
+                  <span className="text-[#b08d57]">
+                    ly
+                  </span>
                 </span>
               </Link>
 
@@ -1755,7 +1880,7 @@ function Home() {
                     aria-hidden="true"
                     className="h-[15px] w-[15px]"
                   >
-                    <path d="M6.5 8.4H3.2V21h3.3V8.4ZM4.85 3A2 2 0 1 0 4.8 7a2 2 0 0 0 .05-4ZM21 13.8c0-3.8-2-5.6-4.7-5.6-2.2 0-3.2 1.2-3.8 2.1V8.4H9.2V21h3.3v-6.2c0-1.6.3-3.1 2.3-3.1 2 0 2 1.8 2 3.2V21H21v-7.2Z"/>
+                    <path d="M6.5 8.4H3.2V21h3.3V8.4ZM4.85 3A2 2 0 1 0 4.8 7a2 2 0 0 0 .05-4ZM21 13.8c0-3.8-2-5.6-4.7-5.6-2.2 0-3.2 1.2-3.8 2.1V8.4H9.2V21h3.3v-6.2c0-1.6.3-3.1 2.3-3.1 2 0 2 1.8 2 3.2V21H21v-7.2Z" />
                   </svg>
                 </button>
 
@@ -1770,7 +1895,7 @@ function Home() {
                     aria-hidden="true"
                     className="h-[15px] w-[15px]"
                   >
-                    <path d="M12 .7a12 12 0 0 0-3.79 23.39c.6.11.82-.26.82-.58v-2.25c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.74.08-.74 1.2.08 1.84 1.23 1.84 1.23 1.07 1.83 2.8 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.34-5.47-5.95 0-1.31.47-2.38 1.23-3.22-.12-.3-.53-1.52.12-3.17 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 3.29-1.23 3.29-1.23.65 1.65.24 2.87.12 3.17.77.84 1.23 1.91 1.23 3.22 0 4.62-2.81 5.64-5.49 5.94.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58A12 12 0 0 0 12 .7Z"/>
+                    <path d="M12 .7a12 12 0 0 0-3.79 23.39c.6.11.82-.26.82-.58v-2.25c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.74.08-.74 1.2.08 1.84 1.23 1.84 1.23 1.07 1.83 2.8 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.34-5.47-5.95 0-1.31.47-2.38 1.23-3.22-.12-.3-.53-1.52.12-3.17 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 3.29-1.23 3.29-1.23.65 1.65.24 2.87.12 3.17.77.84 1.23 1.91 1.23 3.22 0 4.62-2.81 5.64-5.49 5.94.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58A12 12 0 0 0 12 .7Z" />
                   </svg>
                 </button>
               </div>
@@ -1871,14 +1996,15 @@ function Home() {
             </div>
           </div>
 
-          <div className="mt-10 flex flex-col justify-between gap-3 border-t border-stone-200 pt-6 sm:flex-row sm:items-center">
+          <div className="mt-10 flex flex-col justify-between gap-4 border-t border-stone-200 pt-6 sm:flex-row sm:items-center">
             <p className="text-xs text-zinc-400">
               © {new Date().getFullYear()} Resumely. All rights reserved.
             </p>
 
-            <div className="flex items-center gap-5 text-xs text-zinc-400">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-zinc-400">
               <span>Privacy</span>
               <span>Terms</span>
+
               <span className="flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 Frontend preview
