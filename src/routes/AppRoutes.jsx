@@ -19,7 +19,6 @@ import Pricing from "../pages/landing/Pricing";
 import About from "../pages/landing/About";
 import HowItWorks from "../pages/landing/HowItWorks";
 import CoverLetter from "../pages/landing/CoverLetter";
-import Templates from "../pages/landing/Templates";
 
 /* =========================================================
    AUTH
@@ -50,6 +49,7 @@ import Builder from "../pages/builder/Builder";
    RESUME TEMPLATES
 ========================================================= */
 
+import Templates from "../pages/templates/Templates";
 import TemplateDetails from "../pages/templates/TemplateDetails";
 
 /* =========================================================
@@ -147,21 +147,20 @@ function AppRoutes() {
         </Route>
 
         {/* =====================================================
-            SMART PUBLIC TEMPLATE PAGES
+            SMART TEMPLATE PAGES
 
             Guest:
-              Public Navbar
+              Public Navbar + Footer
 
             Logged in:
               Dashboard Sidebar + Topbar
 
-            IMPORTANT:
-              NO LOGIN REQUIRED TO VIEW TEMPLATES
+            Templates remain accessible without login.
         ====================================================== */}
 
         <Route element={<TemplateRouteLayout />}>
           {/* =================================================
-              RESUME TEMPLATE LANDING
+              RESUME TEMPLATES
           ================================================= */}
 
           <Route
