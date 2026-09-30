@@ -5,8 +5,16 @@ const API_BASE_URL =
 export async function apiRequest(path, options = {}) {
   const token = localStorage.getItem("resumely_token");
 
+  const isFormData =
+    typeof FormData !== "undefined" &&
+    options.body instanceof FormData;
+
   const headers = {
-    "Content-Type": "application/json",
+    ...(isFormData
+      ? {}
+      : {
+          "Content-Type": "application/json",
+        }),
     ...(options.headers || {}),
   };
 

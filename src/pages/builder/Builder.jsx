@@ -18,6 +18,7 @@ import {
   FolderKanban,
   Award,
   Languages,
+  Upload,
   X,
   Check,
 } from "lucide-react";
@@ -35,6 +36,8 @@ import {
 } from "../../utils/resumeStorage";
 
 import { Link, useSearchParams } from "react-router-dom";
+
+import DocumentImportModal from "../../components/common/DocumentImportModal";
 
 import {
   createResume,
@@ -136,6 +139,25 @@ const initialResume = {
       level: "Native",
     },
   ],
+};
+
+const emptyResume = {
+  personal: {
+    firstName: "",
+    lastName: "",
+    title: "",
+    email: "",
+    phone: "",
+    location: "",
+    website: "",
+  },
+  summary: "",
+  experience: [],
+  education: [],
+  skills: [],
+  projects: [],
+  certifications: [],
+  languages: [],
 };
 
 const sectionMeta = [
@@ -784,6 +806,112 @@ function Builder() {
 
   const [saved, setSaved] =
     useState(false);
+
+  const [
+    importModalOpen,
+    setImportModalOpen,
+  ] = useState(false);
+
+  const handleResumeImported = (
+    importedData,
+  ) => {
+    if (!importedData) {
+      return;
+    }
+
+    const createItemId = (
+      section,
+      index,
+    ) =>
+      `${Date.now()}-${section}-${index}`;
+
+    const normalizeItems = (
+      items,
+      section,
+    ) =>
+      Array.isArray(items)
+        ? items.map((item, index) => ({
+            ...item,
+            id:
+              item?.id ||
+              createItemId(
+                section,
+                index,
+              ),
+          }))
+        : [];
+
+    const normalizedResume = {
+      ...emptyResume,
+
+      personal: {
+        ...emptyResume.personal,
+        ...(importedData.personal || {}),
+      },
+
+      summary:
+        importedData.summary || "",
+
+      experience:
+        normalizeItems(
+          importedData.experience,
+          "experience",
+        ),
+
+      education:
+        normalizeItems(
+          importedData.education,
+          "education",
+        ),
+
+      skills: Array.isArray(
+        importedData.skills,
+      )
+        ? importedData.skills
+        : [],
+
+      projects:
+        normalizeItems(
+          importedData.projects,
+          "project",
+        ),
+
+      certifications:
+        normalizeItems(
+          importedData.certifications,
+          "certification",
+        ),
+
+      languages:
+        normalizeItems(
+          importedData.languages,
+          "language",
+        ),
+    };
+
+    setResume(
+      normalizedResume,
+    );
+
+    setActiveSection(
+      "personal",
+    );
+
+    setSaved(false);
+    setImportModalOpen(false);
+
+    localStorage.setItem(
+      "resume_builder_draft",
+      JSON.stringify(
+        normalizedResume,
+      ),
+    );
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
   useEffect(() => {
     const token =
@@ -2413,6 +2541,23 @@ function Builder() {
 
               <button
                 type="button"
+                onClick={() =>
+                  setImportModalOpen(
+                    true,
+                  )
+                }
+                className="flex h-9 shrink-0 items-center gap-2 rounded-lg border border-stone-200 bg-white px-2.5 text-xs font-medium text-zinc-700 transition hover:border-[#987542] hover:bg-stone-50 hover:text-zinc-950 sm:px-3"
+                title="Import resume"
+              >
+                <Upload size={15} />
+
+                <span className="hidden sm:inline">
+                  Import
+                </span>
+              </button>
+
+              <button
+                type="button"
                 onClick={handleSave}
                 className="flex h-9 shrink-0 items-center gap-2 rounded-lg border border-stone-200 bg-white px-2.5 text-xs font-medium text-zinc-700 transition hover:bg-stone-50 sm:px-3"
               >
@@ -2700,6 +2845,17 @@ function Builder() {
           </main>
         </div>
       </div>
+
+      <DocumentImportModal
+        open={importModalOpen}
+        type="resume"
+        onClose={() =>
+          setImportModalOpen(false)
+        }
+        onImported={
+          handleResumeImported
+        }
+      />
     </>
   );
 }
