@@ -2,13 +2,34 @@ import {
   BrowserRouter,
   Route,
   Routes,
+  useLocation,
 } from "react-router-dom";
+
+import { useEffect } from "react";
 
 import PublicLayout from "../layouts/PublicLayout";
 import DashboardLayout from "../layouts/DashboardLayout";
 
 import ProtectedRoute from "./ProtectedRoute";
 import TemplateRouteLayout from "./TemplateRouteLayout";
+
+/* =========================================================
+   SCROLL TO TOP
+========================================================= */
+
+function ScrollToTop() {
+  const { pathname, search } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "instant",
+    });
+  }, [pathname, search]);
+
+  return null;
+}
 
 /* =========================================================
    LANDING
@@ -90,6 +111,8 @@ function NotFound() {
 function AppRoutes() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
+
       <Routes>
         {/* =====================================================
             PUBLIC WEBSITE
