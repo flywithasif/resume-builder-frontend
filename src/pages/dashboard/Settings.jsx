@@ -21,14 +21,31 @@ import {
   UserRound,
   Zap,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+
+import {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
 import { useNavigate } from "react-router-dom";
 
-import { logoutUser } from "../../services/authService";
+import {
+  getUserSettings,
+  logoutUser,
+  updateUserSettings,
+} from "../../services/authService";
+
+import { getResumesFromApi } from "../../services/resumeService";
+import { getCoverLettersFromApi } from "../../services/coverLetterService";
+
 import { useAuth } from "../../contexts/AuthContext";
 
-const SETTINGS_KEY = "resumely_settings";
-const TEMPLATE_KEY = "resumely_selected_template";
+const SETTINGS_KEY =
+  "resumely_settings";
+
+const TEMPLATE_KEY =
+  "resumely_selected_template";
 
 const defaultSettings = {
   theme: "light",
@@ -106,27 +123,45 @@ const accents = [
   },
 ];
 
-function Toggle({ checked, onChange, label }) {
+/* =========================================================
+   TOGGLE
+========================================================= */
+
+function Toggle({
+  checked,
+  onChange,
+  label,
+}) {
   return (
     <button
       type="button"
       aria-label={label}
       aria-pressed={checked}
-      onClick={() => onChange(!checked)}
+      onClick={() =>
+        onChange(!checked)
+      }
       className={[
         "relative h-6 w-11 shrink-0 rounded-full transition-all duration-200",
-        checked ? "bg-[#ae8954]" : "bg-zinc-200",
+        checked
+          ? "bg-[#ae8954]"
+          : "bg-zinc-200",
       ].join(" ")}
     >
       <span
         className={[
           "absolute top-1 h-4 w-4 rounded-full bg-white shadow-sm transition-all duration-200",
-          checked ? "left-6" : "left-1",
+          checked
+            ? "left-6"
+            : "left-1",
         ].join(" ")}
       />
     </button>
   );
 }
+
+/* =========================================================
+   SECTION HEADER
+========================================================= */
 
 function SectionHeader({
   icon: Icon,
@@ -151,6 +186,10 @@ function SectionHeader({
     </div>
   );
 }
+
+/* =========================================================
+   SETTING ROW
+========================================================= */
 
 function SettingRow({
   icon: Icon,
@@ -187,46 +226,149 @@ function SettingRow({
   );
 }
 
+/* =========================================================
+   SETTINGS
+========================================================= */
+
 function Settings() {
   const navigate = useNavigate();
-  const fileInputRef = useRef(null);
+  const fileInputRef =
+    useRef(null);
 
-  const { user, logout } = useAuth();
+  const {
+    user,
+    logout,
+  } = useAuth();
 
-  const [settings, setSettings] = useState(defaultSettings);
-  const [saved, setSaved] = useState(false);
-  const [hasChanges, setHasChanges] = useState(false);
-  const [exporting, setExporting] = useState(false);
-  const [importing, setImporting] = useState(false);
+  const [settings, setSettings] =
+    useState(defaultSettings);
 
-  const [storedUser, setStoredUser] = useState(null);
+  const [saved, setSaved] =
+    useState(false);
+
+  const [hasChanges, setHasChanges] =
+    useState(false);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [saving, setSaving] =
+    useState(false);
+
+  const [exporting, setExporting] =
+    useState(false);
+
+  const [importing, setImporting] =
+    useState(false);
+
+  const [error, setError] =
+    useState("");
+
+  /* =========================================================
+     LOAD SETTINGS FROM BACKEND
+  ========================================================= */
 
   useEffect(() => {
-    try {
-      const storedSettings = JSON.parse(
-        localStorage.getItem(SETTINGS_KEY) || "null",
-      );
+    let mounted = true;
 
-      const storedAccount = JSON.parse(
-        localStorage.getItem("resumely_user") || "null",
-      );
+    async function loadSettings() {
+      try {
+        setLoading(true);
+        setError("");
 
-      if (storedSettings) {
-        setSettings({
+        const result =
+          await getUserSettings();
+
+        if (!mounted) {
+          return;
+        }
+
+        const serverSettings = {
           ...defaultSettings,
-          ...storedSettings,
-        });
-      }
+          ...(result?.settings || {}),
+        };
 
-      setStoredUser(storedAccount);
-    } catch {
-      setSettings(defaultSettings);
+        setSettings(
+          serverSettings,
+        );
+
+        localStorage.setItem(
+          SETTINGS_KEY,
+          JSON.stringify(
+            serverSettings,
+          ),
+        );
+
+        if (
+          serverSettings.defaultTemplate
+        ) {
+          localStorage.setItem(
+            TEMPLATE_KEY,
+            serverSettings.defaultTemplate,
+          );
+        }
+      } catch (err) {
+        console.error(
+          "Failed to load settings:",
+          err,
+        );
+
+        if (!mounted) {
+          return;
+        }
+
+        /*
+          Backend unavailable hone par
+          existing local settings fallback.
+        */
+
+        try {
+          const localSettings =
+            JSON.parse(
+              localStorage.getItem(
+                SETTINGS_KEY,
+              ) || "null",
+            );
+
+          if (localSettings) {
+            setSettings({
+              ...defaultSettings,
+              ...localSettings,
+            });
+          }
+        } catch {
+          setSettings(
+            defaultSettings,
+          );
+        }
+
+        setError(
+          err?.message ||
+            "Unable to load settings from the server.",
+        );
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
     }
+
+    loadSettings();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
+
+  /* =========================================================
+     APPLY LOCAL UI PREFERENCES
+  ========================================================= */
 
   useEffect(() => {
     document.documentElement.style.colorScheme =
-      settings.theme === "dark" ? "dark" : "light";
+      settings.theme === "dark"
+        ? "dark"
+        : "light";
 
     document.documentElement.dataset.resumelyTheme =
       settings.theme;
@@ -235,12 +377,18 @@ function Settings() {
       settings.accent;
 
     document.documentElement.dataset.resumelyDensity =
-      settings.compactMode ? "compact" : "comfortable";
+      settings.compactMode
+        ? "compact"
+        : "comfortable";
 
     document.documentElement.dataset.resumelyMotion =
-      settings.reducedMotion ? "reduced" : "normal";
+      settings.reducedMotion
+        ? "reduced"
+        : "normal";
 
-    if (settings.defaultTemplate) {
+    if (
+      settings.defaultTemplate
+    ) {
       localStorage.setItem(
         TEMPLATE_KEY,
         settings.defaultTemplate,
@@ -254,9 +402,20 @@ function Settings() {
     settings.defaultTemplate,
   ]);
 
-  const currentUser = user || storedUser;
+  /* =========================================================
+     CURRENT USER
+  ========================================================= */
 
-  const update = (field, value) => {
+  const currentUser = user;
+
+  /* =========================================================
+     UPDATE SETTING
+  ========================================================= */
+
+  const update = (
+    field,
+    value,
+  ) => {
     setSettings((current) => ({
       ...current,
       [field]: value,
@@ -264,225 +423,469 @@ function Settings() {
 
     setSaved(false);
     setHasChanges(true);
+    setError("");
   };
 
-  const saveSettings = () => {
-    localStorage.setItem(
-      SETTINGS_KEY,
-      JSON.stringify(settings),
-    );
+  /* =========================================================
+     SAVE SETTINGS TO BACKEND
+  ========================================================= */
 
-    localStorage.setItem(
-      TEMPLATE_KEY,
-      settings.defaultTemplate,
-    );
+  const saveSettings =
+    async () => {
+      try {
+        setSaving(true);
+        setSaved(false);
+        setError("");
 
-    setSaved(true);
-    setHasChanges(false);
+        const result =
+          await updateUserSettings(
+            settings,
+          );
 
-    window.setTimeout(() => {
-      setSaved(false);
-    }, 2500);
-  };
+        const nextSettings = {
+          ...defaultSettings,
+          ...(result?.settings ||
+            settings),
+        };
 
-  const resetSettings = () => {
-    const confirmed = window.confirm(
-      "Reset all Resumely preferences to their default values?",
-    );
+        setSettings(
+          nextSettings,
+        );
 
-    if (!confirmed) return;
+        localStorage.setItem(
+          SETTINGS_KEY,
+          JSON.stringify(
+            nextSettings,
+          ),
+        );
 
-    setSettings(defaultSettings);
+        localStorage.setItem(
+          TEMPLATE_KEY,
+          nextSettings.defaultTemplate,
+        );
 
-    localStorage.setItem(
-      SETTINGS_KEY,
-      JSON.stringify(defaultSettings),
-    );
+        setSaved(true);
+        setHasChanges(false);
 
-    localStorage.setItem(
-      TEMPLATE_KEY,
-      defaultSettings.defaultTemplate,
-    );
+        window.setTimeout(() => {
+          setSaved(false);
+        }, 2500);
+      } catch (err) {
+        console.error(
+          "Failed to save settings:",
+          err,
+        );
 
-    setSaved(true);
-    setHasChanges(false);
+        setError(
+          err?.message ||
+            "Unable to save settings.",
+        );
+      } finally {
+        setSaving(false);
+      }
+    };
 
-    window.setTimeout(() => {
-      setSaved(false);
-    }, 2500);
-  };
+  /* =========================================================
+     RESET SETTINGS
+  ========================================================= */
 
-  const exportSettings = () => {
-    try {
-      const payload = {
-        product: "Resumely",
-        exportedAt: new Date().toISOString(),
-        settings,
-      };
+  const resetSettings =
+    async () => {
+      const confirmed =
+        window.confirm(
+          "Reset all Resumely preferences to their default values?",
+        );
 
-      const blob = new Blob(
-        [JSON.stringify(payload, null, 2)],
-        {
-          type: "application/json",
-        },
-      );
+      if (!confirmed) {
+        return;
+      }
 
-      const url = URL.createObjectURL(blob);
+      try {
+        setSaving(true);
+        setError("");
 
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      anchor.download = "resumely-settings.json";
-      anchor.click();
+        const result =
+          await updateUserSettings(
+            defaultSettings,
+          );
 
-      URL.revokeObjectURL(url);
-    } catch {
-      window.alert(
-        "Unable to export settings right now.",
-      );
-    }
-  };
+        const nextSettings = {
+          ...defaultSettings,
+          ...(result?.settings ||
+            defaultSettings),
+        };
 
-  const exportWorkspace = () => {
-    setExporting(true);
+        setSettings(
+          nextSettings,
+        );
 
-    try {
-      const workspace = {
-        product: "Resumely",
-        exportedAt: new Date().toISOString(),
-        user: currentUser || null,
-        settings,
-        resumes: JSON.parse(
-          localStorage.getItem("resumely_resumes") || "[]",
-        ),
-        draft: JSON.parse(
-          localStorage.getItem("resume_builder_draft") ||
-            "null",
-        ),
-      };
+        localStorage.setItem(
+          SETTINGS_KEY,
+          JSON.stringify(
+            nextSettings,
+          ),
+        );
 
-      const blob = new Blob(
-        [JSON.stringify(workspace, null, 2)],
-        {
-          type: "application/json",
-        },
-      );
+        localStorage.setItem(
+          TEMPLATE_KEY,
+          nextSettings.defaultTemplate,
+        );
 
-      const url = URL.createObjectURL(blob);
+        setSaved(true);
+        setHasChanges(false);
 
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      anchor.download = `resumely-workspace-${new Date()
-        .toISOString()
-        .slice(0, 10)}.json`;
+        window.setTimeout(() => {
+          setSaved(false);
+        }, 2500);
+      } catch (err) {
+        console.error(
+          "Failed to reset settings:",
+          err,
+        );
 
-      anchor.click();
+        setError(
+          err?.message ||
+            "Unable to reset settings.",
+        );
+      } finally {
+        setSaving(false);
+      }
+    };
 
-      URL.revokeObjectURL(url);
-    } catch {
-      window.alert(
-        "Unable to export your workspace.",
-      );
-    } finally {
-      window.setTimeout(() => {
-        setExporting(false);
-      }, 700);
-    }
-  };
+  /* =========================================================
+     EXPORT SETTINGS
+  ========================================================= */
 
-  const importSettings = async (event) => {
-    const file = event.target.files?.[0];
+  const exportSettings =
+    () => {
+      try {
+        const payload = {
+          product: "Resumely",
+          exportedAt:
+            new Date().toISOString(),
+          settings,
+        };
 
-    if (!file) return;
+        const blob =
+          new Blob(
+            [
+              JSON.stringify(
+                payload,
+                null,
+                2,
+              ),
+            ],
+            {
+              type: "application/json",
+            },
+          );
 
-    setImporting(true);
+        const url =
+          URL.createObjectURL(
+            blob,
+          );
 
-    try {
-      const text = await file.text();
-      const parsed = JSON.parse(text);
+        const anchor =
+          document.createElement(
+            "a",
+          );
 
-      const incoming =
-        parsed?.settings || parsed;
+        anchor.href = url;
+        anchor.download =
+          "resumely-settings.json";
 
-      const nextSettings = {
-        ...defaultSettings,
-        ...incoming,
-      };
+        anchor.click();
 
-      setSettings(nextSettings);
+        URL.revokeObjectURL(
+          url,
+        );
+      } catch {
+        window.alert(
+          "Unable to export settings right now.",
+        );
+      }
+    };
 
-      localStorage.setItem(
-        SETTINGS_KEY,
-        JSON.stringify(nextSettings),
-      );
+  /* =========================================================
+     EXPORT WORKSPACE FROM BACKEND
+  ========================================================= */
 
-      localStorage.setItem(
-        TEMPLATE_KEY,
-        nextSettings.defaultTemplate,
+  const exportWorkspace =
+    async () => {
+      setExporting(true);
+
+      try {
+        const [
+          resumeResult,
+          coverLetterResult,
+        ] = await Promise.all([
+          getResumesFromApi(),
+          getCoverLettersFromApi(),
+        ]);
+
+        const workspace = {
+          product: "Resumely",
+
+          exportedAt:
+            new Date().toISOString(),
+
+          user:
+            currentUser || null,
+
+          settings,
+
+          resumes:
+            resumeResult?.resumes ||
+            [],
+
+          coverLetters:
+            coverLetterResult?.coverLetters ||
+            [],
+        };
+
+        const blob =
+          new Blob(
+            [
+              JSON.stringify(
+                workspace,
+                null,
+                2,
+              ),
+            ],
+            {
+              type: "application/json",
+            },
+          );
+
+        const url =
+          URL.createObjectURL(
+            blob,
+          );
+
+        const anchor =
+          document.createElement(
+            "a",
+          );
+
+        anchor.href = url;
+
+        anchor.download = `resumely-workspace-${new Date()
+          .toISOString()
+          .slice(0, 10)}.json`;
+
+        anchor.click();
+
+        URL.revokeObjectURL(
+          url,
+        );
+      } catch (err) {
+        console.error(
+          "Failed to export workspace:",
+          err,
+        );
+
+        window.alert(
+          err?.message ||
+            "Unable to export your workspace.",
+        );
+      } finally {
+        window.setTimeout(() => {
+          setExporting(false);
+        }, 700);
+      }
+    };
+
+  /* =========================================================
+     IMPORT SETTINGS
+  ========================================================= */
+
+  const importSettings =
+    async (event) => {
+      const file =
+        event.target.files?.[0];
+
+      if (!file) {
+        return;
+      }
+
+      setImporting(true);
+      setError("");
+
+      try {
+        const text =
+          await file.text();
+
+        const parsed =
+          JSON.parse(text);
+
+        const incoming =
+          parsed?.settings ||
+          parsed;
+
+        const nextSettings = {
+          ...defaultSettings,
+          ...incoming,
+        };
+
+        const result =
+          await updateUserSettings(
+            nextSettings,
+          );
+
+        const savedSettings = {
+          ...defaultSettings,
+          ...(result?.settings ||
+            nextSettings),
+        };
+
+        setSettings(
+          savedSettings,
+        );
+
+        localStorage.setItem(
+          SETTINGS_KEY,
+          JSON.stringify(
+            savedSettings,
+          ),
+        );
+
+        localStorage.setItem(
+          TEMPLATE_KEY,
+          savedSettings.defaultTemplate,
+        );
+
+        setSaved(true);
+        setHasChanges(false);
+
+        window.setTimeout(() => {
+          setSaved(false);
+        }, 2500);
+      } catch (err) {
+        console.error(
+          "Failed to import settings:",
+          err,
+        );
+
+        window.alert(
+          err?.message ||
+            "This settings file is not valid.",
+        );
+      } finally {
+        setImporting(false);
+
+        if (
+          fileInputRef.current
+        ) {
+          fileInputRef.current.value =
+            "";
+        }
+      }
+    };
+
+  /* =========================================================
+     CLEAR DRAFT
+  ========================================================= */
+
+  const clearDraft =
+    () => {
+      const confirmed =
+        window.confirm(
+          "Clear the current unsaved resume draft? This cannot be undone.",
+        );
+
+      if (!confirmed) {
+        return;
+      }
+
+      localStorage.removeItem(
+        "resume_builder_draft",
       );
 
       setSaved(true);
-      setHasChanges(false);
-    } catch {
-      window.alert(
-        "This settings file is not valid.",
-      );
-    } finally {
-      setImporting(false);
-
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
 
       window.setTimeout(() => {
         setSaved(false);
       }, 2500);
-    }
-  };
+    };
 
-  const clearDraft = () => {
-    const confirmed = window.confirm(
-      "Clear the current unsaved resume draft? This cannot be undone.",
+  /* =========================================================
+     CLEAR LOCAL WORKSPACE
+  ========================================================= */
+
+  const clearLocalWorkspace =
+    () => {
+      const confirmed =
+        window.confirm(
+          "This will remove locally stored resumes and drafts from this browser. Continue?",
+        );
+
+      if (!confirmed) {
+        return;
+      }
+
+      localStorage.removeItem(
+        "resumely_resumes",
+      );
+
+      localStorage.removeItem(
+        "resume_builder_draft",
+      );
+
+      setSaved(true);
+
+      window.setTimeout(() => {
+        setSaved(false);
+      }, 2500);
+    };
+
+  /* =========================================================
+     LOGOUT
+  ========================================================= */
+
+  const handleLogout =
+    () => {
+      logoutUser();
+
+      if (
+        typeof logout ===
+        "function"
+      ) {
+        logout();
+      }
+
+      navigate("/login", {
+        replace: true,
+      });
+    };
+
+  /* =========================================================
+     LOADING
+  ========================================================= */
+
+  if (loading) {
+    return (
+      <div className="mx-auto w-full max-w-[1100px] px-3 pb-20 sm:px-5 lg:px-6">
+        <div className="animate-pulse">
+          <div className="h-3 w-20 rounded bg-zinc-200" />
+
+          <div className="mt-3 h-8 w-32 rounded bg-zinc-200" />
+
+          <div className="mt-3 h-4 w-80 max-w-full rounded bg-zinc-100" />
+
+          <div className="mt-8 space-y-5">
+            {Array.from({
+              length: 5,
+            }).map((_, index) => (
+              <div
+                key={index}
+                className="h-40 rounded-2xl bg-zinc-100"
+              />
+            ))}
+          </div>
+        </div>
+      </div>
     );
-
-    if (!confirmed) return;
-
-    localStorage.removeItem("resume_builder_draft");
-
-    setSaved(true);
-
-    window.setTimeout(() => {
-      setSaved(false);
-    }, 2500);
-  };
-
-  const clearLocalWorkspace = () => {
-    const confirmed = window.confirm(
-      "This will remove locally stored resumes and drafts from this browser. Continue?",
-    );
-
-    if (!confirmed) return;
-
-    localStorage.removeItem("resumely_resumes");
-    localStorage.removeItem("resume_builder_draft");
-
-    setSaved(true);
-
-    window.setTimeout(() => {
-      setSaved(false);
-    }, 2500);
-  };
-
-  const handleLogout = () => {
-    logoutUser();
-
-    if (typeof logout === "function") {
-      logout();
-    }
-
-    navigate("/login", {
-      replace: true,
-    });
-  };
+  }
 
   return (
     <div className="mx-auto w-full max-w-[1100px] px-3 pb-20 sm:px-5 sm:pb-16 lg:px-6">
@@ -500,10 +903,21 @@ function Settings() {
         </h1>
 
         <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-500">
-          Personalize your Resumely workspace, editor,
-          notifications, privacy and data preferences.
+          Personalize your Resumely
+          workspace, editor, notifications,
+          privacy and data preferences.
         </p>
       </div>
+
+      {/* =====================================================
+          ERROR
+      ====================================================== */}
+
+      {error && (
+        <div className="mt-6 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-xs font-medium text-red-600">
+          {error}
+        </div>
+      )}
 
       {/* =====================================================
           SAVE STATUS
@@ -538,10 +952,16 @@ function Settings() {
           <button
             type="button"
             onClick={saveSettings}
-            className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#111111] px-4 text-xs font-semibold text-white transition-all hover:bg-[#ae8954] active:scale-[0.98] sm:px-5"
+            disabled={
+              saving || !hasChanges
+            }
+            className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#111111] px-4 text-xs font-semibold text-white transition-all hover:bg-[#ae8954] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 sm:px-5"
           >
             <Save size={14} />
-            Save changes
+
+            {saving
+              ? "Saving..."
+              : "Save changes"}
           </button>
         </div>
       </div>
@@ -561,16 +981,14 @@ function Settings() {
           </div>
 
           <div className="p-4 sm:p-6">
-            {/* Theme */}
-
             <div className="min-w-0">
               <p className="text-xs font-semibold text-zinc-900">
                 Theme
               </p>
 
               <p className="mt-1 text-xs text-zinc-500">
-                Choose how Resumely should behave with your
-                preferred color scheme.
+                Choose your preferred color
+                scheme.
               </p>
 
               <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -590,48 +1008,58 @@ function Settings() {
                     label: "Dark",
                     icon: Moon,
                   },
-                ].map(({ id, label, icon: Icon }) => {
-                  const active =
-                    settings.theme === id;
+                ].map(
+                  ({
+                    id,
+                    label,
+                    icon: Icon,
+                  }) => {
+                    const active =
+                      settings.theme ===
+                      id;
 
-                  return (
-                    <button
-                      key={id}
-                      type="button"
-                      onClick={() =>
-                        update("theme", id)
-                      }
-                      className={[
-                        "flex min-w-0 items-center gap-3 rounded-xl border p-3.5 text-left transition-all",
-                        active
-                          ? "border-[#ae8954] bg-[#f6f1e8]"
-                          : "border-[#e5e0d8] hover:border-[#ae8954]",
-                      ].join(" ")}
-                    >
-                      <span
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        onClick={() =>
+                          update(
+                            "theme",
+                            id,
+                          )
+                        }
                         className={[
-                          "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
+                          "flex min-w-0 items-center gap-3 rounded-xl border p-3.5 text-left transition-all",
                           active
-                            ? "bg-[#111111] text-white"
-                            : "bg-[#f3f0ea] text-zinc-500",
+                            ? "border-[#ae8954] bg-[#f6f1e8]"
+                            : "border-[#e5e0d8] hover:border-[#ae8954]",
                         ].join(" ")}
                       >
-                        <Icon size={16} />
-                      </span>
+                        <span
+                          className={[
+                            "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
+                            active
+                              ? "bg-[#111111] text-white"
+                              : "bg-[#f3f0ea] text-zinc-500",
+                          ].join(" ")}
+                        >
+                          <Icon size={16} />
+                        </span>
 
-                      <span className="truncate text-xs font-semibold text-zinc-900">
-                        {label}
-                      </span>
+                        <span className="truncate text-xs font-semibold text-zinc-900">
+                          {label}
+                        </span>
 
-                      {active && (
-                        <Check
-                          size={15}
-                          className="ml-auto shrink-0 text-[#ae8954]"
-                        />
-                      )}
-                    </button>
-                  );
-                })}
+                        {active && (
+                          <Check
+                            size={15}
+                            className="ml-auto shrink-0 text-[#ae8954]"
+                          />
+                        )}
+                      </button>
+                    );
+                  },
+                )}
               </div>
 
               <div className="mt-3 flex min-w-0 gap-2 rounded-xl bg-[#faf8f4] p-3">
@@ -641,10 +1069,8 @@ function Settings() {
                 />
 
                 <p className="min-w-0 text-[11px] leading-5 text-zinc-500">
-                  Your preference is stored locally. The full
-                  application-wide dark theme can be connected
-                  to the global design tokens when the theme
-                  system is added across all pages.
+                  Your preference is saved
+                  to your Resumely account.
                 </p>
               </div>
             </div>
@@ -657,47 +1083,53 @@ function Settings() {
               </p>
 
               <p className="mt-1 text-xs text-zinc-500">
-                Choose the accent used for your workspace
-                preferences.
+                Choose your workspace accent.
               </p>
 
               <div className="mt-4 flex flex-wrap gap-2.5">
-                {accents.map((item) => {
-                  const active =
-                    settings.accent === item.id;
+                {accents.map(
+                  (item) => {
+                    const active =
+                      settings.accent ===
+                      item.id;
 
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() =>
-                        update("accent", item.id)
-                      }
-                      className={[
-                        "flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-xs font-medium transition-all",
-                        active
-                          ? "border-[#111111] bg-[#f6f3ed]"
-                          : "border-[#e5e0d8] hover:border-[#ae8954]",
-                      ].join(" ")}
-                    >
-                      <span
-                        className="h-3 w-3 shrink-0 rounded-full"
-                        style={{
-                          backgroundColor: item.color,
-                        }}
-                      />
-
-                      {item.label}
-
-                      {active && (
-                        <Check
-                          size={13}
-                          className="text-[#ae8954]"
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() =>
+                          update(
+                            "accent",
+                            item.id,
+                          )
+                        }
+                        className={[
+                          "flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-xs font-medium transition-all",
+                          active
+                            ? "border-[#111111] bg-[#f6f3ed]"
+                            : "border-[#e5e0d8] hover:border-[#ae8954]",
+                        ].join(" ")}
+                      >
+                        <span
+                          className="h-3 w-3 shrink-0 rounded-full"
+                          style={{
+                            backgroundColor:
+                              item.color,
+                          }}
                         />
-                      )}
-                    </button>
-                  );
-                })}
+
+                        {item.label}
+
+                        {active && (
+                          <Check
+                            size={13}
+                            className="text-[#ae8954]"
+                          />
+                        )}
+                      </button>
+                    );
+                  },
+                )}
               </div>
             </div>
 
@@ -707,12 +1139,17 @@ function Settings() {
               <SettingRow
                 icon={Monitor}
                 title="Compact workspace"
-                description="Reduce spacing around workspace controls when you want more information on screen."
+                description="Reduce spacing around workspace controls."
               >
                 <Toggle
-                  checked={settings.compactMode}
+                  checked={
+                    settings.compactMode
+                  }
                   onChange={(value) =>
-                    update("compactMode", value)
+                    update(
+                      "compactMode",
+                      value,
+                    )
                   }
                   label="Toggle compact workspace"
                 />
@@ -726,9 +1163,14 @@ function Settings() {
                 description="Reduce interface animations and transitions."
               >
                 <Toggle
-                  checked={settings.reducedMotion}
+                  checked={
+                    settings.reducedMotion
+                  }
                   onChange={(value) =>
-                    update("reducedMotion", value)
+                    update(
+                      "reducedMotion",
+                      value,
+                    )
                   }
                   label="Toggle reduced motion"
                 />
@@ -751,15 +1193,15 @@ function Settings() {
           </div>
 
           <div className="px-4 sm:px-6">
-            {/* Default template */}
-
             <SettingRow
               icon={FileJson}
               title="Default resume template"
               description="This template will be selected when you start a new resume."
             >
               <select
-                value={settings.defaultTemplate}
+                value={
+                  settings.defaultTemplate
+                }
                 onChange={(event) =>
                   update(
                     "defaultTemplate",
@@ -768,20 +1210,20 @@ function Settings() {
                 }
                 className="h-10 w-full min-w-0 rounded-xl border border-[#e5e0d8] bg-[#fbfaf8] px-3 text-xs font-medium outline-none transition focus:border-[#ae8954] sm:w-auto sm:min-w-[180px]"
               >
-                {templates.map((template) => (
-                  <option
-                    key={template.id}
-                    value={template.id}
-                  >
-                    {template.label}
-                  </option>
-                ))}
+                {templates.map(
+                  (template) => (
+                    <option
+                      key={template.id}
+                      value={template.id}
+                    >
+                      {template.label}
+                    </option>
+                  ),
+                )}
               </select>
             </SettingRow>
 
             <div className="border-t border-[#eeeae3]" />
-
-            {/* Autosave */}
 
             <SettingRow
               icon={Save}
@@ -789,9 +1231,14 @@ function Settings() {
               description="Automatically save resume changes while you work."
             >
               <Toggle
-                checked={settings.autosave}
+                checked={
+                  settings.autosave
+                }
                 onChange={(value) =>
-                  update("autosave", value)
+                  update(
+                    "autosave",
+                    value,
+                  )
                 }
                 label="Toggle auto-save"
               />
@@ -807,7 +1254,9 @@ function Settings() {
                   description="How often the editor should attempt an automatic save."
                 >
                   <select
-                    value={settings.autosaveInterval}
+                    value={
+                      settings.autosaveInterval
+                    }
                     onChange={(event) =>
                       update(
                         "autosaveInterval",
@@ -844,9 +1293,14 @@ function Settings() {
               description="Keep browser spellcheck enabled inside resume fields."
             >
               <Toggle
-                checked={settings.spellcheck}
+                checked={
+                  settings.spellcheck
+                }
                 onChange={(value) =>
-                  update("spellcheck", value)
+                  update(
+                    "spellcheck",
+                    value,
+                  )
                 }
                 label="Toggle spellcheck"
               />
@@ -860,9 +1314,14 @@ function Settings() {
               description="Show page boundaries while editing an A4 resume."
             >
               <Toggle
-                checked={settings.showPageBreaks}
+                checked={
+                  settings.showPageBreaks
+                }
                 onChange={(value) =>
-                  update("showPageBreaks", value)
+                  update(
+                    "showPageBreaks",
+                    value,
+                  )
                 }
                 label="Toggle page-break guides"
               />
@@ -876,7 +1335,9 @@ function Settings() {
               description="Show helpful suggestions when important resume sections are incomplete."
             >
               <Toggle
-                checked={settings.showCompletionTips}
+                checked={
+                  settings.showCompletionTips
+                }
                 onChange={(value) =>
                   update(
                     "showCompletionTips",
@@ -909,7 +1370,9 @@ function Settings() {
               description="Receive important product and workspace messages by email."
             >
               <Toggle
-                checked={settings.emailNotifications}
+                checked={
+                  settings.emailNotifications
+                }
                 onChange={(value) =>
                   update(
                     "emailNotifications",
@@ -928,7 +1391,9 @@ function Settings() {
               description="Receive reminders when you have unfinished resume work."
             >
               <Toggle
-                checked={settings.resumeReminders}
+                checked={
+                  settings.resumeReminders
+                }
                 onChange={(value) =>
                   update(
                     "resumeReminders",
@@ -947,7 +1412,9 @@ function Settings() {
               description="Keep important sign-in and account security notifications enabled."
             >
               <Toggle
-                checked={settings.securityAlerts}
+                checked={
+                  settings.securityAlerts
+                }
                 onChange={(value) =>
                   update(
                     "securityAlerts",
@@ -966,7 +1433,9 @@ function Settings() {
               description="Occasional updates about new Resumely features and improvements."
             >
               <Toggle
-                checked={settings.productUpdates}
+                checked={
+                  settings.productUpdates
+                }
                 onChange={(value) =>
                   update(
                     "productUpdates",
@@ -988,7 +1457,7 @@ function Settings() {
             <SectionHeader
               icon={ShieldCheck}
               title="Privacy & Data"
-              description="Control local data preferences and download a copy of your workspace."
+              description="Control your privacy preferences and download a copy of your workspace."
             />
           </div>
 
@@ -999,7 +1468,9 @@ function Settings() {
               description="Control whether your profile is treated as private or visible."
             >
               <select
-                value={settings.profileVisibility}
+                value={
+                  settings.profileVisibility
+                }
                 onChange={(event) =>
                   update(
                     "profileVisibility",
@@ -1023,12 +1494,17 @@ function Settings() {
             <SettingRow
               icon={Info}
               title="Product analytics"
-              description="Allow anonymous product usage information to be stored locally as a preference."
+              description="Allow anonymous product usage information as a preference."
             >
               <Toggle
-                checked={settings.analytics}
+                checked={
+                  settings.analytics
+                }
                 onChange={(value) =>
-                  update("analytics", value)
+                  update(
+                    "analytics",
+                    value,
+                  )
                 }
                 label="Toggle product analytics"
               />
@@ -1039,12 +1515,16 @@ function Settings() {
             <SettingRow
               icon={HardDriveDownload}
               title="Export workspace"
-              description="Download your locally stored resumes, draft and settings as one JSON file."
+              description="Download your MongoDB resumes, cover letters and settings as one JSON file."
             >
               <button
                 type="button"
-                onClick={exportWorkspace}
-                disabled={exporting}
+                onClick={
+                  exportWorkspace
+                }
+                disabled={
+                  exporting
+                }
                 className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-[#e5e0d8] bg-white px-4 text-xs font-semibold text-zinc-700 transition hover:border-[#ae8954] hover:text-[#987542] disabled:opacity-50 sm:w-auto"
               >
                 <Download size={14} />
@@ -1064,7 +1544,9 @@ function Settings() {
             >
               <button
                 type="button"
-                onClick={clearDraft}
+                onClick={
+                  clearDraft
+                }
                 className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-[#ead8d8] bg-white px-4 text-xs font-semibold text-red-600 transition hover:bg-red-50 sm:w-auto"
               >
                 <Trash2 size={14} />
@@ -1093,12 +1575,14 @@ function Settings() {
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#111111] text-xs font-semibold text-white">
                   {currentUser?.name
                     ?.split(" ")
-                    .map((part) =>
-                      part.charAt(0),
+                    .map(
+                      (part) =>
+                        part.charAt(0),
                     )
                     .join("")
                     .slice(0, 2)
-                    .toUpperCase() || "U"}
+                    .toUpperCase() ||
+                    "U"}
                 </div>
 
                 <div className="min-w-0">
@@ -1119,7 +1603,9 @@ function Settings() {
               <button
                 type="button"
                 onClick={() =>
-                  navigate("/dashboard/profile")
+                  navigate(
+                    "/dashboard/profile",
+                  )
                 }
                 className="group flex min-w-0 items-center justify-between rounded-xl border border-[#e5e0d8] p-4 text-left transition hover:border-[#ae8954] hover:bg-[#faf8f4]"
               >
@@ -1149,7 +1635,9 @@ function Settings() {
               <button
                 type="button"
                 onClick={() =>
-                  navigate("/dashboard/profile")
+                  navigate(
+                    "/dashboard/profile",
+                  )
                 }
                 className="group flex min-w-0 items-center justify-between rounded-xl border border-[#e5e0d8] p-4 text-left transition hover:border-[#ae8954] hover:bg-[#faf8f4]"
               >
@@ -1176,25 +1664,11 @@ function Settings() {
                 />
               </button>
             </div>
-
-            <div className="mt-4 flex min-w-0 gap-2 rounded-xl border border-amber-100 bg-amber-50 p-3">
-              <Info
-                size={14}
-                className="mt-0.5 shrink-0 text-amber-600"
-              />
-
-              <p className="min-w-0 text-[11px] leading-5 text-amber-800">
-                Password changes and advanced security
-                controls are handled from your account area.
-                Backend security endpoints can be connected
-                separately.
-              </p>
-            </div>
           </div>
         </section>
 
         {/* ===================================================
-            IMPORT / EXPORT PREFERENCES
+            SETTINGS BACKUP
         ==================================================== */}
 
         <section className="min-w-0 overflow-hidden rounded-2xl border border-[#e7e2d9] bg-white p-4 sm:p-6">
@@ -1207,7 +1681,9 @@ function Settings() {
           <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <button
               type="button"
-              onClick={exportSettings}
+              onClick={
+                exportSettings
+              }
               className="flex min-w-0 items-center justify-between rounded-xl border border-[#e5e0d8] p-4 text-left transition hover:border-[#ae8954] hover:bg-[#faf8f4]"
             >
               <div className="flex min-w-0 items-center gap-3">
@@ -1269,7 +1745,9 @@ function Settings() {
             ref={fileInputRef}
             type="file"
             accept="application/json,.json"
-            onChange={importSettings}
+            onChange={
+              importSettings
+            }
             className="hidden"
           />
         </section>
@@ -1291,7 +1769,8 @@ function Settings() {
                 </h2>
 
                 <p className="mt-1 text-xs leading-5 text-zinc-500">
-                  Actions in this area can remove locally stored
+                  Actions in this area can
+                  remove locally stored
                   workspace data.
                 </p>
               </div>
@@ -1306,15 +1785,19 @@ function Settings() {
                 </p>
 
                 <p className="mt-1 max-w-xl text-[11px] leading-5 text-zinc-500">
-                  Remove locally stored resumes and builder
-                  drafts from this browser. This does not delete
-                  data already stored on the backend.
+                  Remove locally stored
+                  resumes and builder drafts
+                  from this browser. This
+                  does not delete data already
+                  stored on the backend.
                 </p>
               </div>
 
               <button
                 type="button"
-                onClick={clearLocalWorkspace}
+                onClick={
+                  clearLocalWorkspace
+                }
                 className="inline-flex h-10 w-full shrink-0 items-center justify-center gap-2 rounded-xl border border-red-200 bg-white px-4 text-xs font-semibold text-red-600 transition hover:bg-red-600 hover:text-white sm:w-auto"
               >
                 <Trash2 size={14} />
@@ -1336,14 +1819,17 @@ function Settings() {
               </p>
 
               <p className="mt-1 text-xs leading-5 text-zinc-500">
-                Sign out from this browser and return to the
-                login screen.
+                Sign out from this browser
+                and return to the login
+                screen.
               </p>
             </div>
 
             <button
               type="button"
-              onClick={handleLogout}
+              onClick={
+                handleLogout
+              }
               className="inline-flex h-10 w-full shrink-0 items-center justify-center rounded-xl border border-[#e5e0d8] px-5 text-xs font-semibold text-zinc-700 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 sm:w-auto"
             >
               Sign out
@@ -1358,8 +1844,11 @@ function Settings() {
         <div className="sticky bottom-3 z-20 flex min-w-0 flex-col gap-3 rounded-2xl border border-[#e7e2d9] bg-[#fbfaf7]/95 p-3 shadow-[0_12px_40px_rgba(0,0,0,0.08)] backdrop-blur sm:bottom-4 sm:flex-row sm:items-center sm:justify-between">
           <button
             type="button"
-            onClick={resetSettings}
-            className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-[#e5e0d8] bg-white px-4 text-xs font-semibold text-zinc-600 transition hover:border-[#ae8954] hover:text-[#987542] sm:w-auto"
+            onClick={
+              resetSettings
+            }
+            disabled={saving}
+            className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-[#e5e0d8] bg-white px-4 text-xs font-semibold text-zinc-600 transition hover:border-[#ae8954] hover:text-[#987542] disabled:opacity-50 sm:w-auto"
           >
             <RotateCcw size={14} />
             Reset preferences
@@ -1375,11 +1864,20 @@ function Settings() {
 
             <button
               type="button"
-              onClick={saveSettings}
-              className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-[#111111] px-5 text-xs font-semibold text-white transition-all hover:bg-[#ae8954] active:scale-[0.98] sm:flex-none"
+              onClick={
+                saveSettings
+              }
+              disabled={
+                saving ||
+                !hasChanges
+              }
+              className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-[#111111] px-5 text-xs font-semibold text-white transition-all hover:bg-[#ae8954] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
             >
               <Save size={14} />
-              Save changes
+
+              {saving
+                ? "Saving..."
+                : "Save changes"}
             </button>
           </div>
         </div>

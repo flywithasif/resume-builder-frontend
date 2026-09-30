@@ -9,33 +9,14 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   calculateResumeProgress,
   formatUpdatedAt,
-  getResumes,
 } from "../../utils/resumeStorage";
-
-/* =========================================================
-   COVER LETTER STORAGE
-========================================================= */
-
-const COVER_LETTER_STORAGE_KEY = "resumely_cover_letters";
-
-function getCoverLetters() {
-  try {
-    const saved = localStorage.getItem(COVER_LETTER_STORAGE_KEY);
-
-    if (!saved) return [];
-
-    const parsed = JSON.parse(saved);
-
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
+import { getResumesFromApi } from "../../services/resumeService";
+import { getCoverLettersFromApi } from "../../services/coverLetterService";
 
 /* =========================================================
    PROGRESS BAR
@@ -180,9 +161,88 @@ function CoverLetterThumbnail({ letter }) {
 
 function Dashboard() {
   const [search, setSearch] = useState("");
+  const [resumes, setResumes] = useState([]);
+  const [coverLetters, setCoverLetters] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const resumes = getResumes();
-  const coverLetters = getCoverLetters();
+  /* =======================================================
+     LOAD DASHBOARD DATA FROM API
+  ======================================================== */
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadDashboardData() {
+      try {
+        setLoading(true);
+        setError("");
+
+        const [resumeResult, coverLetterResult] = await Promise.all([
+          getResumesFromApi(),
+          getCoverLettersFromApi(),
+        ]);
+
+        if (cancelled) return;
+
+        const apiResumes = Array.isArray(resumeResult?.resumes)
+          ? resumeResult.resumes
+          : [];
+
+        const apiCoverLetters = Array.isArray(
+          coverLetterResult?.coverLetters,
+        )
+          ? coverLetterResult.coverLetters
+          : [];
+
+        setResumes(
+          apiResumes.map((item) => ({
+            ...item,
+            id: item._id || item.id,
+            progress:
+              item.progress ?? calculateResumeProgress(item.data),
+          })),
+        );
+
+        setCoverLetters(
+          apiCoverLetters.map((item) => ({
+            ...(item.data || {}),
+            id: item._id || item.id,
+            title:
+              item.title ||
+              item.data?.title ||
+              "Untitled Cover Letter",
+            template:
+              item.template || item.data?.template || "modern",
+            createdAt: item.createdAt,
+            updatedAt: item.updatedAt,
+          })),
+        );
+      } catch (loadError) {
+        if (cancelled) return;
+
+        console.error("Dashboard API load failed:", loadError);
+
+        setError(
+          loadError?.message ||
+            "Unable to load your documents. Please refresh and try again.",
+        );
+
+        setResumes([]);
+        setCoverLetters([]);
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadDashboardData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   /* =======================================================
      RESUME SEARCH
@@ -196,7 +256,7 @@ function Dashboard() {
     return resumes.filter(
       (resume) =>
         resume.title?.toLowerCase().includes(query) ||
-        resume.template?.toLowerCase().includes(query)
+        resume.template?.toLowerCase().includes(query),
     );
   }, [search, resumes]);
 
@@ -205,11 +265,11 @@ function Dashboard() {
   ======================================================== */
 
   const completed = resumes.filter(
-    (resume) => (resume.progress || 0) >= 80
+    (resume) => (resume.progress || 0) >= 80,
   ).length;
 
   const inProgress = resumes.filter(
-    (resume) => (resume.progress || 0) < 80
+    (resume) => (resume.progress || 0) < 80,
   ).length;
 
   /* =======================================================
@@ -353,6 +413,12 @@ function Dashboard() {
         </div>
       </section>
 
+      {error && (
+        <div className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
+          {error}
+        </div>
+      )}
+
       {/* =====================================================
           STATS
       ====================================================== */}
@@ -427,12 +493,25 @@ function Dashboard() {
         </div>
 
         {/* =================================================
-            EMPTY RESUME STATE
+            RESUME CONTENT
         ================================================== */}
 
-        {filteredResumes.length === 0 ? (
+        {loading ? (
+          <div className="mt-5 rounded-xl border border-stone-200 bg-stone-50 px-4 py-9 text-center sm:mt-6 sm:px-6 sm:py-10">
+            <p className="text-sm font-medium text-zinc-700">
+              Loading resumes...
+            </p>
+
+            <p className="mt-1 text-xs text-zinc-500">
+              Fetching your saved documents.
+            </p>
+          </div>
+        ) : filteredResumes.length === 0 ? (
           <div className="mt-5 rounded-xl border border-dashed border-stone-200 bg-stone-50 px-4 py-9 text-center sm:mt-6 sm:px-6 sm:py-10">
-            <FileText className="mx-auto text-zinc-300" size={28} />
+            <FileText
+              className="mx-auto text-zinc-300"
+              size={28}
+            />
 
             <p className="mt-3 text-sm font-medium text-zinc-800">
               {resumes.length
@@ -510,7 +589,10 @@ function Dashboard() {
 
                         <span className="shrink-0">·</span>
 
-                        <Clock3 size={11} className="shrink-0" />
+                        <Clock3
+                          size={11}
+                          className="shrink-0"
+                        />
 
                         <span className="truncate">
                           {formatUpdatedAt(resume.updatedAt)}
@@ -535,7 +617,9 @@ function Dashboard() {
                     </div>
 
                     <Link
-                      to={`/builder?id=${encodeURIComponent(resume.id)}`}
+                      to={`/builder?id=${encodeURIComponent(
+                        resume.id,
+                      )}`}
                       className="
                         flex
                         h-9
@@ -650,10 +734,20 @@ function Dashboard() {
         </div>
 
         {/* =================================================
-            EMPTY COVER LETTERS
+            COVER LETTER CONTENT
         ================================================== */}
 
-        {filteredCoverLetters.length === 0 ? (
+        {loading ? (
+          <div className="mt-5 rounded-xl border border-stone-200 bg-stone-50 px-4 py-10 text-center sm:mt-6 sm:px-6 sm:py-12">
+            <p className="text-sm font-medium text-zinc-700">
+              Loading cover letters...
+            </p>
+
+            <p className="mt-1 text-xs text-zinc-500">
+              Fetching your saved documents.
+            </p>
+          </div>
+        ) : filteredCoverLetters.length === 0 ? (
           <div className="mt-5 rounded-xl border border-dashed border-stone-200 bg-stone-50 px-4 py-10 text-center sm:mt-6 sm:px-6 sm:py-12">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-white text-zinc-300 shadow-sm">
               <Mail size={22} />
@@ -763,11 +857,14 @@ function Dashboard() {
 
                       <span className="shrink-0">·</span>
 
-                      <Clock3 size={10} className="shrink-0" />
+                      <Clock3
+                        size={10}
+                        className="shrink-0"
+                      />
 
                       <span className="truncate">
                         {formatUpdatedAt(
-                          letter.updatedAt || letter.createdAt
+                          letter.updatedAt || letter.createdAt,
                         )}
                       </span>
                     </p>
@@ -778,7 +875,7 @@ function Dashboard() {
 
                 <Link
                   to={`/cover-letter-builder?id=${encodeURIComponent(
-                    letter.id
+                    letter.id,
                   )}`}
                   className="
                     flex
