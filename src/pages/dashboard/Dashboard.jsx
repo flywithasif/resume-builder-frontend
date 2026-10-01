@@ -7,6 +7,7 @@ import {
   Plus,
   Sparkles,
   TrendingUp,
+  Upload,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
@@ -17,6 +18,7 @@ import {
 } from "../../utils/resumeStorage";
 import { getResumesFromApi } from "../../services/resumeService";
 import { getCoverLettersFromApi } from "../../services/coverLetterService";
+import DocumentImportModal from "../../components/common/DocumentImportModal";
 
 /* =========================================================
    PROGRESS BAR
@@ -165,6 +167,60 @@ function Dashboard() {
   const [coverLetters, setCoverLetters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [importModalOpen, setImportModalOpen] = useState(false);
+
+  const handleResumeImported = (importedData) => {
+    if (!importedData) return;
+
+    const createItemId = (section, index) =>
+      `${Date.now()}-${section}-${index}`;
+
+    const normalizeItems = (items, section) =>
+      Array.isArray(items)
+        ? items.map((item, index) => ({
+            ...item,
+            id: item?.id || createItemId(section, index),
+          }))
+        : [];
+
+    const emptyResume = {
+      personal: {},
+      summary: "",
+      experience: [],
+      education: [],
+      skills: [],
+      projects: [],
+      certifications: [],
+      languages: [],
+    };
+
+    const normalizedResume = {
+      ...emptyResume,
+      personal: {
+        ...emptyResume.personal,
+        ...(importedData.personal || {}),
+      },
+      summary: importedData.summary || "",
+      experience: normalizeItems(importedData.experience, "experience"),
+      education: normalizeItems(importedData.education, "education"),
+      skills: Array.isArray(importedData.skills) ? importedData.skills : [],
+      projects: normalizeItems(importedData.projects, "project"),
+      certifications: normalizeItems(
+        importedData.certifications,
+        "certification",
+      ),
+      languages: normalizeItems(importedData.languages, "language"),
+    };
+
+    localStorage.setItem(
+      "resume_builder_draft",
+      JSON.stringify(normalizedResume),
+    );
+
+    localStorage.setItem("resumely_template", "executive");
+    setImportModalOpen(false);
+    window.location.href = "/builder?new=1";
+  };
 
   /* =======================================================
      LOAD DASHBOARD DATA FROM API
@@ -365,6 +421,52 @@ function Dashboard() {
 
               <span className="whitespace-nowrap">Create Resume</span>
             </Link>
+
+            {/* IMPORT RESUME */}
+
+            <button
+              type="button"
+              onClick={() => setImportModalOpen(true)}
+              className="
+                group
+                inline-flex
+                h-11
+                w-full
+                shrink-0
+                items-center
+                justify-center
+                gap-2
+                rounded-xl
+                border
+                border-white/20
+                bg-white/10
+                px-4
+                text-sm
+                font-semibold
+                text-white
+                shadow-[0_8px_25px_rgba(0,0,0,0.16)]
+                backdrop-blur-sm
+                transition-all
+                duration-200
+                hover:border-[#ae8954]
+                hover:bg-[#ae8954]
+                hover:text-white
+                active:scale-[0.98]
+                sm:w-auto
+                sm:min-w-[150px]
+                sm:px-5
+              "
+            >
+              <Upload
+                size={17}
+                strokeWidth={2}
+                className="shrink-0 transition-transform duration-200 group-hover:-translate-y-0.5"
+              />
+
+              <span className="whitespace-nowrap">
+                Import Resume
+              </span>
+            </button>
 
             {/* CREATE COVER LETTER */}
 
@@ -936,6 +1038,13 @@ function Dashboard() {
           </Link>
         )}
       </section>
+
+      <DocumentImportModal
+        open={importModalOpen}
+        type="resume"
+        onClose={() => setImportModalOpen(false)}
+        onImported={handleResumeImported}
+      />
     </div>
   );
 }
