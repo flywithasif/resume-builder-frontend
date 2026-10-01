@@ -75,9 +75,9 @@ function Login() {
     setLoading(true);
     setErrors({});
 
+    const identifier = form.identifier.trim();
+
     try {
-      const identifier =
-        form.identifier.trim();
 
       const payload = {
         password: form.password,
@@ -107,10 +107,31 @@ function Login() {
         replace: true,
       });
     } catch (error) {
+      const errorMessage =
+        error?.message ||
+        "Unable to sign in. Please check your credentials.";
+
+      if (
+        errorMessage
+          .toLowerCase()
+          .includes("verify your email")
+      ) {
+        localStorage.setItem(
+          "resumely_pending_email",
+          identifier.trim(),
+        );
+
+        navigate("/verify-email", {
+          state: {
+            email: identifier.trim(),
+          },
+        });
+
+        return;
+      }
+
       setErrors({
-        form:
-          error?.message ||
-          "Unable to sign in. Please check your credentials.",
+        form: errorMessage,
       });
     } finally {
       setLoading(false);
