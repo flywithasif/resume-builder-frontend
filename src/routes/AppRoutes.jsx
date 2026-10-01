@@ -36,7 +36,7 @@ function ScrollToTop() {
 ========================================================= */
 
 import Home from "../pages/landing/Home";
-import LandingTemplates from "../pages/landing/Templates";
+import TemplateShowcase from "../pages/landing/TemplateShowcase";
 import Pricing from "../pages/landing/Pricing";
 import About from "../pages/landing/About";
 import HowItWorks from "../pages/landing/HowItWorks";
@@ -82,6 +82,28 @@ import CoverLetterTemplates from "../pages/templates/CoverLetterTemplates";
 import CoverLetterBuilder from "../pages/coverLetters/CoverLetterBuilder";
 
 /* =========================================================
+   TEMPLATE ENTRY
+
+   Guest:
+   /templates → Landing Template Showcase
+
+   Logged in:
+   /templates → Actual Template Library
+========================================================= */
+
+function TemplateEntry() {
+  const isAuthenticated = Boolean(
+    localStorage.getItem("resumely_token"),
+  );
+
+  if (isAuthenticated) {
+    return <Templates />;
+  }
+
+  return <TemplateShowcase />;
+}
+
+/* =========================================================
    404
 ========================================================= */
 
@@ -121,48 +143,71 @@ function AppRoutes() {
 
         <Route element={<PublicLayout />}>
           {/* HOME */}
+
           <Route
             path="/"
             element={<Home />}
           />
 
           {/* =================================================
-              TEMPLATE LANDING PAGE
+              TEMPLATE SHOWCASE / TEMPLATE LIBRARY
 
-              /templates
-              Ye landing Templates.jsx hai.
+              Guest:
+                Landing showcase
+
+              Logged in:
+                Actual template library
           ================================================= */}
 
           <Route
             path="/templates"
-            element={<LandingTemplates />}
+            element={<TemplateEntry />}
           />
 
-          {/* Optional same landing page URL */}
+          {/* =================================================
+              ACTUAL TEMPLATE LIBRARY
+
+              This route always shows the complete
+              resume template collection.
+          ================================================= */}
+
+          <Route
+            path="/templates/all"
+            element={<Templates />}
+          />
+
+          {/* =================================================
+              LANDING TEMPLATE SHOWCASE DIRECT URL
+          ================================================= */}
+
           <Route
             path="/resume-templates"
-            element={<LandingTemplates />}
+            element={<TemplateShowcase />}
           />
 
-          {/* COVER LETTER LANDING */}
+          {/* COVER LETTER */}
+
           <Route
             path="/cover-letter"
             element={<CoverLetter />}
           />
 
           {/* ABOUT */}
+
           <Route
             path="/about"
             element={<About />}
           />
 
           {/* HOW IT WORKS */}
+
           <Route
             path="/how-it-works"
             element={<HowItWorks />}
           />
 
           {/* PRICING */}
+
           <Route
             path="/pricing"
             element={<Pricing />}
@@ -194,35 +239,14 @@ function AppRoutes() {
         </Route>
 
         {/* =====================================================
-            ACTUAL TEMPLATE LIBRARY
+            TEMPLATE DETAILS
         ====================================================== */}
 
         <Route element={<TemplateRouteLayout />}>
-          {/* =================================================
-              ACTUAL RESUME TEMPLATE LIBRARY
-
-              /templates/all
-          ================================================= */}
-
-          <Route
-            path="/templates/all"
-            element={<Templates />}
-          />
-
-          {/* =================================================
-              INDIVIDUAL TEMPLATE DETAILS
-
-              /templates/:templateId
-          ================================================= */}
-
           <Route
             path="/templates/:templateId"
             element={<TemplateDetails />}
           />
-
-          {/* =================================================
-              COVER LETTER TEMPLATES
-          ================================================= */}
 
           <Route
             path="/cover-letter-templates"

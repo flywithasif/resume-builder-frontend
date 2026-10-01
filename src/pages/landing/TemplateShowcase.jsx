@@ -319,7 +319,7 @@ function Templates() {
             </div>
 
             <Link
-              to="/templates"
+              to="/templates/all"
               className="hidden shrink-0 items-center gap-2 text-xs font-semibold text-zinc-500 transition hover:text-zinc-950 sm:flex"
             >
               Explore all templates
