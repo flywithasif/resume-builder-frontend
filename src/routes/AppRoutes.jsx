@@ -82,28 +82,6 @@ import CoverLetterTemplates from "../pages/templates/CoverLetterTemplates";
 import CoverLetterBuilder from "../pages/coverLetters/CoverLetterBuilder";
 
 /* =========================================================
-   TEMPLATE ENTRY
-
-   Guest:
-   /templates → Landing Template Showcase
-
-   Logged in:
-   /templates → Actual Template Library
-========================================================= */
-
-function TemplateEntry() {
-  const isAuthenticated = Boolean(
-    localStorage.getItem("resumely_token"),
-  );
-
-  if (isAuthenticated) {
-    return <Templates />;
-  }
-
-  return <TemplateShowcase />;
-}
-
-/* =========================================================
    404
 ========================================================= */
 
@@ -147,42 +125,6 @@ function AppRoutes() {
           <Route
             path="/"
             element={<Home />}
-          />
-
-          {/* =================================================
-              TEMPLATE SHOWCASE / TEMPLATE LIBRARY
-
-              Guest:
-                Landing showcase
-
-              Logged in:
-                Actual template library
-          ================================================= */}
-
-          <Route
-            path="/templates"
-            element={<TemplateEntry />}
-          />
-
-          {/* =================================================
-              ACTUAL TEMPLATE LIBRARY
-
-              This route always shows the complete
-              resume template collection.
-          ================================================= */}
-
-          <Route
-            path="/templates/all"
-            element={<Templates />}
-          />
-
-          {/* =================================================
-              LANDING TEMPLATE SHOWCASE DIRECT URL
-          ================================================= */}
-
-          <Route
-            path="/resume-templates"
-            element={<TemplateShowcase />}
           />
 
           {/* COVER LETTER */}
@@ -236,17 +178,74 @@ function AppRoutes() {
             path="/reset-password"
             element={<ResetPassword />}
           />
+
+          {/* =================================================
+              LANDING TEMPLATE SHOWCASE
+
+              Direct landing URL only.
+
+              /resume-templates
+          ================================================= */}
+
+          <Route
+            path="/resume-templates"
+            element={<TemplateShowcase />}
+          />
         </Route>
 
         {/* =====================================================
-            TEMPLATE DETAILS
+            SMART TEMPLATE ROUTES
+
+            Guest:
+              Public Navbar + Template pages
+
+            Logged in:
+              Dashboard Sidebar + Dashboard Topbar
         ====================================================== */}
 
         <Route element={<TemplateRouteLayout />}>
+          {/* =================================================
+              TEMPLATE ENTRY
+
+              Guest:
+                /templates → TemplateShowcase
+
+              Logged in:
+                /templates → Actual Templates
+          ================================================= */}
+
+          <Route
+            path="/templates"
+            element={
+              localStorage.getItem("resumely_token") ? (
+                <Templates />
+              ) : (
+                <TemplateShowcase />
+              )
+            }
+          />
+
+          {/* =================================================
+              ACTUAL TEMPLATE LIBRARY
+          ================================================= */}
+
+          <Route
+            path="/templates/all"
+            element={<Templates />}
+          />
+
+          {/* =================================================
+              INDIVIDUAL TEMPLATE
+          ================================================= */}
+
           <Route
             path="/templates/:templateId"
             element={<TemplateDetails />}
           />
+
+          {/* =================================================
+              COVER LETTER TEMPLATES
+          ================================================= */}
 
           <Route
             path="/cover-letter-templates"
