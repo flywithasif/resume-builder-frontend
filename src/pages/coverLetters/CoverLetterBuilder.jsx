@@ -1151,56 +1151,6 @@ function CoverLetterBuilder() {
       </header>
 
       {/* =====================================================
-          IMPORT COVER LETTER
-      ====================================================== */}
-
-      <div className="mx-auto w-full max-w-[1700px] px-3 pt-3 sm:px-5 sm:pt-4 md:px-6 lg:px-7">
-        <button
-          type="button"
-          onClick={() => setImportModalOpen(true)}
-          className="
-            group
-            flex
-            w-full
-            items-center
-            justify-between
-            gap-4
-            rounded-xl
-            border
-            border-[#d8c8ae]
-            bg-white
-            px-4
-            py-3
-            text-left
-            shadow-sm
-            transition
-            hover:border-[#987542]
-            hover:shadow-md
-            sm:px-5
-          "
-        >
-          <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#f3ede3] text-[#987542] transition group-hover:bg-[#987542] group-hover:text-white">
-              <Upload size={17} />
-            </div>
-
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-zinc-950">
-                Import Cover Letter
-              </p>
-              <p className="mt-0.5 truncate text-xs text-zinc-500">
-                Upload a PDF or DOCX to automatically fill your cover letter.
-              </p>
-            </div>
-          </div>
-
-          <span className="shrink-0 rounded-lg bg-zinc-950 px-3.5 py-2 text-xs font-semibold text-white transition group-hover:bg-[#987542]">
-            Import
-          </span>
-        </button>
-      </div>
-
-      {/* =====================================================
           WORKSPACE
       ====================================================== */}
 
