@@ -1,10 +1,11 @@
 import {
+  ArrowRight,
+  CheckCircle2,
   Eye,
   EyeOff,
   LockKeyhole,
   Mail,
-  ArrowRight,
-  CheckCircle2,
+  Phone,
 } from "lucide-react";
 
 import {
@@ -23,7 +24,7 @@ function Login() {
   const { login } = useAuth();
 
   const [form, setForm] = useState({
-    email: "",
+    identifier: "",
     password: "",
     remember: false,
   });
@@ -31,10 +32,6 @@ function Login() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
-  // ---------------------------------------------------------
-  // INPUT UPDATE
-  // ---------------------------------------------------------
 
   const updateField = (field, value) => {
     setForm((current) => ({
@@ -49,33 +46,21 @@ function Login() {
     }));
   };
 
-  // ---------------------------------------------------------
-  // VALIDATION
-  // ---------------------------------------------------------
-
   const validate = () => {
     const nextErrors = {};
 
-    if (!form.email.trim()) {
-      nextErrors.email = "Email is required.";
-    } else if (
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-        form.email.trim()
-      )
-    ) {
-      nextErrors.email = "Enter a valid email address.";
+    if (!form.identifier.trim()) {
+      nextErrors.identifier =
+        "Email or mobile number is required.";
     }
 
     if (!form.password) {
-      nextErrors.password = "Password is required.";
+      nextErrors.password =
+        "Password is required.";
     }
 
     return nextErrors;
   };
-
-  // ---------------------------------------------------------
-  // LOGIN
-  // ---------------------------------------------------------
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -91,27 +76,31 @@ function Login() {
     setErrors({});
 
     try {
-      await login({
-        email: form.email.trim().toLowerCase(),
-        password: form.password,
-      });
+      const identifier =
+        form.identifier.trim();
 
-      // -----------------------------------------------------
-      // IMPORTANT:
-      // If user came from a template, return to builder.
-      // Otherwise go to dashboard.
-      // -----------------------------------------------------
+      const payload = {
+        password: form.password,
+      };
+
+      if (identifier.includes("@")) {
+        payload.email =
+          identifier.toLowerCase();
+      } else {
+        payload.phone = identifier;
+      }
+
+      await login(payload);
 
       const destination =
         location.state?.from ||
         localStorage.getItem(
-          "resumely_after_login"
+          "resumely_after_login",
         ) ||
         "/dashboard";
 
-      // Remove temporary redirect
       localStorage.removeItem(
-        "resumely_after_login"
+        "resumely_after_login",
       );
 
       navigate(destination, {
@@ -121,7 +110,7 @@ function Login() {
       setErrors({
         form:
           error?.message ||
-          "Unable to sign in. Please check your email and password.",
+          "Unable to sign in. Please check your credentials.",
       });
     } finally {
       setLoading(false);
@@ -131,24 +120,18 @@ function Login() {
   return (
     <div className="min-h-[calc(100vh-72px)] bg-[#f8f8f6]">
       <div className="mx-auto flex min-h-[calc(100vh-72px)] w-full max-w-[1440px] flex-col lg:grid lg:grid-cols-[0.9fr_1.1fr]">
+        {/* LEFT */}
 
-        {/* =====================================================
-            LEFT PREMIUM PANEL
-        ====================================================== */}
-
-        <div className="hidden flex-col justify-between border-r border-stone-200 bg-zinc-950 p-8 text-white lg:flex xl:p-12 2xl:p-14">
-
-          {/* LOGO */}
-
+        <div className="hidden flex-col justify-between border-r border-stone-200 bg-zinc-950 p-8 text-white lg:flex xl:p-12">
           <Link
             to="/"
             className="flex w-fit items-center gap-3"
           >
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-sm font-bold text-zinc-950">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-sm font-bold text-zinc-950">
               R
             </span>
 
-            <span className="text-lg font-semibold tracking-tight">
+            <span className="text-lg font-semibold">
               Resume
               <span className="text-[#c6a36c]">
                 ly
@@ -156,14 +139,12 @@ function Login() {
             </span>
           </Link>
 
-          {/* CONTENT */}
-
-          <div className="my-12 max-w-lg xl:my-0">
+          <div className="my-12 max-w-lg">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#c6a36c]">
               Welcome back
             </p>
 
-            <h1 className="mt-5 text-4xl font-semibold leading-[1.05] tracking-[-0.05em] xl:text-5xl 2xl:text-6xl">
+            <h1 className="mt-5 text-4xl font-semibold leading-[1.05] tracking-[-0.05em] xl:text-5xl">
               Continue building a resume you&apos;re proud to send.
             </h1>
 
@@ -185,10 +166,10 @@ function Login() {
                 >
                   <CheckCircle2
                     size={16}
-                    className="shrink-0 text-[#c6a36c]"
+                    className="text-[#c6a36c]"
                   />
 
-                  <span>{item}</span>
+                  {item}
                 </div>
               ))}
             </div>
@@ -199,26 +180,20 @@ function Login() {
           </p>
         </div>
 
-        {/* =====================================================
-            RIGHT LOGIN PANEL
-        ====================================================== */}
+        {/* RIGHT */}
 
-        <div className="flex w-full flex-1 items-center justify-center px-4 py-8 sm:px-6 sm:py-10 md:px-8 md:py-12 lg:min-h-[calc(100vh-72px)] lg:px-10 xl:px-14">
-
+        <div className="flex min-h-full items-center justify-center px-4 py-8 sm:px-6 md:px-8 lg:px-10 xl:px-14">
           <div className="w-full max-w-[440px]">
-
-            {/* MOBILE LOGO */}
-
-            <div className="mb-6 sm:mb-8 lg:hidden">
+            <div className="mb-6 lg:hidden">
               <Link
                 to="/"
                 className="flex w-fit items-center gap-3"
               >
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-950 text-sm font-bold text-white">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-950 text-sm font-bold text-white">
                   R
                 </span>
 
-                <span className="text-lg font-semibold tracking-tight">
+                <span className="text-lg font-semibold">
                   Resume
                   <span className="text-[#b08d57]">
                     ly
@@ -227,82 +202,80 @@ function Login() {
               </Link>
             </div>
 
-            {/* LOGIN CARD */}
-
-            <div className="w-full rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_20px_60px_rgba(24,24,27,0.07)] sm:p-7 md:p-8">
-
+            <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_20px_60px_rgba(24,24,27,0.07)] sm:p-7 md:p-8">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#987542]">
                 Account
               </p>
 
-              <h2 className="mt-2 text-xl font-semibold tracking-[-0.035em] text-zinc-950 sm:text-2xl">
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-950">
                 Sign in to your account
               </h2>
 
               <p className="mt-2 text-sm leading-6 text-zinc-500">
-                Continue building your professional resume.
+                Use your email or mobile number.
               </p>
 
-              {/* ERROR */}
-
               {errors.form && (
-                <div className="mt-5 break-words rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-5 text-red-700">
+                <div className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                   {errors.form}
                 </div>
               )}
 
-              {/* FORM */}
-
               <form
                 onSubmit={handleSubmit}
-                className="mt-6 space-y-5 sm:mt-7"
+                className="mt-6 space-y-5"
                 noValidate
               >
-                {/* EMAIL */}
-
                 <div>
                   <label
-                    htmlFor="login-email"
+                    htmlFor="login-identifier"
                     className="mb-1.5 block text-xs font-medium text-zinc-600"
                   >
-                    Email
+                    Email or mobile number
                   </label>
 
                   <div className="relative">
-                    <Mail
-                      size={16}
-                      className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
-                    />
+                    {form.identifier.includes(
+                      "@",
+                    ) ? (
+                      <Mail
+                        size={16}
+                        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+                      />
+                    ) : (
+                      <Phone
+                        size={16}
+                        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+                      />
+                    )}
 
                     <input
-                      id="login-email"
-                      type="email"
-                      value={form.email}
+                      id="login-identifier"
+                      type="text"
+                      value={form.identifier}
                       onChange={(event) =>
                         updateField(
-                          "email",
-                          event.target.value
+                          "identifier",
+                          event.target.value,
                         )
                       }
-                      placeholder="you@example.com"
-                      autoComplete="email"
+                      placeholder="Email or mobile number"
+                      autoComplete="username"
                       disabled={loading}
-                      className={`h-11 w-full min-w-0 rounded-xl border bg-white pl-10 pr-3 text-sm text-zinc-900 outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:cursor-not-allowed disabled:bg-zinc-50 ${
-                        errors.email
-                          ? "border-red-300 focus:border-red-500"
+                      className={`h-11 w-full rounded-xl border bg-white pl-10 pr-3 text-sm outline-none ${
+                        errors.identifier
+                          ? "border-red-300"
                           : "border-stone-200 focus:border-zinc-900"
                       }`}
                     />
                   </div>
 
-                  {errors.email && (
-                    <p className="mt-1.5 break-words text-xs text-red-600">
-                      {errors.email}
+                  {errors.identifier && (
+                    <p className="mt-1.5 text-xs text-red-600">
+                      {errors.identifier}
                     </p>
                   )}
                 </div>
-
-                {/* PASSWORD */}
 
                 <div>
                   <label
@@ -329,15 +302,15 @@ function Login() {
                       onChange={(event) =>
                         updateField(
                           "password",
-                          event.target.value
+                          event.target.value,
                         )
                       }
                       placeholder="Enter your password"
                       autoComplete="current-password"
                       disabled={loading}
-                      className={`h-11 w-full min-w-0 rounded-xl border bg-white pl-10 pr-11 text-sm text-zinc-900 outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:cursor-not-allowed disabled:bg-zinc-50 ${
+                      className={`h-11 w-full rounded-xl border bg-white pl-10 pr-11 text-sm outline-none ${
                         errors.password
-                          ? "border-red-300 focus:border-red-500"
+                          ? "border-red-300"
                           : "border-stone-200 focus:border-zinc-900"
                       }`}
                     />
@@ -346,16 +319,10 @@ function Login() {
                       type="button"
                       onClick={() =>
                         setShowPassword(
-                          (current) => !current
+                          (current) => !current,
                         )
                       }
-                      disabled={loading}
-                      className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center text-zinc-400 hover:text-zinc-900 disabled:cursor-not-allowed"
-                      aria-label={
-                        showPassword
-                          ? "Hide password"
-                          : "Show password"
-                      }
+                      className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center text-zinc-400"
                     >
                       {showPassword ? (
                         <EyeOff size={16} />
@@ -366,78 +333,56 @@ function Login() {
                   </div>
 
                   {errors.password && (
-                    <p className="mt-1.5 break-words text-xs text-red-600">
+                    <p className="mt-1.5 text-xs text-red-600">
                       {errors.password}
                     </p>
                   )}
                 </div>
 
-                {/* OPTIONS */}
-
-                <div className="flex flex-col gap-3 xs:flex-row xs:items-center xs:justify-between sm:flex-row sm:items-center sm:justify-between">
-
-                  <label className="flex w-fit cursor-pointer items-center gap-2 text-xs text-zinc-600">
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 text-xs text-zinc-600">
                     <input
                       type="checkbox"
                       checked={form.remember}
                       onChange={(event) =>
                         updateField(
                           "remember",
-                          event.target.checked
+                          event.target.checked,
                         )
                       }
-                      disabled={loading}
-                      className="h-4 w-4 shrink-0 rounded border-stone-300 accent-zinc-950"
+                      className="h-4 w-4 accent-zinc-950"
                     />
 
-                    <span className="whitespace-nowrap">
-                      Remember me
-                    </span>
+                    Remember me
                   </label>
 
                   <Link
                     to="/forgot-password"
-                    className="w-fit text-xs font-semibold text-zinc-700 hover:text-[#987542]"
+                    className="text-xs font-semibold text-zinc-700 hover:text-[#987542]"
                   >
                     Forgot password?
                   </Link>
                 </div>
 
-                {/* SUBMIT */}
-
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-zinc-950 px-4 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-zinc-950 px-4 text-sm font-semibold text-white hover:bg-zinc-800 disabled:opacity-60"
                 >
                   {loading
                     ? "Signing in..."
                     : "Sign In"}
 
                   {!loading && (
-                    <ArrowRight
-                      size={16}
-                      className="shrink-0"
-                    />
+                    <ArrowRight size={16} />
                   )}
                 </button>
               </form>
 
-              {/* REGISTER */}
-
-              <p className="mt-6 text-center text-sm leading-6 text-zinc-500 sm:mt-7">
+              <p className="mt-6 text-center text-sm text-zinc-500">
                 Don&apos;t have an account?{" "}
-
                 <Link
                   to="/register"
-                  state={{
-                    from:
-                      location.state?.from ||
-                      localStorage.getItem(
-                        "resumely_after_login"
-                      ) ||
-                      undefined,
-                  }}
                   className="font-semibold text-zinc-900 hover:text-[#987542]"
                 >
                   Create one

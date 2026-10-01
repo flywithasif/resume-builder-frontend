@@ -19,6 +19,10 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  /* =========================================================
+     RESTORE SESSION
+  ========================================================= */
+
   useEffect(() => {
     let mounted = true;
 
@@ -37,15 +41,20 @@ export function AuthProvider({ children }) {
       try {
         const result = await getCurrentUser();
 
-        if (mounted) {
-          setUser(result?.user || null);
+        if (!mounted) {
+          return;
+        }
 
-          if (result?.user) {
-            localStorage.setItem(
-              "resumely_user",
-              JSON.stringify(result.user),
-            );
-          }
+        if (result?.user) {
+          setUser(result.user);
+
+          localStorage.setItem(
+            "resumely_user",
+            JSON.stringify(result.user),
+          );
+        } else {
+          logoutUser();
+          setUser(null);
         }
       } catch {
         logoutUser();
@@ -67,6 +76,10 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
+  /* =========================================================
+     LOGIN
+  ========================================================= */
+
   const login = async (credentials) => {
     setLoading(true);
 
@@ -81,19 +94,32 @@ export function AuthProvider({ children }) {
     }
   };
 
+  /* =========================================================
+     REGISTER
+  ========================================================= */
+
   const register = async (payload) => {
     setLoading(true);
 
     try {
       const result = await registerUser(payload);
 
-      setUser(result?.user || null);
+      /*
+        Registration now requires email verification.
+        Do NOT authenticate the user here.
+      */
+
+      setUser(null);
 
       return result;
     } finally {
       setLoading(false);
     }
   };
+
+  /* =========================================================
+     LOGOUT
+  ========================================================= */
 
   const logout = () => {
     logoutUser();
@@ -123,7 +149,9 @@ export function useAuth() {
   const context = useContext(AuthContext);
 
   if (!context) {
-    throw new Error("useAuth must be used inside AuthProvider");
+    throw new Error(
+      "useAuth must be used inside AuthProvider",
+    );
   }
 
   return context;

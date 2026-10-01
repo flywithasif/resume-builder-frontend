@@ -1,0 +1,2542 @@
+===== FRONTEND FILE STRUCTURE =====
+Folder PATH listing
+Volume serial number is 00000085 0EFA:B8FA
+C:\USERS\ASIF\ONEDRIVE\DESKTOP\RESUME-BUILDER-SAAS\FRONTEND\SRC
+|   App.jsx
+|   index.css
+|   main.jsx
+|   
++---assets
++---components
+|   +---common
+|   |       DocumentImportModal.jsx
+|   |       Logo.jsx
+|   |       
+|   +---layout
+|   |       Navbar.jsx
+|   |       Sidebar.jsx
+|   |       
+|   \---ui
+|           Badge.jsx
+|           Button.jsx
+|           Card.jsx
+|           EmptyState.jsx
+|           Input.jsx
+|           Spinner.jsx
+|           
++---contexts
+|       AuthContext.jsx
+|       
++---data
+|       coverLetterTemplates.js
+|       navigation.js
+|       
++---layouts
+|       DashboardLayout.jsx
+|       Footer.jsx
+|       PublicLayout.jsx
+|       
++---pages
+|   +---auth
+|   |       ForgotPassword.jsx
+|   |       Login.jsx
+|   |       Register.jsx
+|   |       ResetPassword.jsx
+|   |       
+|   +---builder
+|   |       Builder.jsx
+|   |       
+|   +---coverLetters
+|   |       CoverLetterBuilder.jsx
+|   |       
+|   +---dashboard
+|   |       CoverLetters.jsx
+|   |       Dashboard.jsx
+|   |       Profile.jsx
+|   |       Resumes.jsx
+|   |       Settings.jsx
+|   |       
+|   +---landing
+|   |       About.jsx
+|   |       CoverLetter.jsx
+|   |       Home.jsx
+|   |       HowItWorks.jsx
+|   |       Pricing.jsx
+|   |       TemplateShowcase.jsx
+|   |       
+|   \---templates
+|           CoverLetterTemplates.jsx
+|           resumeTemplates.jsx
+|           TemplateDetails.jsx
+|           Templates.jsx
+|           
++---routes
+|       AppRoutes.jsx
+|       ProtectedRoute.jsx
+|       TemplateRouteLayout.jsx
+|       
++---services
+|       api.js
+|       authService.js
+|       coverLetterService.js
+|       importService.js
+|       resumeService.js
+|       
+\---utils
+        resumeStorage.js
+        
+
+===== FILE CONTENTS =====
+
+========================================
+FILE: package.json
+========================================
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.9.1",
+    "@tailwindcss/vite": "^4.3.3",
+    "framer-motion": "^13.4.4",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.2.1",
+    "lucide-react": "^1.48.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-hook-form": "^7.89.0",
+    "react-router-dom": "^7.18.4",
+    "tailwindcss": "^4.3.3",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "@vitejs/plugin-react": "^6.1.1",
+    "eslint": "^10.10.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.6",
+    "globals": "^17.12.0",
+    "vite": "^8.3.0"
+  }
+}
+
+
+========================================
+FILE: src/App.jsx
+========================================
+import AppRoutes from "./routes/AppRoutes";
+import { AuthProvider } from "./contexts/AuthContext";
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
+  );
+}
+
+export default App;
+
+========================================
+FILE: src/main.jsx
+========================================
+import React from "react";
+import ReactDOM from "react-dom/client";
+
+import App from "./App";
+import "./index.css";
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+);
+
+========================================
+FILE: C:\Users\Asif\OneDrive\Desktop\resume-builder-saas\Frontend\src\contexts\AuthContext.jsx
+========================================
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
+import {
+  getCurrentUser,
+  loginUser,
+  logoutUser,
+  registerUser,
+} from "../services/authService";
+
+const AuthContext = createContext(null);
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function restoreSession() {
+      const token = localStorage.getItem("resumely_token");
+
+      if (!token) {
+        if (mounted) {
+          setUser(null);
+          setLoading(false);
+        }
+
+        return;
+      }
+
+      try {
+        const result = await getCurrentUser();
+
+        if (mounted) {
+          setUser(result?.user || null);
+
+          if (result?.user) {
+            localStorage.setItem(
+              "resumely_user",
+              JSON.stringify(result.user),
+            );
+          }
+        }
+      } catch {
+        logoutUser();
+
+        if (mounted) {
+          setUser(null);
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    restoreSession();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const login = async (credentials) => {
+    setLoading(true);
+
+    try {
+      const result = await loginUser(credentials);
+
+      setUser(result?.user || null);
+
+      return result;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const register = async (payload) => {
+    setLoading(true);
+
+    try {
+      const result = await registerUser(payload);
+
+      setUser(result?.user || null);
+
+      return result;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const logout = () => {
+    logoutUser();
+    setUser(null);
+  };
+
+  const value = useMemo(
+    () => ({
+      user,
+      loading,
+      isAuthenticated: Boolean(user),
+      login,
+      register,
+      logout,
+    }),
+    [user, loading],
+  );
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error("useAuth must be used inside AuthProvider");
+  }
+
+  return context;
+}
+
+========================================
+FILE: C:\Users\Asif\OneDrive\Desktop\resume-builder-saas\Frontend\src\pages\auth\ForgotPassword.jsx
+========================================
+import { ArrowLeft, ArrowRight, CheckCircle2, Mail } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useState } from "react";
+
+function ForgotPassword() {
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    if (!email.trim()) {
+      setError("Email is required.");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError("Enter a valid email address.");
+      return;
+    }
+
+    setError("");
+    setLoading(true);
+
+    window.setTimeout(() => {
+      setLoading(false);
+      setSubmitted(true);
+    }, 700);
+  };
+
+  return (
+    <div className="min-h-[calc(100dvh-72px)] bg-[#f8f8f6]">
+      <div className="mx-auto flex min-h-[calc(100dvh-72px)] w-full max-w-[760px] items-center justify-center px-4 py-8 sm:px-6 sm:py-10 md:px-8 md:py-12">
+        <div className="w-full max-w-[460px]">
+          {/* BACK TO LOGIN */}
+          <Link
+            to="/login"
+            className="mb-5 inline-flex min-h-8 items-center gap-2 text-xs font-medium text-zinc-500 transition-colors hover:text-zinc-950 sm:mb-7"
+          >
+            <ArrowLeft size={14} />
+            Back to login
+          </Link>
+
+          {/* CARD */}
+          <div className="w-full rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_20px_60px_rgba(24,24,27,0.07)] sm:p-7 md:p-9">
+            {!submitted ? (
+              <>
+                {/* ICON */}
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-zinc-950 text-white">
+                  <Mail size={19} />
+                </div>
+
+                {/* LABEL */}
+                <p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#987542] sm:mt-7 sm:text-xs">
+                  Account recovery
+                </p>
+
+                {/* TITLE */}
+                <h1 className="mt-2 text-[22px] font-semibold leading-tight tracking-[-0.035em] text-zinc-950 sm:text-2xl">
+                  Forgot your password?
+                </h1>
+
+                {/* DESCRIPTION */}
+                <p className="mt-2 text-sm leading-6 text-zinc-500">
+                  Enter the email associated with your account and we&apos;ll
+                  prepare the password reset flow.
+                </p>
+
+                {/* FORM */}
+                <form
+                  onSubmit={handleSubmit}
+                  className="mt-6 sm:mt-7"
+                  noValidate
+                >
+                  <label
+                    htmlFor="forgot-email"
+                    className="mb-1.5 block text-xs font-medium text-zinc-600"
+                  >
+                    Email
+                  </label>
+
+                  <div className="relative">
+                    <Mail
+                      size={16}
+                      className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+                    />
+
+                    <input
+                      id="forgot-email"
+                      type="email"
+                      value={email}
+                      onChange={(event) => {
+                        setEmail(event.target.value);
+                        setError("");
+                      }}
+                      placeholder="you@example.com"
+                      autoComplete="email"
+                      className={`h-11 w-full min-w-0 rounded-xl border bg-white pl-10 pr-3 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 ${
+                        error
+                          ? "border-red-300"
+                          : "border-stone-200 focus:border-zinc-900"
+                      }`}
+                    />
+                  </div>
+
+                  {error && (
+                    <p className="mt-1.5 text-xs leading-5 text-red-600">
+                      {error}
+                    </p>
+                  )}
+
+                  {/* SUBMIT BUTTON */}
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="mt-5 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-zinc-950 px-4 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {loading ? "Preparing..." : "Continue"}
+
+                    {!loading && <ArrowRight size={16} />}
+                  </button>
+                </form>
+              </>
+            ) : (
+              /* SUCCESS STATE */
+              <div className="text-center">
+                {/* SUCCESS ICON */}
+                <div className="mx-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+                  <CheckCircle2 size={23} />
+                </div>
+
+                {/* LABEL */}
+                <p className="mt-5 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#987542] sm:mt-6 sm:text-xs">
+                  Check your inbox
+                </p>
+
+                {/* TITLE */}
+                <h1 className="mt-2 text-[22px] font-semibold leading-tight tracking-[-0.035em] text-zinc-950 sm:text-2xl">
+                  Reset link prepared
+                </h1>
+
+                {/* DESCRIPTION */}
+                <p className="mt-3 text-sm leading-6 text-zinc-500">
+                  A password reset message would be sent to{" "}
+                  <span className="break-all font-medium text-zinc-800">
+                    {email}
+                  </span>
+                  .
+                </p>
+
+                {/* INFO */}
+                <p className="mt-3 text-xs leading-5 text-zinc-400">
+                  Email delivery is not connected yet. This is the frontend
+                  success state for the current stage.
+                </p>
+
+                {/* BACK BUTTON */}
+                <Link
+                  to="/login"
+                  className="mt-6 flex min-h-11 w-full items-center justify-center rounded-xl border border-stone-200 px-4 text-sm font-semibold text-zinc-800 transition-colors hover:bg-stone-50 sm:mt-7"
+                >
+                  Back to login
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default ForgotPassword;
+
+========================================
+FILE: C:\Users\Asif\OneDrive\Desktop\resume-builder-saas\Frontend\src\pages\auth\Login.jsx
+========================================
+import {
+  Eye,
+  EyeOff,
+  LockKeyhole,
+  Mail,
+  ArrowRight,
+  CheckCircle2,
+} from "lucide-react";
+
+import {
+  Link,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+
+import { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+
+function Login() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const { login } = useAuth();
+
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+    remember: false,
+  });
+
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  // ---------------------------------------------------------
+  // INPUT UPDATE
+  // ---------------------------------------------------------
+
+  const updateField = (field, value) => {
+    setForm((current) => ({
+      ...current,
+      [field]: value,
+    }));
+
+    setErrors((current) => ({
+      ...current,
+      [field]: "",
+      form: "",
+    }));
+  };
+
+  // ---------------------------------------------------------
+  // VALIDATION
+  // ---------------------------------------------------------
+
+  const validate = () => {
+    const nextErrors = {};
+
+    if (!form.email.trim()) {
+      nextErrors.email = "Email is required.";
+    } else if (
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+        form.email.trim()
+      )
+    ) {
+      nextErrors.email = "Enter a valid email address.";
+    }
+
+    if (!form.password) {
+      nextErrors.password = "Password is required.";
+    }
+
+    return nextErrors;
+  };
+
+  // ---------------------------------------------------------
+  // LOGIN
+  // ---------------------------------------------------------
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const nextErrors = validate();
+
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      return;
+    }
+
+    setLoading(true);
+    setErrors({});
+
+    try {
+      await login({
+        email: form.email.trim().toLowerCase(),
+        password: form.password,
+      });
+
+      // -----------------------------------------------------
+      // IMPORTANT:
+      // If user came from a template, return to builder.
+      // Otherwise go to dashboard.
+      // -----------------------------------------------------
+
+      const destination =
+        location.state?.from ||
+        localStorage.getItem(
+          "resumely_after_login"
+        ) ||
+        "/dashboard";
+
+      // Remove temporary redirect
+      localStorage.removeItem(
+        "resumely_after_login"
+      );
+
+      navigate(destination, {
+        replace: true,
+      });
+    } catch (error) {
+      setErrors({
+        form:
+          error?.message ||
+          "Unable to sign in. Please check your email and password.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-[calc(100vh-72px)] bg-[#f8f8f6]">
+      <div className="mx-auto flex min-h-[calc(100vh-72px)] w-full max-w-[1440px] flex-col lg:grid lg:grid-cols-[0.9fr_1.1fr]">
+
+        {/* =====================================================
+            LEFT PREMIUM PANEL
+        ====================================================== */}
+
+        <div className="hidden flex-col justify-between border-r border-stone-200 bg-zinc-950 p-8 text-white lg:flex xl:p-12 2xl:p-14">
+
+          {/* LOGO */}
+
+          <Link
+            to="/"
+            className="flex w-fit items-center gap-3"
+          >
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-sm font-bold text-zinc-950">
+              R
+            </span>
+
+            <span className="text-lg font-semibold tracking-tight">
+              Resume
+              <span className="text-[#c6a36c]">
+                ly
+              </span>
+            </span>
+          </Link>
+
+          {/* CONTENT */}
+
+          <div className="my-12 max-w-lg xl:my-0">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#c6a36c]">
+              Welcome back
+            </p>
+
+            <h1 className="mt-5 text-4xl font-semibold leading-[1.05] tracking-[-0.05em] xl:text-5xl 2xl:text-6xl">
+              Continue building a resume you&apos;re proud to send.
+            </h1>
+
+            <p className="mt-6 max-w-md text-sm leading-7 text-zinc-400">
+              Return to your workspace, continue an
+              existing resume or start preparing a new
+              version for your next opportunity.
+            </p>
+
+            <div className="mt-8 space-y-3">
+              {[
+                "Live resume editing",
+                "Professional templates",
+                "Multiple resume versions",
+              ].map((item) => (
+                <div
+                  key={item}
+                  className="flex items-center gap-2.5 text-sm text-zinc-300"
+                >
+                  <CheckCircle2
+                    size={16}
+                    className="shrink-0 text-[#c6a36c]"
+                  />
+
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <p className="text-xs text-zinc-600">
+            Build clearly. Apply confidently.
+          </p>
+        </div>
+
+        {/* =====================================================
+            RIGHT LOGIN PANEL
+        ====================================================== */}
+
+        <div className="flex w-full flex-1 items-center justify-center px-4 py-8 sm:px-6 sm:py-10 md:px-8 md:py-12 lg:min-h-[calc(100vh-72px)] lg:px-10 xl:px-14">
+
+          <div className="w-full max-w-[440px]">
+
+            {/* MOBILE LOGO */}
+
+            <div className="mb-6 sm:mb-8 lg:hidden">
+              <Link
+                to="/"
+                className="flex w-fit items-center gap-3"
+              >
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-950 text-sm font-bold text-white">
+                  R
+                </span>
+
+                <span className="text-lg font-semibold tracking-tight">
+                  Resume
+                  <span className="text-[#b08d57]">
+                    ly
+                  </span>
+                </span>
+              </Link>
+            </div>
+
+            {/* LOGIN CARD */}
+
+            <div className="w-full rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_20px_60px_rgba(24,24,27,0.07)] sm:p-7 md:p-8">
+
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#987542]">
+                Account
+              </p>
+
+              <h2 className="mt-2 text-xl font-semibold tracking-[-0.035em] text-zinc-950 sm:text-2xl">
+                Sign in to your account
+              </h2>
+
+              <p className="mt-2 text-sm leading-6 text-zinc-500">
+                Continue building your professional resume.
+              </p>
+
+              {/* ERROR */}
+
+              {errors.form && (
+                <div className="mt-5 break-words rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-5 text-red-700">
+                  {errors.form}
+                </div>
+              )}
+
+              {/* FORM */}
+
+              <form
+                onSubmit={handleSubmit}
+                className="mt-6 space-y-5 sm:mt-7"
+                noValidate
+              >
+                {/* EMAIL */}
+
+                <div>
+                  <label
+                    htmlFor="login-email"
+                    className="mb-1.5 block text-xs font-medium text-zinc-600"
+                  >
+                    Email
+                  </label>
+
+                  <div className="relative">
+                    <Mail
+                      size={16}
+                      className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+                    />
+
+                    <input
+                      id="login-email"
+                      type="email"
+                      value={form.email}
+                      onChange={(event) =>
+                        updateField(
+                          "email",
+                          event.target.value
+                        )
+                      }
+                      placeholder="you@example.com"
+                      autoComplete="email"
+                      disabled={loading}
+                      className={`h-11 w-full min-w-0 rounded-xl border bg-white pl-10 pr-3 text-sm text-zinc-900 outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:cursor-not-allowed disabled:bg-zinc-50 ${
+                        errors.email
+                          ? "border-red-300 focus:border-red-500"
+                          : "border-stone-200 focus:border-zinc-900"
+                      }`}
+                    />
+                  </div>
+
+                  {errors.email && (
+                    <p className="mt-1.5 break-words text-xs text-red-600">
+                      {errors.email}
+                    </p>
+                  )}
+                </div>
+
+                {/* PASSWORD */}
+
+                <div>
+                  <label
+                    htmlFor="login-password"
+                    className="mb-1.5 block text-xs font-medium text-zinc-600"
+                  >
+                    Password
+                  </label>
+
+                  <div className="relative">
+                    <LockKeyhole
+                      size={16}
+                      className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+                    />
+
+                    <input
+                      id="login-password"
+                      type={
+                        showPassword
+                          ? "text"
+                          : "password"
+                      }
+                      value={form.password}
+                      onChange={(event) =>
+                        updateField(
+                          "password",
+                          event.target.value
+                        )
+                      }
+                      placeholder="Enter your password"
+                      autoComplete="current-password"
+                      disabled={loading}
+                      className={`h-11 w-full min-w-0 rounded-xl border bg-white pl-10 pr-11 text-sm text-zinc-900 outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:cursor-not-allowed disabled:bg-zinc-50 ${
+                        errors.password
+                          ? "border-red-300 focus:border-red-500"
+                          : "border-stone-200 focus:border-zinc-900"
+                      }`}
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowPassword(
+                          (current) => !current
+                        )
+                      }
+                      disabled={loading}
+                      className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center text-zinc-400 hover:text-zinc-900 disabled:cursor-not-allowed"
+                      aria-label={
+                        showPassword
+                          ? "Hide password"
+                          : "Show password"
+                      }
+                    >
+                      {showPassword ? (
+                        <EyeOff size={16} />
+                      ) : (
+                        <Eye size={16} />
+                      )}
+                    </button>
+                  </div>
+
+                  {errors.password && (
+                    <p className="mt-1.5 break-words text-xs text-red-600">
+                      {errors.password}
+                    </p>
+                  )}
+                </div>
+
+                {/* OPTIONS */}
+
+                <div className="flex flex-col gap-3 xs:flex-row xs:items-center xs:justify-between sm:flex-row sm:items-center sm:justify-between">
+
+                  <label className="flex w-fit cursor-pointer items-center gap-2 text-xs text-zinc-600">
+                    <input
+                      type="checkbox"
+                      checked={form.remember}
+                      onChange={(event) =>
+                        updateField(
+                          "remember",
+                          event.target.checked
+                        )
+                      }
+                      disabled={loading}
+                      className="h-4 w-4 shrink-0 rounded border-stone-300 accent-zinc-950"
+                    />
+
+                    <span className="whitespace-nowrap">
+                      Remember me
+                    </span>
+                  </label>
+
+                  <Link
+                    to="/forgot-password"
+                    className="w-fit text-xs font-semibold text-zinc-700 hover:text-[#987542]"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+
+                {/* SUBMIT */}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-zinc-950 px-4 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {loading
+                    ? "Signing in..."
+                    : "Sign In"}
+
+                  {!loading && (
+                    <ArrowRight
+                      size={16}
+                      className="shrink-0"
+                    />
+                  )}
+                </button>
+              </form>
+
+              {/* REGISTER */}
+
+              <p className="mt-6 text-center text-sm leading-6 text-zinc-500 sm:mt-7">
+                Don&apos;t have an account?{" "}
+
+                <Link
+                  to="/register"
+                  state={{
+                    from:
+                      location.state?.from ||
+                      localStorage.getItem(
+                        "resumely_after_login"
+                      ) ||
+                      undefined,
+                  }}
+                  className="font-semibold text-zinc-900 hover:text-[#987542]"
+                >
+                  Create one
+                </Link>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Login;
+
+========================================
+FILE: C:\Users\Asif\OneDrive\Desktop\resume-builder-saas\Frontend\src\pages\auth\Register.jsx
+========================================
+import {
+  ArrowRight,
+  CheckCircle2,
+  Eye,
+  EyeOff,
+  LockKeyhole,
+  Mail,
+  UserRound,
+} from "lucide-react";
+
+import {
+  Link,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+
+import { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+
+function Register() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const { register } = useAuth();
+
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // ---------------------------------------------------------
+  // INPUT UPDATE
+  // ---------------------------------------------------------
+
+  const updateField = (field, value) => {
+    setForm((current) => ({
+      ...current,
+      [field]: value,
+    }));
+
+    setErrors((current) => ({
+      ...current,
+      [field]: "",
+      form: "",
+    }));
+  };
+
+  // ---------------------------------------------------------
+  // VALIDATION
+  // ---------------------------------------------------------
+
+  const validate = () => {
+    const nextErrors = {};
+
+    if (!form.name.trim()) {
+      nextErrors.name = "Full name is required.";
+    } else if (form.name.trim().length < 2) {
+      nextErrors.name = "Enter your full name.";
+    }
+
+    if (!form.email.trim()) {
+      nextErrors.email = "Email is required.";
+    } else if (
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+        form.email.trim()
+      )
+    ) {
+      nextErrors.email = "Enter a valid email address.";
+    }
+
+    if (!form.password) {
+      nextErrors.password = "Password is required.";
+    } else if (form.password.length < 8) {
+      nextErrors.password =
+        "Use at least 8 characters.";
+    }
+
+    if (!form.confirmPassword) {
+      nextErrors.confirmPassword =
+        "Please confirm your password.";
+    } else if (
+      form.password !== form.confirmPassword
+    ) {
+      nextErrors.confirmPassword =
+        "Passwords do not match.";
+    }
+
+    return nextErrors;
+  };
+
+  // ---------------------------------------------------------
+  // REGISTER
+  // ---------------------------------------------------------
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const nextErrors = validate();
+
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      return;
+    }
+
+    setLoading(true);
+    setErrors({});
+
+    try {
+      await register({
+        name: form.name.trim(),
+        email: form.email.trim().toLowerCase(),
+        password: form.password,
+      });
+
+      // -----------------------------------------------------
+      // IMPORTANT:
+      // If user came from template selection,
+      // continue to builder after registration.
+      // -----------------------------------------------------
+
+      const destination =
+        location.state?.from ||
+        localStorage.getItem(
+          "resumely_after_login"
+        ) ||
+        "/dashboard";
+
+      localStorage.removeItem(
+        "resumely_after_login"
+      );
+
+      navigate(destination, {
+        replace: true,
+      });
+    } catch (error) {
+      setErrors({
+        form:
+          error?.message ||
+          "Unable to create your account. Please try again.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-[calc(100dvh-72px)] bg-[#f8f8f6]">
+      <div className="mx-auto flex min-h-[calc(100dvh-72px)] w-full max-w-[1440px] lg:grid lg:grid-cols-[0.9fr_1.1fr]">
+        {/* =====================================================
+            LEFT PREMIUM PANEL
+        ====================================================== */}
+
+        <div className="hidden flex-col justify-between border-r border-stone-200 bg-zinc-950 p-8 text-white lg:flex xl:p-14">
+          {/* LOGO */}
+
+          <Link
+            to="/"
+            className="flex w-fit items-center gap-3"
+          >
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-sm font-bold text-zinc-950">
+              R
+            </span>
+
+            <span className="text-lg font-semibold tracking-tight">
+              Resume
+              <span className="text-[#c6a36c]">
+                ly
+              </span>
+            </span>
+          </Link>
+
+          {/* CONTENT */}
+
+          <div className="my-auto max-w-lg py-10">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#c6a36c]">
+              Get started
+            </p>
+
+            <h1 className="mt-5 text-4xl font-semibold leading-[1.05] tracking-[-0.05em] xl:text-6xl">
+              Turn your experience into a resume that feels like you.
+            </h1>
+
+            <p className="mt-6 max-w-md text-sm leading-7 text-zinc-400">
+              Create your account and build a polished
+              resume with a focused editor and
+              professional templates.
+            </p>
+
+            <div className="mt-8 space-y-3">
+              {[
+                "Start with professional templates",
+                "Edit with a live preview",
+                "Create multiple resume versions",
+              ].map((item) => (
+                <div
+                  key={item}
+                  className="flex items-center gap-2.5 text-sm text-zinc-300"
+                >
+                  <CheckCircle2
+                    size={16}
+                    className="shrink-0 text-[#c6a36c]"
+                  />
+
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <p className="text-xs text-zinc-600">
+            Your career story starts here.
+          </p>
+        </div>
+
+        {/* =====================================================
+            RIGHT REGISTER PANEL
+        ====================================================== */}
+
+        <div className="flex min-w-0 items-center justify-center px-4 py-8 sm:px-6 sm:py-10 md:px-8 md:py-12 lg:px-10 xl:px-14">
+          <div className="w-full max-w-[440px]">
+            {/* MOBILE LOGO */}
+
+            <div className="mb-6 sm:mb-8 lg:hidden">
+              <Link
+                to="/"
+                className="flex w-fit items-center gap-3"
+              >
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-950 text-sm font-bold text-white">
+                  R
+                </span>
+
+                <span className="text-lg font-semibold tracking-tight">
+                  Resume
+                  <span className="text-[#b08d57]">
+                    ly
+                  </span>
+                </span>
+              </Link>
+            </div>
+
+            {/* REGISTER CARD */}
+
+            <div className="w-full rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_20px_60px_rgba(24,24,27,0.07)] sm:p-7 md:p-8">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#987542]">
+                Create account
+              </p>
+
+              <h2 className="mt-2 text-xl font-semibold tracking-[-0.035em] text-zinc-950 sm:text-2xl">
+                Create your account
+              </h2>
+
+              <p className="mt-2 text-sm leading-6 text-zinc-500">
+                Build your first professional resume.
+              </p>
+
+              {/* ERROR */}
+
+              {errors.form && (
+                <div className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-5 text-red-700">
+                  {errors.form}
+                </div>
+              )}
+
+              {/* FORM */}
+
+              <form
+                onSubmit={handleSubmit}
+                className="mt-6 space-y-4 sm:mt-7"
+                noValidate
+              >
+                {/* NAME */}
+
+                <div>
+                  <label
+                    htmlFor="register-name"
+                    className="mb-1.5 block text-xs font-medium text-zinc-600"
+                  >
+                    Full name
+                  </label>
+
+                  <div className="relative">
+                    <UserRound
+                      size={16}
+                      className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+                    />
+
+                    <input
+                      id="register-name"
+                      type="text"
+                      value={form.name}
+                      onChange={(event) =>
+                        updateField(
+                          "name",
+                          event.target.value
+                        )
+                      }
+                      placeholder="John Doe"
+                      autoComplete="name"
+                      disabled={loading}
+                      className={`h-11 w-full min-w-0 rounded-xl border bg-white pl-10 pr-3 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:bg-zinc-50 ${
+                        errors.name
+                          ? "border-red-300 focus:border-red-500"
+                          : "border-stone-200 focus:border-zinc-900"
+                      }`}
+                    />
+                  </div>
+
+                  {errors.name && (
+                    <p className="mt-1.5 text-xs text-red-600">
+                      {errors.name}
+                    </p>
+                  )}
+                </div>
+
+                {/* EMAIL */}
+
+                <div>
+                  <label
+                    htmlFor="register-email"
+                    className="mb-1.5 block text-xs font-medium text-zinc-600"
+                  >
+                    Email
+                  </label>
+
+                  <div className="relative">
+                    <Mail
+                      size={16}
+                      className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+                    />
+
+                    <input
+                      id="register-email"
+                      type="email"
+                      value={form.email}
+                      onChange={(event) =>
+                        updateField(
+                          "email",
+                          event.target.value
+                        )
+                      }
+                      placeholder="you@example.com"
+                      autoComplete="email"
+                      disabled={loading}
+                      className={`h-11 w-full min-w-0 rounded-xl border bg-white pl-10 pr-3 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:bg-zinc-50 ${
+                        errors.email
+                          ? "border-red-300 focus:border-red-500"
+                          : "border-stone-200 focus:border-zinc-900"
+                      }`}
+                    />
+                  </div>
+
+                  {errors.email && (
+                    <p className="mt-1.5 text-xs text-red-600">
+                      {errors.email}
+                    </p>
+                  )}
+                </div>
+
+                {/* PASSWORD */}
+
+                <div>
+                  <label
+                    htmlFor="register-password"
+                    className="mb-1.5 block text-xs font-medium text-zinc-600"
+                  >
+                    Password
+                  </label>
+
+                  <div className="relative">
+                    <LockKeyhole
+                      size={16}
+                      className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+                    />
+
+                    <input
+                      id="register-password"
+                      type={
+                        showPassword
+                          ? "text"
+                          : "password"
+                      }
+                      value={form.password}
+                      onChange={(event) =>
+                        updateField(
+                          "password",
+                          event.target.value
+                        )
+                      }
+                      placeholder="Create a password"
+                      autoComplete="new-password"
+                      disabled={loading}
+                      className={`h-11 w-full min-w-0 rounded-xl border bg-white pl-10 pr-11 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:bg-zinc-50 ${
+                        errors.password
+                          ? "border-red-300 focus:border-red-500"
+                          : "border-stone-200 focus:border-zinc-900"
+                      }`}
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowPassword(
+                          (current) => !current
+                        )
+                      }
+                      disabled={loading}
+                      className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center text-zinc-400 transition-colors hover:text-zinc-900"
+                      aria-label={
+                        showPassword
+                          ? "Hide password"
+                          : "Show password"
+                      }
+                    >
+                      {showPassword ? (
+                        <EyeOff size={16} />
+                      ) : (
+                        <Eye size={16} />
+                      )}
+                    </button>
+                  </div>
+
+                  {errors.password && (
+                    <p className="mt-1.5 text-xs text-red-600">
+                      {errors.password}
+                    </p>
+                  )}
+                </div>
+
+                {/* CONFIRM PASSWORD */}
+
+                <div>
+                  <label
+                    htmlFor="register-confirm-password"
+                    className="mb-1.5 block text-xs font-medium text-zinc-600"
+                  >
+                    Confirm password
+                  </label>
+
+                  <div className="relative">
+                    <LockKeyhole
+                      size={16}
+                      className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+                    />
+
+                    <input
+                      id="register-confirm-password"
+                      type={
+                        showConfirmPassword
+                          ? "text"
+                          : "password"
+                      }
+                      value={form.confirmPassword}
+                      onChange={(event) =>
+                        updateField(
+                          "confirmPassword",
+                          event.target.value
+                        )
+                      }
+                      placeholder="Confirm your password"
+                      autoComplete="new-password"
+                      disabled={loading}
+                      className={`h-11 w-full min-w-0 rounded-xl border bg-white pl-10 pr-11 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:bg-zinc-50 ${
+                        errors.confirmPassword
+                          ? "border-red-300 focus:border-red-500"
+                          : "border-stone-200 focus:border-zinc-900"
+                      }`}
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowConfirmPassword(
+                          (current) => !current
+                        )
+                      }
+                      disabled={loading}
+                      className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center text-zinc-400 transition-colors hover:text-zinc-900"
+                      aria-label={
+                        showConfirmPassword
+                          ? "Hide password"
+                          : "Show password"
+                      }
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff size={16} />
+                      ) : (
+                        <Eye size={16} />
+                      )}
+                    </button>
+                  </div>
+
+                  {errors.confirmPassword && (
+                    <p className="mt-1.5 text-xs text-red-600">
+                      {errors.confirmPassword}
+                    </p>
+                  )}
+                </div>
+
+                {/* SUBMIT */}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-zinc-950 px-4 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {loading
+                    ? "Creating account..."
+                    : "Create Account"}
+
+                  {!loading && (
+                    <ArrowRight
+                      size={16}
+                      className="shrink-0"
+                    />
+                  )}
+                </button>
+              </form>
+
+              {/* LOGIN */}
+
+              <p className="mt-6 text-center text-sm leading-6 text-zinc-500 sm:mt-7">
+                Already have an account?{" "}
+
+                <Link
+                  to="/login"
+                  state={{
+                    from:
+                      location.state?.from ||
+                      localStorage.getItem(
+                        "resumely_after_login"
+                      ) ||
+                      undefined,
+                  }}
+                  className="font-semibold text-zinc-900 hover:text-[#987542]"
+                >
+                  Sign in
+                </Link>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Register;
+
+========================================
+FILE: C:\Users\Asif\OneDrive\Desktop\resume-builder-saas\Frontend\src\pages\auth\ResetPassword.jsx
+========================================
+import {
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle2,
+  Eye,
+  EyeOff,
+  LockKeyhole,
+} from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+
+function ResetPassword() {
+  const navigate = useNavigate();
+
+  const [form, setForm] = useState({
+    password: "",
+    confirmPassword: "",
+  });
+
+  const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+
+  const updateField = (field, value) => {
+    setForm((current) => ({
+      ...current,
+      [field]: value,
+    }));
+
+    setErrors((current) => ({
+      ...current,
+      [field]: "",
+    }));
+  };
+
+  const validate = () => {
+    const nextErrors = {};
+
+    if (!form.password) {
+      nextErrors.password = "New password is required.";
+    } else if (form.password.length < 8) {
+      nextErrors.password = "Use at least 8 characters.";
+    }
+
+    if (!form.confirmPassword) {
+      nextErrors.confirmPassword = "Please confirm your password.";
+    } else if (form.password !== form.confirmPassword) {
+      nextErrors.confirmPassword = "Passwords do not match.";
+    }
+
+    return nextErrors;
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    const nextErrors = validate();
+
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      return;
+    }
+
+    setLoading(true);
+
+    window.setTimeout(() => {
+      setLoading(false);
+      setSuccess(true);
+    }, 700);
+  };
+
+  return (
+    <div className="min-h-[calc(100dvh-64px)] bg-[#f8f8f6] sm:min-h-[calc(100dvh-72px)]">
+      <div className="mx-auto flex min-h-[calc(100dvh-64px)] w-full max-w-[760px] items-center justify-center px-4 py-8 sm:min-h-[calc(100dvh-72px)] sm:px-6 sm:py-10 md:px-8 md:py-12">
+        <div className="w-full max-w-[460px]">
+          {/* BACK TO LOGIN */}
+          <Link
+            to="/login"
+            className="mb-5 inline-flex items-center gap-2 text-xs font-medium text-zinc-500 transition-colors hover:text-zinc-950 sm:mb-7"
+          >
+            <ArrowLeft size={14} />
+            <span>Back to login</span>
+          </Link>
+
+          {/* CARD */}
+          <div className="w-full rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_20px_60px_rgba(24,24,27,0.07)] sm:p-7 md:p-9">
+            {!success ? (
+              <>
+                {/* ICON */}
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-zinc-950 text-white">
+                  <LockKeyhole size={19} />
+                </div>
+
+                {/* HEADING */}
+                <p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#987542] sm:mt-7 sm:text-xs">
+                  Secure your account
+                </p>
+
+                <h1 className="mt-2 text-[22px] font-semibold leading-tight tracking-[-0.035em] text-zinc-950 sm:text-2xl">
+                  Create a new password
+                </h1>
+
+                <p className="mt-2 text-sm leading-6 text-zinc-500">
+                  Choose a strong password for your account.
+                </p>
+
+                {/* FORM */}
+                <form
+                  onSubmit={handleSubmit}
+                  className="mt-6 space-y-5 sm:mt-7"
+                  noValidate
+                >
+                  {/* NEW PASSWORD */}
+                  <div>
+                    <label
+                      htmlFor="reset-password"
+                      className="mb-1.5 block text-xs font-medium text-zinc-600"
+                    >
+                      New password
+                    </label>
+
+                    <div className="relative">
+                      <LockKeyhole
+                        size={16}
+                        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+                      />
+
+                      <input
+                        id="reset-password"
+                        type={showPassword ? "text" : "password"}
+                        value={form.password}
+                        onChange={(event) =>
+                          updateField("password", event.target.value)
+                        }
+                        placeholder="Enter new password"
+                        autoComplete="new-password"
+                        className={`h-11 w-full min-w-0 rounded-xl border bg-white pl-10 pr-11 text-sm outline-none transition-colors focus:ring-2 focus:ring-zinc-900/5 ${
+                          errors.password
+                            ? "border-red-300"
+                            : "border-stone-200 focus:border-zinc-900"
+                        }`}
+                      />
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowPassword((current) => !current)
+                        }
+                        className="absolute right-0 top-0 flex h-11 w-11 shrink-0 items-center justify-center text-zinc-400 transition-colors hover:text-zinc-900"
+                        aria-label={
+                          showPassword
+                            ? "Hide password"
+                            : "Show password"
+                        }
+                      >
+                        {showPassword ? (
+                          <EyeOff size={16} />
+                        ) : (
+                          <Eye size={16} />
+                        )}
+                      </button>
+                    </div>
+
+                    {errors.password && (
+                      <p className="mt-1.5 text-xs leading-5 text-red-600">
+                        {errors.password}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* CONFIRM PASSWORD */}
+                  <div>
+                    <label
+                      htmlFor="reset-confirm-password"
+                      className="mb-1.5 block text-xs font-medium text-zinc-600"
+                    >
+                      Confirm password
+                    </label>
+
+                    <div className="relative">
+                      <LockKeyhole
+                        size={16}
+                        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+                      />
+
+                      <input
+                        id="reset-confirm-password"
+                        type={showConfirmPassword ? "text" : "password"}
+                        value={form.confirmPassword}
+                        onChange={(event) =>
+                          updateField(
+                            "confirmPassword",
+                            event.target.value
+                          )
+                        }
+                        placeholder="Confirm new password"
+                        autoComplete="new-password"
+                        className={`h-11 w-full min-w-0 rounded-xl border bg-white pl-10 pr-11 text-sm outline-none transition-colors focus:ring-2 focus:ring-zinc-900/5 ${
+                          errors.confirmPassword
+                            ? "border-red-300"
+                            : "border-stone-200 focus:border-zinc-900"
+                        }`}
+                      />
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowConfirmPassword(
+                            (current) => !current
+                          )
+                        }
+                        className="absolute right-0 top-0 flex h-11 w-11 shrink-0 items-center justify-center text-zinc-400 transition-colors hover:text-zinc-900"
+                        aria-label={
+                          showConfirmPassword
+                            ? "Hide confirm password"
+                            : "Show confirm password"
+                        }
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff size={16} />
+                        ) : (
+                          <Eye size={16} />
+                        )}
+                      </button>
+                    </div>
+
+                    {errors.confirmPassword && (
+                      <p className="mt-1.5 text-xs leading-5 text-red-600">
+                        {errors.confirmPassword}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* SUBMIT BUTTON */}
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-zinc-950 px-4 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    <span>
+                      {loading ? "Updating..." : "Reset Password"}
+                    </span>
+
+                    {!loading && <ArrowRight size={16} />}
+                  </button>
+                </form>
+              </>
+            ) : (
+              /* SUCCESS STATE */
+              <div className="text-center">
+                <div className="mx-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+                  <CheckCircle2 size={23} />
+                </div>
+
+                <p className="mt-5 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#987542] sm:mt-6 sm:text-xs">
+                  Password updated
+                </p>
+
+                <h1 className="mt-2 text-[22px] font-semibold leading-tight tracking-[-0.035em] text-zinc-950 sm:text-2xl">
+                  You&apos;re ready to sign in
+                </h1>
+
+                <p className="mx-auto mt-3 max-w-[360px] text-sm leading-6 text-zinc-500">
+                  Your new password has been accepted by this frontend flow.
+                </p>
+
+                <p className="mx-auto mt-3 max-w-[360px] text-xs leading-5 text-zinc-400">
+                  Real password persistence will be connected when the
+                  backend authentication API is integrated.
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() => navigate("/login")}
+                  className="mt-6 flex h-11 w-full items-center justify-center rounded-xl bg-zinc-950 px-4 text-sm font-semibold text-white transition hover:bg-zinc-800 sm:mt-7"
+                >
+                  Continue to login
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default ResetPassword;
+
+========================================
+FILE: C:\Users\Asif\OneDrive\Desktop\resume-builder-saas\Frontend\src\routes\AppRoutes.jsx
+========================================
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
+
+import { useEffect } from "react";
+
+import PublicLayout from "../layouts/PublicLayout";
+import DashboardLayout from "../layouts/DashboardLayout";
+
+import ProtectedRoute from "./ProtectedRoute";
+import TemplateRouteLayout from "./TemplateRouteLayout";
+
+/* =========================================================
+   SCROLL TO TOP
+========================================================= */
+
+function ScrollToTop() {
+  const { pathname, search } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "instant",
+    });
+  }, [pathname, search]);
+
+  return null;
+}
+
+/* =========================================================
+   LANDING
+========================================================= */
+
+import Home from "../pages/landing/Home";
+import TemplateShowcase from "../pages/landing/TemplateShowcase";
+import Pricing from "../pages/landing/Pricing";
+import About from "../pages/landing/About";
+import HowItWorks from "../pages/landing/HowItWorks";
+import CoverLetter from "../pages/landing/CoverLetter";
+
+/* =========================================================
+   AUTH
+========================================================= */
+
+import Login from "../pages/auth/Login";
+import Register from "../pages/auth/Register";
+import ForgotPassword from "../pages/auth/ForgotPassword";
+import ResetPassword from "../pages/auth/ResetPassword";
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+import Dashboard from "../pages/dashboard/Dashboard";
+import Resumes from "../pages/dashboard/Resumes";
+import CoverLetters from "../pages/dashboard/CoverLetters";
+import Profile from "../pages/dashboard/Profile";
+import Settings from "../pages/dashboard/Settings";
+
+/* =========================================================
+   RESUME BUILDER
+========================================================= */
+
+import Builder from "../pages/builder/Builder";
+
+/* =========================================================
+   ACTUAL RESUME TEMPLATES
+========================================================= */
+
+import Templates from "../pages/templates/Templates";
+import TemplateDetails from "../pages/templates/TemplateDetails";
+
+/* =========================================================
+   COVER LETTER
+========================================================= */
+
+import CoverLetterTemplates from "../pages/templates/CoverLetterTemplates";
+import CoverLetterBuilder from "../pages/coverLetters/CoverLetterBuilder";
+
+/* =========================================================
+   TEMPLATE ENTRY
+========================================================= */
+
+/*
+  Guest:
+    /templates → TemplateShowcase
+
+  Logged in:
+    /templates → Actual Templates
+*/
+
+function TemplateEntry() {
+  const isAuthenticated = Boolean(
+    localStorage.getItem("resumely_token"),
+  );
+
+  if (isAuthenticated) {
+    return <Templates />;
+  }
+
+  return <TemplateShowcase />;
+}
+
+/* =========================================================
+   404
+========================================================= */
+
+function NotFound() {
+  return (
+    <div className="flex min-h-[70vh] items-center justify-center bg-[#f7f7f5] px-6 text-center">
+      <div>
+        <p className="text-sm font-semibold text-[#ae8954]">
+          404
+        </p>
+
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-950">
+          Page not found
+        </h1>
+
+        <p className="mt-3 text-sm text-zinc-500">
+          The page you're looking for doesn't exist.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================
+   APP ROUTES
+========================================================= */
+
+function AppRoutes() {
+  return (
+    <BrowserRouter>
+      <ScrollToTop />
+
+      <Routes>
+        {/* =====================================================
+            PUBLIC WEBSITE
+        ====================================================== */}
+
+        <Route element={<PublicLayout />}>
+          {/* HOME */}
+
+          <Route
+            path="/"
+            element={<Home />}
+          />
+
+          {/* COVER LETTER */}
+
+          <Route
+            path="/cover-letter"
+            element={<CoverLetter />}
+          />
+
+          {/* ABOUT */}
+
+          <Route
+            path="/about"
+            element={<About />}
+          />
+
+          {/* HOW IT WORKS */}
+
+          <Route
+            path="/how-it-works"
+            element={<HowItWorks />}
+          />
+
+          {/* PRICING */}
+
+          <Route
+            path="/pricing"
+            element={<Pricing />}
+          />
+
+          {/* =================================================
+              AUTH
+          ================================================= */}
+
+          <Route
+            path="/login"
+            element={<Login />}
+          />
+
+          <Route
+            path="/register"
+            element={<Register />}
+          />
+
+          <Route
+            path="/forgot-password"
+            element={<ForgotPassword />}
+          />
+
+          <Route
+            path="/reset-password"
+            element={<ResetPassword />}
+          />
+
+          {/* =================================================
+              PUBLIC TEMPLATE SHOWCASE
+
+              This URL always shows the landing showcase.
+          ================================================= */}
+
+          <Route
+            path="/resume-templates"
+            element={<TemplateShowcase />}
+          />
+        </Route>
+
+        {/* =====================================================
+            SMART TEMPLATE ROUTES
+
+            Guest:
+              Public Navbar + Template Showcase
+
+            Logged in:
+              Dashboard Sidebar + Dashboard Topbar
+              + Actual Templates
+        ====================================================== */}
+
+        <Route element={<TemplateRouteLayout />}>
+          {/* =================================================
+              TEMPLATE ENTRY
+          ================================================= */}
+
+          <Route
+            path="/templates"
+            element={<TemplateEntry />}
+          />
+
+          {/* =================================================
+              ACTUAL TEMPLATE LIBRARY
+          ================================================= */}
+
+          <Route
+            path="/templates/all"
+            element={<Templates />}
+          />
+
+          {/* =================================================
+              INDIVIDUAL TEMPLATE
+          ================================================= */}
+
+          <Route
+            path="/templates/:templateId"
+            element={<TemplateDetails />}
+          />
+
+          {/* =================================================
+              COVER LETTER TEMPLATES
+          ================================================= */}
+
+          <Route
+            path="/cover-letter-templates"
+            element={<CoverLetterTemplates />}
+          />
+        </Route>
+
+        {/* =====================================================
+            PROTECTED APPLICATION
+        ====================================================== */}
+
+        <Route element={<ProtectedRoute />}>
+          {/* =================================================
+              DASHBOARD
+          ================================================= */}
+
+          <Route element={<DashboardLayout />}>
+            <Route
+              path="/dashboard"
+              element={<Dashboard />}
+            />
+
+            <Route
+              path="/dashboard/resumes"
+              element={<Resumes />}
+            />
+
+            <Route
+              path="/dashboard/cover-letters"
+              element={<CoverLetters />}
+            />
+
+            <Route
+              path="/dashboard/profile"
+              element={<Profile />}
+            />
+
+            <Route
+              path="/dashboard/settings"
+              element={<Settings />}
+            />
+          </Route>
+
+          {/* =================================================
+              RESUME BUILDER
+          ================================================= */}
+
+          <Route
+            path="/builder"
+            element={<Builder />}
+          />
+
+          <Route
+            path="/builder/:resumeId"
+            element={<Builder />}
+          />
+
+          {/* =================================================
+              COVER LETTER BUILDER
+          ================================================= */}
+
+          <Route
+            path="/cover-letter-builder"
+            element={<CoverLetterBuilder />}
+          />
+        </Route>
+
+        {/* =====================================================
+            404
+        ====================================================== */}
+
+        <Route
+          path="*"
+          element={<NotFound />}
+        />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default AppRoutes;
+
+========================================
+FILE: C:\Users\Asif\OneDrive\Desktop\resume-builder-saas\Frontend\src\routes\ProtectedRoute.jsx
+========================================
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+
+function ProtectedRoute() {
+  const location = useLocation();
+
+  const token = localStorage.getItem("resumely_token");
+
+  if (!token) {
+    const destination =
+      location.pathname +
+      location.search +
+      location.hash;
+
+    return (
+      <Navigate
+        to="/login"
+        replace
+        state={{
+          from: destination,
+        }}
+      />
+    );
+  }
+
+  return <Outlet />;
+}
+
+export default ProtectedRoute;
+
+========================================
+FILE: C:\Users\Asif\OneDrive\Desktop\resume-builder-saas\Frontend\src\routes\TemplateRouteLayout.jsx
+========================================
+import { Outlet } from "react-router-dom";
+
+import Navbar from "../components/layout/Navbar";
+import DashboardLayout from "../layouts/DashboardLayout";
+import Footer from "../layouts/Footer";
+
+function TemplateRouteLayout() {
+  const isAuthenticated = Boolean(
+    localStorage.getItem("resumely_token"),
+  );
+
+  /*
+    =========================================================
+    GUEST
+    =========================================================
+
+    /templates
+    /templates/:templateId
+
+    -> Public Navbar
+    -> Template Content
+    -> Public Footer
+
+
+    =========================================================
+    LOGGED IN
+    =========================================================
+
+    /templates
+    /templates/:templateId
+
+    -> Dashboard Sidebar
+    -> Dashboard Topbar
+    -> Template Content
+  */
+
+  if (isAuthenticated) {
+    return <DashboardLayout />;
+  }
+
+  return (
+    <div className="min-h-screen bg-[#f8f8f6] text-zinc-900">
+      <Navbar />
+
+      <main>
+        <Outlet />
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
+
+export default TemplateRouteLayout;
+
+========================================
+FILE: C:\Users\Asif\OneDrive\Desktop\resume-builder-saas\Frontend\src\services\api.js
+========================================
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  "http://localhost:5000/api";
+
+export async function apiRequest(path, options = {}) {
+  const token = localStorage.getItem("resumely_token");
+
+  const isFormData =
+    typeof FormData !== "undefined" &&
+    options.body instanceof FormData;
+
+  const headers = {
+    ...(isFormData
+      ? {}
+      : {
+          "Content-Type": "application/json",
+        }),
+    ...(options.headers || {}),
+  };
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  let response;
+
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      ...options,
+      headers,
+    });
+  } catch (error) {
+    console.error("API Network Error:", error);
+
+    throw new Error(
+      `Unable to connect to the server. Please make sure the backend is running on ${API_BASE_URL}.`,
+    );
+  }
+
+  const contentType =
+    response.headers.get("content-type") || "";
+
+  let payload;
+
+  try {
+    payload = contentType.includes("application/json")
+      ? await response.json()
+      : await response.text();
+  } catch {
+    payload = null;
+  }
+
+  if (!response.ok) {
+    const message =
+      typeof payload === "object" && payload?.message
+        ? payload.message
+        : `Request failed with status ${response.status}.`;
+
+    throw new Error(message);
+  }
+
+  return payload;
+}
+
+export { API_BASE_URL };
+
+========================================
+FILE: C:\Users\Asif\OneDrive\Desktop\resume-builder-saas\Frontend\src\services\authService.js
+========================================
+import { apiRequest } from "./api";
+
+/* =========================================================
+   REGISTER
+========================================================= */
+
+export async function registerUser(payload) {
+  const result = await apiRequest("/auth/register", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+  if (result.token) {
+    localStorage.setItem(
+      "resumely_token",
+      result.token,
+    );
+
+    localStorage.setItem(
+      "resumely_user",
+      JSON.stringify(result.user),
+    );
+  }
+
+  return result;
+}
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+export async function loginUser(payload) {
+  const result = await apiRequest("/auth/login", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+  if (result.token) {
+    localStorage.setItem(
+      "resumely_token",
+      result.token,
+    );
+
+    localStorage.setItem(
+      "resumely_user",
+      JSON.stringify(result.user),
+    );
+  }
+
+  return result;
+}
+
+/* =========================================================
+   CURRENT USER
+========================================================= */
+
+export async function getCurrentUser() {
+  return apiRequest("/auth/me");
+}
+
+/* =========================================================
+   UPDATE PROFILE
+========================================================= */
+
+export async function updateProfile(payload) {
+  const result = await apiRequest(
+    "/auth/profile",
+    {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    },
+  );
+
+  if (result?.user) {
+    localStorage.setItem(
+      "resumely_user",
+      JSON.stringify(result.user),
+    );
+  }
+
+  return result;
+}
+
+/* =========================================================
+   CHANGE PASSWORD
+========================================================= */
+
+export async function changePassword(payload) {
+  return apiRequest(
+    "/auth/password",
+    {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    },
+  );
+}
+
+/* =========================================================
+   GET SETTINGS
+========================================================= */
+
+export async function getUserSettings() {
+  return apiRequest(
+    "/auth/settings",
+  );
+}
+
+/* =========================================================
+   UPDATE SETTINGS
+========================================================= */
+
+export async function updateUserSettings(
+  settings,
+) {
+  return apiRequest(
+    "/auth/settings",
+    {
+      method: "PUT",
+      body: JSON.stringify({
+        settings,
+      }),
+    },
+  );
+}
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+export function logoutUser() {
+  localStorage.removeItem(
+    "resumely_token",
+  );
+
+  localStorage.removeItem(
+    "resumely_user",
+  );
+}
+
+========================================
+FILE: C:\Users\Asif\OneDrive\Desktop\resume-builder-saas\Frontend\src\services\coverLetterService.js
+========================================
+import { apiRequest } from "./api";
+
+export function createCoverLetter(payload) {
+  return apiRequest("/cover-letters", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function getCoverLettersFromApi() {
+  return apiRequest("/cover-letters");
+}
+
+export function getCoverLetterFromApi(id) {
+  return apiRequest(`/cover-letters/${encodeURIComponent(id)}`);
+}
+
+export function updateCoverLetterOnApi(id, payload) {
+  return apiRequest(`/cover-letters/${encodeURIComponent(id)}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deleteCoverLetterFromApi(id) {
+  return apiRequest(`/cover-letters/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+  });
+}
+
+export function duplicateCoverLetterOnApi(id) {
+  return apiRequest(
+    `/cover-letters/${encodeURIComponent(id)}/duplicate`,
+    {
+      method: "POST",
+    },
+  );
+}
+
+========================================
+FILE: C:\Users\Asif\OneDrive\Desktop\resume-builder-saas\Frontend\src\services\importService.js
+========================================
+import { apiRequest } from "./api";
+
+export async function importResume(file) {
+  const formData = new FormData();
+
+  formData.append("file", file);
+
+  return apiRequest("/import/resume", {
+    method: "POST",
+    body: formData,
+  });
+}
+
+export async function importCoverLetter(file) {
+  const formData = new FormData();
+
+  formData.append("file", file);
+
+  return apiRequest("/import/cover-letter", {
+    method: "POST",
+    body: formData,
+  });
+}
+
+========================================
+FILE: C:\Users\Asif\OneDrive\Desktop\resume-builder-saas\Frontend\src\services\resumeService.js
+========================================
+import { apiRequest } from "./api";
+
+export function createResume(payload) {
+  return apiRequest("/resumes", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function getResumesFromApi() {
+  return apiRequest("/resumes");
+}
+
+export function getResumeFromApi(id) {
+  return apiRequest(`/resumes/${encodeURIComponent(id)}`);
+}
+
+export function updateResumeOnApi(id, payload) {
+  return apiRequest(`/resumes/${encodeURIComponent(id)}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deleteResumeFromApi(id) {
+  return apiRequest(`/resumes/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+  });
+}
+
+export function duplicateResumeOnApi(id) {
+  return apiRequest(
+    `/resumes/${encodeURIComponent(id)}/duplicate`,
+    {
+      method: "POST",
+    },
+  );
+}

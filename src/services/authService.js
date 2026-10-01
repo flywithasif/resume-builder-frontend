@@ -5,17 +5,27 @@ import { apiRequest } from "./api";
 ========================================================= */
 
 export async function registerUser(payload) {
-  const result = await apiRequest("/auth/register", {
+  return apiRequest("/auth/register", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+/* =========================================================
+   VERIFY EMAIL OTP
+========================================================= */
+
+export async function verifyEmailOtp(payload) {
+  const result = await apiRequest("/auth/verify-email", {
     method: "POST",
     body: JSON.stringify(payload),
   });
 
-  if (result.token) {
-    localStorage.setItem(
-      "resumely_token",
-      result.token,
-    );
+  if (result?.token) {
+    localStorage.setItem("resumely_token", result.token);
+  }
 
+  if (result?.user) {
     localStorage.setItem(
       "resumely_user",
       JSON.stringify(result.user),
@@ -23,6 +33,17 @@ export async function registerUser(payload) {
   }
 
   return result;
+}
+
+/* =========================================================
+   RESEND EMAIL OTP
+========================================================= */
+
+export async function resendEmailOtp(payload) {
+  return apiRequest("/auth/resend-email-otp", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
 }
 
 /* =========================================================
@@ -35,12 +56,11 @@ export async function loginUser(payload) {
     body: JSON.stringify(payload),
   });
 
-  if (result.token) {
-    localStorage.setItem(
-      "resumely_token",
-      result.token,
-    );
+  if (result?.token) {
+    localStorage.setItem("resumely_token", result.token);
+  }
 
+  if (result?.user) {
     localStorage.setItem(
       "resumely_user",
       JSON.stringify(result.user),
@@ -48,6 +68,39 @@ export async function loginUser(payload) {
   }
 
   return result;
+}
+
+/* =========================================================
+   FORGOT PASSWORD
+========================================================= */
+
+export async function forgotPassword(payload) {
+  return apiRequest("/auth/forgot-password", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+/* =========================================================
+   VERIFY RESET OTP
+========================================================= */
+
+export async function verifyResetOtp(payload) {
+  return apiRequest("/auth/verify-reset-otp", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+/* =========================================================
+   RESET PASSWORD
+========================================================= */
+
+export async function resetPassword(payload) {
+  return apiRequest("/auth/reset-password", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
 }
 
 /* =========================================================
@@ -63,13 +116,10 @@ export async function getCurrentUser() {
 ========================================================= */
 
 export async function updateProfile(payload) {
-  const result = await apiRequest(
-    "/auth/profile",
-    {
-      method: "PUT",
-      body: JSON.stringify(payload),
-    },
-  );
+  const result = await apiRequest("/auth/profile", {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
 
   if (result?.user) {
     localStorage.setItem(
@@ -86,13 +136,10 @@ export async function updateProfile(payload) {
 ========================================================= */
 
 export async function changePassword(payload) {
-  return apiRequest(
-    "/auth/password",
-    {
-      method: "PUT",
-      body: JSON.stringify(payload),
-    },
-  );
+  return apiRequest("/auth/password", {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
 }
 
 /* =========================================================
@@ -100,27 +147,20 @@ export async function changePassword(payload) {
 ========================================================= */
 
 export async function getUserSettings() {
-  return apiRequest(
-    "/auth/settings",
-  );
+  return apiRequest("/auth/settings");
 }
 
 /* =========================================================
    UPDATE SETTINGS
 ========================================================= */
 
-export async function updateUserSettings(
-  settings,
-) {
-  return apiRequest(
-    "/auth/settings",
-    {
-      method: "PUT",
-      body: JSON.stringify({
-        settings,
-      }),
-    },
-  );
+export async function updateUserSettings(settings) {
+  return apiRequest("/auth/settings", {
+    method: "PUT",
+    body: JSON.stringify({
+      settings,
+    }),
+  });
 }
 
 /* =========================================================
@@ -128,11 +168,8 @@ export async function updateUserSettings(
 ========================================================= */
 
 export function logoutUser() {
-  localStorage.removeItem(
-    "resumely_token",
-  );
-
-  localStorage.removeItem(
-    "resumely_user",
-  );
+  localStorage.removeItem("resumely_token");
+  localStorage.removeItem("resumely_user");
+  localStorage.removeItem("resumely_pending_email");
+  localStorage.removeItem("resumely_reset_email");
 }

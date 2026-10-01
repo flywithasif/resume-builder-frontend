@@ -49,6 +49,8 @@ import CoverLetter from "../pages/landing/CoverLetter";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import ForgotPassword from "../pages/auth/ForgotPassword";
+import VerifyEmail from "../pages/auth/VerifyEmail";
+import VerifyResetOtp from "../pages/auth/VerifyResetOtp";
 import ResetPassword from "../pages/auth/ResetPassword";
 
 /* =========================================================
@@ -193,10 +195,28 @@ function AppRoutes() {
             element={<Register />}
           />
 
+          {/* EMAIL VERIFICATION */}
+
+          <Route
+            path="/verify-email"
+            element={<VerifyEmail />}
+          />
+
+          {/* FORGOT PASSWORD */}
+
           <Route
             path="/forgot-password"
             element={<ForgotPassword />}
           />
+
+          {/* RESET PASSWORD OTP */}
+
+          <Route
+            path="/verify-reset-otp"
+            element={<VerifyResetOtp />}
+          />
+
+          {/* RESET PASSWORD */}
 
           <Route
             path="/reset-password"

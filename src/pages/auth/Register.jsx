@@ -5,6 +5,7 @@ import {
   EyeOff,
   LockKeyhole,
   Mail,
+  Phone,
   UserRound,
 } from "lucide-react";
 
@@ -26,6 +27,7 @@ function Register() {
   const [form, setForm] = useState({
     name: "",
     email: "",
+    phone: "",
     password: "",
     confirmPassword: "",
   });
@@ -36,9 +38,9 @@ function Register() {
     useState(false);
   const [loading, setLoading] = useState(false);
 
-  // ---------------------------------------------------------
-  // INPUT UPDATE
-  // ---------------------------------------------------------
+  /* =========================================================
+     INPUT UPDATE
+  ========================================================= */
 
   const updateField = (field, value) => {
     setForm((current) => ({
@@ -53,9 +55,9 @@ function Register() {
     }));
   };
 
-  // ---------------------------------------------------------
-  // VALIDATION
-  // ---------------------------------------------------------
+  /* =========================================================
+     VALIDATION
+  ========================================================= */
 
   const validate = () => {
     const nextErrors = {};
@@ -70,10 +72,25 @@ function Register() {
       nextErrors.email = "Email is required.";
     } else if (
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-        form.email.trim()
+        form.email.trim(),
       )
     ) {
       nextErrors.email = "Enter a valid email address.";
+    }
+
+    const phoneDigits = form.phone.replace(/\D/g, "");
+
+    if (!phoneDigits) {
+      nextErrors.phone = "Mobile number is required.";
+    } else if (
+      !(
+        phoneDigits.length === 10 ||
+        (phoneDigits.length === 12 &&
+          phoneDigits.startsWith("91"))
+      )
+    ) {
+      nextErrors.phone =
+        "Enter a valid 10-digit mobile number.";
     }
 
     if (!form.password) {
@@ -96,9 +113,9 @@ function Register() {
     return nextErrors;
   };
 
-  // ---------------------------------------------------------
-  // REGISTER
-  // ---------------------------------------------------------
+  /* =========================================================
+     REGISTER
+  ========================================================= */
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -114,32 +131,33 @@ function Register() {
     setErrors({});
 
     try {
-      await register({
+      const result = await register({
         name: form.name.trim(),
         email: form.email.trim().toLowerCase(),
+        phone: form.phone.trim(),
         password: form.password,
+        confirmPassword: form.confirmPassword,
       });
 
-      // -----------------------------------------------------
-      // IMPORTANT:
-      // If user came from template selection,
-      // continue to builder after registration.
-      // -----------------------------------------------------
-
-      const destination =
-        location.state?.from ||
-        localStorage.getItem(
-          "resumely_after_login"
-        ) ||
-        "/dashboard";
-
-      localStorage.removeItem(
-        "resumely_after_login"
+      localStorage.setItem(
+        "resumely_pending_email",
+        form.email.trim().toLowerCase(),
       );
 
-      navigate(destination, {
+      navigate("/verify-email", {
         replace: true,
+        state: {
+          email: form.email.trim().toLowerCase(),
+          from:
+            location.state?.from ||
+            localStorage.getItem(
+              "resumely_after_login",
+            ) ||
+            "/dashboard",
+        },
       });
+
+      return result;
     } catch (error) {
       setErrors({
         form:
@@ -159,13 +177,11 @@ function Register() {
         ====================================================== */}
 
         <div className="hidden flex-col justify-between border-r border-stone-200 bg-zinc-950 p-8 text-white lg:flex xl:p-14">
-          {/* LOGO */}
-
           <Link
             to="/"
             className="flex w-fit items-center gap-3"
           >
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-sm font-bold text-zinc-950">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-sm font-bold text-zinc-950">
               R
             </span>
 
@@ -177,8 +193,6 @@ function Register() {
             </span>
           </Link>
 
-          {/* CONTENT */}
-
           <div className="my-auto max-w-lg py-10">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#c6a36c]">
               Get started
@@ -189,9 +203,8 @@ function Register() {
             </h1>
 
             <p className="mt-6 max-w-md text-sm leading-7 text-zinc-400">
-              Create your account and build a polished
-              resume with a focused editor and
-              professional templates.
+              Create your account and build a polished resume
+              with a focused editor and professional templates.
             </p>
 
             <div className="mt-8 space-y-3">
@@ -228,12 +241,12 @@ function Register() {
           <div className="w-full max-w-[440px]">
             {/* MOBILE LOGO */}
 
-            <div className="mb-6 sm:mb-8 lg:hidden">
+            <div className="mb-6 lg:hidden">
               <Link
                 to="/"
                 className="flex w-fit items-center gap-3"
               >
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-950 text-sm font-bold text-white">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-950 text-sm font-bold text-white">
                   R
                 </span>
 
@@ -245,8 +258,6 @@ function Register() {
                 </span>
               </Link>
             </div>
-
-            {/* REGISTER CARD */}
 
             <div className="w-full rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_20px_60px_rgba(24,24,27,0.07)] sm:p-7 md:p-8">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#987542]">
@@ -261,19 +272,15 @@ function Register() {
                 Build your first professional resume.
               </p>
 
-              {/* ERROR */}
-
               {errors.form && (
                 <div className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-5 text-red-700">
                   {errors.form}
                 </div>
               )}
 
-              {/* FORM */}
-
               <form
                 onSubmit={handleSubmit}
-                className="mt-6 space-y-4 sm:mt-7"
+                className="mt-6 space-y-4"
                 noValidate
               >
                 {/* NAME */}
@@ -299,15 +306,15 @@ function Register() {
                       onChange={(event) =>
                         updateField(
                           "name",
-                          event.target.value
+                          event.target.value,
                         )
                       }
                       placeholder="John Doe"
                       autoComplete="name"
                       disabled={loading}
-                      className={`h-11 w-full min-w-0 rounded-xl border bg-white pl-10 pr-3 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:bg-zinc-50 ${
+                      className={`h-11 w-full rounded-xl border bg-white pl-10 pr-3 text-sm outline-none ${
                         errors.name
-                          ? "border-red-300 focus:border-red-500"
+                          ? "border-red-300"
                           : "border-stone-200 focus:border-zinc-900"
                       }`}
                     />
@@ -343,15 +350,15 @@ function Register() {
                       onChange={(event) =>
                         updateField(
                           "email",
-                          event.target.value
+                          event.target.value,
                         )
                       }
                       placeholder="you@example.com"
                       autoComplete="email"
                       disabled={loading}
-                      className={`h-11 w-full min-w-0 rounded-xl border bg-white pl-10 pr-3 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:bg-zinc-50 ${
+                      className={`h-11 w-full rounded-xl border bg-white pl-10 pr-3 text-sm outline-none ${
                         errors.email
-                          ? "border-red-300 focus:border-red-500"
+                          ? "border-red-300"
                           : "border-stone-200 focus:border-zinc-900"
                       }`}
                     />
@@ -360,6 +367,50 @@ function Register() {
                   {errors.email && (
                     <p className="mt-1.5 text-xs text-red-600">
                       {errors.email}
+                    </p>
+                  )}
+                </div>
+
+                {/* PHONE */}
+
+                <div>
+                  <label
+                    htmlFor="register-phone"
+                    className="mb-1.5 block text-xs font-medium text-zinc-600"
+                  >
+                    Mobile number
+                  </label>
+
+                  <div className="relative">
+                    <Phone
+                      size={16}
+                      className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+                    />
+
+                    <input
+                      id="register-phone"
+                      type="tel"
+                      value={form.phone}
+                      onChange={(event) =>
+                        updateField(
+                          "phone",
+                          event.target.value,
+                        )
+                      }
+                      placeholder="9876543210"
+                      autoComplete="tel"
+                      disabled={loading}
+                      className={`h-11 w-full rounded-xl border bg-white pl-10 pr-3 text-sm outline-none ${
+                        errors.phone
+                          ? "border-red-300"
+                          : "border-stone-200 focus:border-zinc-900"
+                      }`}
+                    />
+                  </div>
+
+                  {errors.phone && (
+                    <p className="mt-1.5 text-xs text-red-600">
+                      {errors.phone}
                     </p>
                   )}
                 </div>
@@ -391,15 +442,15 @@ function Register() {
                       onChange={(event) =>
                         updateField(
                           "password",
-                          event.target.value
+                          event.target.value,
                         )
                       }
                       placeholder="Create a password"
                       autoComplete="new-password"
                       disabled={loading}
-                      className={`h-11 w-full min-w-0 rounded-xl border bg-white pl-10 pr-11 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:bg-zinc-50 ${
+                      className={`h-11 w-full rounded-xl border bg-white pl-10 pr-11 text-sm outline-none ${
                         errors.password
-                          ? "border-red-300 focus:border-red-500"
+                          ? "border-red-300"
                           : "border-stone-200 focus:border-zinc-900"
                       }`}
                     />
@@ -408,16 +459,10 @@ function Register() {
                       type="button"
                       onClick={() =>
                         setShowPassword(
-                          (current) => !current
+                          (current) => !current,
                         )
                       }
-                      disabled={loading}
-                      className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center text-zinc-400 transition-colors hover:text-zinc-900"
-                      aria-label={
-                        showPassword
-                          ? "Hide password"
-                          : "Show password"
-                      }
+                      className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center text-zinc-400"
                     >
                       {showPassword ? (
                         <EyeOff size={16} />
@@ -461,15 +506,15 @@ function Register() {
                       onChange={(event) =>
                         updateField(
                           "confirmPassword",
-                          event.target.value
+                          event.target.value,
                         )
                       }
                       placeholder="Confirm your password"
                       autoComplete="new-password"
                       disabled={loading}
-                      className={`h-11 w-full min-w-0 rounded-xl border bg-white pl-10 pr-11 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 disabled:bg-zinc-50 ${
+                      className={`h-11 w-full rounded-xl border bg-white pl-10 pr-11 text-sm outline-none ${
                         errors.confirmPassword
-                          ? "border-red-300 focus:border-red-500"
+                          ? "border-red-300"
                           : "border-stone-200 focus:border-zinc-900"
                       }`}
                     />
@@ -478,16 +523,10 @@ function Register() {
                       type="button"
                       onClick={() =>
                         setShowConfirmPassword(
-                          (current) => !current
+                          (current) => !current,
                         )
                       }
-                      disabled={loading}
-                      className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center text-zinc-400 transition-colors hover:text-zinc-900"
-                      aria-label={
-                        showConfirmPassword
-                          ? "Hide password"
-                          : "Show password"
-                      }
+                      className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center text-zinc-400"
                     >
                       {showConfirmPassword ? (
                         <EyeOff size={16} />
@@ -504,41 +543,23 @@ function Register() {
                   )}
                 </div>
 
-                {/* SUBMIT */}
-
                 <button
                   type="submit"
                   disabled={loading}
-                  className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-zinc-950 px-4 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-zinc-950 px-4 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:opacity-60"
                 >
                   {loading
                     ? "Creating account..."
                     : "Create Account"}
 
-                  {!loading && (
-                    <ArrowRight
-                      size={16}
-                      className="shrink-0"
-                    />
-                  )}
+                  {!loading && <ArrowRight size={16} />}
                 </button>
               </form>
 
-              {/* LOGIN */}
-
-              <p className="mt-6 text-center text-sm leading-6 text-zinc-500 sm:mt-7">
+              <p className="mt-6 text-center text-sm text-zinc-500">
                 Already have an account?{" "}
-
                 <Link
                   to="/login"
-                  state={{
-                    from:
-                      location.state?.from ||
-                      localStorage.getItem(
-                        "resumely_after_login"
-                      ) ||
-                      undefined,
-                  }}
                   className="font-semibold text-zinc-900 hover:text-[#987542]"
                 >
                   Sign in
