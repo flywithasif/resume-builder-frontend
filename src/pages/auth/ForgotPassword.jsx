@@ -1,22 +1,33 @@
-import { ArrowLeft, ArrowRight, CheckCircle2, Mail } from "lucide-react";
-import { Link } from "react-router-dom";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle2,
+  Loader2,
+  Mail,
+} from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
+import { forgotPassword } from "../../services/authService";
+
 function ForgotPassword() {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
-  const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!email.trim()) {
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!normalizedEmail) {
       setError("Email is required.");
       return;
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
       setError("Enter a valid email address.");
       return;
     }
@@ -24,10 +35,29 @@ function ForgotPassword() {
     setError("");
     setLoading(true);
 
-    window.setTimeout(() => {
+    try {
+      await forgotPassword({
+        email: normalizedEmail,
+      });
+
+      localStorage.setItem(
+        "resumely_reset_email",
+        normalizedEmail,
+      );
+
+      navigate("/verify-reset-otp", {
+        state: {
+          email: normalizedEmail,
+        },
+      });
+    } catch (err) {
+      setError(
+        err?.message ||
+          "Unable to send reset OTP. Please try again.",
+      );
+    } finally {
       setLoading(false);
-      setSubmitted(true);
-    }, 700);
+    }
   };
 
   return (
@@ -45,126 +75,107 @@ function ForgotPassword() {
 
           {/* CARD */}
           <div className="w-full rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_20px_60px_rgba(24,24,27,0.07)] sm:p-7 md:p-9">
-            {!submitted ? (
-              <>
-                {/* ICON */}
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-zinc-950 text-white">
-                  <Mail size={19} />
-                </div>
+            {/* ICON */}
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-zinc-950 text-white">
+              <Mail size={19} />
+            </div>
 
-                {/* LABEL */}
-                <p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#987542] sm:mt-7 sm:text-xs">
-                  Account recovery
-                </p>
+            {/* LABEL */}
+            <p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#987542] sm:mt-7 sm:text-xs">
+              Account recovery
+            </p>
 
-                {/* TITLE */}
-                <h1 className="mt-2 text-[22px] font-semibold leading-tight tracking-[-0.035em] text-zinc-950 sm:text-2xl">
-                  Forgot your password?
-                </h1>
+            {/* TITLE */}
+            <h1 className="mt-2 text-[22px] font-semibold leading-tight tracking-[-0.035em] text-zinc-950 sm:text-2xl">
+              Forgot your password?
+            </h1>
 
-                {/* DESCRIPTION */}
-                <p className="mt-2 text-sm leading-6 text-zinc-500">
-                  Enter the email associated with your account and we&apos;ll
-                  prepare the password reset flow.
-                </p>
+            {/* DESCRIPTION */}
+            <p className="mt-2 text-sm leading-6 text-zinc-500">
+              Enter the email associated with your account and we&apos;ll
+              send you a password reset OTP.
+            </p>
 
-                {/* FORM */}
-                <form
-                  onSubmit={handleSubmit}
-                  className="mt-6 sm:mt-7"
-                  noValidate
-                >
-                  <label
-                    htmlFor="forgot-email"
-                    className="mb-1.5 block text-xs font-medium text-zinc-600"
-                  >
-                    Email
-                  </label>
+            {/* FORM */}
+            <form
+              onSubmit={handleSubmit}
+              className="mt-6 sm:mt-7"
+              noValidate
+            >
+              <label
+                htmlFor="forgot-email"
+                className="mb-1.5 block text-xs font-medium text-zinc-600"
+              >
+                Email
+              </label>
 
-                  <div className="relative">
-                    <Mail
-                      size={16}
-                      className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
-                    />
+              <div className="relative">
+                <Mail
+                  size={16}
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+                />
 
-                    <input
-                      id="forgot-email"
-                      type="email"
-                      value={email}
-                      onChange={(event) => {
-                        setEmail(event.target.value);
-                        setError("");
-                      }}
-                      placeholder="you@example.com"
-                      autoComplete="email"
-                      className={`h-11 w-full min-w-0 rounded-xl border bg-white pl-10 pr-3 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 ${
-                        error
-                          ? "border-red-300"
-                          : "border-stone-200 focus:border-zinc-900"
-                      }`}
-                    />
-                  </div>
-
-                  {error && (
-                    <p className="mt-1.5 text-xs leading-5 text-red-600">
-                      {error}
-                    </p>
-                  )}
-
-                  {/* SUBMIT BUTTON */}
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="mt-5 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-zinc-950 px-4 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {loading ? "Preparing..." : "Continue"}
-
-                    {!loading && <ArrowRight size={16} />}
-                  </button>
-                </form>
-              </>
-            ) : (
-              /* SUCCESS STATE */
-              <div className="text-center">
-                {/* SUCCESS ICON */}
-                <div className="mx-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
-                  <CheckCircle2 size={23} />
-                </div>
-
-                {/* LABEL */}
-                <p className="mt-5 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#987542] sm:mt-6 sm:text-xs">
-                  Check your inbox
-                </p>
-
-                {/* TITLE */}
-                <h1 className="mt-2 text-[22px] font-semibold leading-tight tracking-[-0.035em] text-zinc-950 sm:text-2xl">
-                  Reset link prepared
-                </h1>
-
-                {/* DESCRIPTION */}
-                <p className="mt-3 text-sm leading-6 text-zinc-500">
-                  A password reset message would be sent to{" "}
-                  <span className="break-all font-medium text-zinc-800">
-                    {email}
-                  </span>
-                  .
-                </p>
-
-                {/* INFO */}
-                <p className="mt-3 text-xs leading-5 text-zinc-400">
-                  Email delivery is not connected yet. This is the frontend
-                  success state for the current stage.
-                </p>
-
-                {/* BACK BUTTON */}
-                <Link
-                  to="/login"
-                  className="mt-6 flex min-h-11 w-full items-center justify-center rounded-xl border border-stone-200 px-4 text-sm font-semibold text-zinc-800 transition-colors hover:bg-stone-50 sm:mt-7"
-                >
-                  Back to login
-                </Link>
+                <input
+                  id="forgot-email"
+                  type="email"
+                  value={email}
+                  onChange={(event) => {
+                    setEmail(event.target.value);
+                    setError("");
+                  }}
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                  disabled={loading}
+                  className={`h-11 w-full min-w-0 rounded-xl border bg-white pl-10 pr-3 text-sm outline-none transition focus:ring-2 focus:ring-zinc-900/5 ${
+                    error
+                      ? "border-red-300"
+                      : "border-stone-200 focus:border-zinc-900"
+                  }`}
+                />
               </div>
-            )}
+
+              {/* ERROR */}
+              {error && (
+                <p className="mt-1.5 text-xs leading-5 text-red-600">
+                  {error}
+                </p>
+              )}
+
+              {/* SUBMIT BUTTON */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="mt-5 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-zinc-950 px-4 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {loading ? (
+                  <>
+                    <Loader2
+                      size={16}
+                      className="animate-spin"
+                    />
+                    Sending OTP...
+                  </>
+                ) : (
+                  <>
+                    Send OTP
+                    <ArrowRight size={16} />
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* SECURITY NOTE */}
+            <div className="mt-5 flex items-start gap-2 rounded-xl border border-stone-200 bg-stone-50 px-3 py-3">
+              <CheckCircle2
+                size={15}
+                className="mt-0.5 shrink-0 text-emerald-600"
+              />
+
+              <p className="text-xs leading-5 text-zinc-500">
+                A 6-digit OTP will be sent to your registered email
+                address.
+              </p>
+            </div>
           </div>
         </div>
       </div>
