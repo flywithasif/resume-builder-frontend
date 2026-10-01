@@ -5,6 +5,7 @@ import {
   FileText,
   Save,
   Sparkles,
+  Upload,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -15,6 +16,7 @@ import {
 import jsPDF from "jspdf";
 
 import coverLetterTemplates from "../../data/coverLetterTemplates";
+import DocumentImportModal from "../../components/common/DocumentImportModal";
 import {
   createCoverLetter,
   getCoverLetterFromApi,
@@ -352,6 +354,7 @@ function CoverLetterBuilder() {
 
   const [saved, setSaved] = useState(false);
   const [previewMobile, setPreviewMobile] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
 
   const selectedTemplate = useMemo(() => {
     return (
@@ -442,6 +445,45 @@ function CoverLetterBuilder() {
       cancelled = true;
     };
   }, [editingId, queryTemplate]);
+
+  const handleCoverLetterImported = (importedData) => {
+    if (!importedData) return;
+
+    setData((current) => ({
+      ...current,
+      title: "Imported Cover Letter",
+      fullName: importedData.fullName || "",
+      email: importedData.email || "",
+      phone: importedData.phone || "",
+      location: importedData.location || "",
+      date: importedData.date || "",
+      hiringManager: importedData.hiringManager || "",
+      company: importedData.company || "",
+      companyAddress: importedData.companyAddress || "",
+      position: importedData.position || "",
+      subject: importedData.position
+        ? `Application for ${importedData.position}`
+        : "",
+      greeting: importedData.greeting || "",
+      opening: importedData.opening || "",
+      body: importedData.body || "",
+      secondBody: importedData.secondBody || "",
+      closing: importedData.closing || "",
+      signOff: importedData.signOff || "",
+      id: undefined,
+      createdAt: undefined,
+      updatedAt: undefined,
+    }));
+
+    setSaved(false);
+    setImportModalOpen(false);
+    setPreviewMobile(false);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
   const updateField = (field, value) => {
     setSaved(false);
@@ -1050,6 +1092,17 @@ function CoverLetterBuilder() {
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <button
               type="button"
+              onClick={() => setImportModalOpen(true)}
+              className="flex h-9 shrink-0 items-center gap-2 rounded-lg border border-stone-200 bg-white px-2.5 text-xs font-medium text-zinc-700 transition hover:border-[#987542] hover:bg-stone-50 hover:text-zinc-950 sm:px-3"
+              title="Import cover letter"
+              aria-label="Import cover letter"
+            >
+              <Upload size={15} />
+              <span className="hidden sm:inline">Import</span>
+            </button>
+
+            <button
+              type="button"
               onClick={() =>
                 setPreviewMobile(
                   (current) => !current,
@@ -1096,6 +1149,56 @@ function CoverLetterBuilder() {
           </div>
         </div>
       </header>
+
+      {/* =====================================================
+          IMPORT COVER LETTER
+      ====================================================== */}
+
+      <div className="mx-auto w-full max-w-[1700px] px-3 pt-3 sm:px-5 sm:pt-4 md:px-6 lg:px-7">
+        <button
+          type="button"
+          onClick={() => setImportModalOpen(true)}
+          className="
+            group
+            flex
+            w-full
+            items-center
+            justify-between
+            gap-4
+            rounded-xl
+            border
+            border-[#d8c8ae]
+            bg-white
+            px-4
+            py-3
+            text-left
+            shadow-sm
+            transition
+            hover:border-[#987542]
+            hover:shadow-md
+            sm:px-5
+          "
+        >
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#f3ede3] text-[#987542] transition group-hover:bg-[#987542] group-hover:text-white">
+              <Upload size={17} />
+            </div>
+
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-zinc-950">
+                Import Cover Letter
+              </p>
+              <p className="mt-0.5 truncate text-xs text-zinc-500">
+                Upload a PDF or DOCX to automatically fill your cover letter.
+              </p>
+            </div>
+          </div>
+
+          <span className="shrink-0 rounded-lg bg-zinc-950 px-3.5 py-2 text-xs font-semibold text-white transition group-hover:bg-[#987542]">
+            Import
+          </span>
+        </button>
+      </div>
 
       {/* =====================================================
           WORKSPACE
@@ -1482,6 +1585,14 @@ function CoverLetterBuilder() {
           </div>
         </section>
       </main>
+
+
+      <DocumentImportModal
+        open={importModalOpen}
+        type="cover-letter"
+        onClose={() => setImportModalOpen(false)}
+        onImported={handleCoverLetterImported}
+      />
 
       {/* =====================================================
           RESPONSIVE PREVIEW STYLES
