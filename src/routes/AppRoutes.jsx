@@ -36,6 +36,7 @@ function ScrollToTop() {
 ========================================================= */
 
 import Home from "../pages/landing/Home";
+import LandingTemplates from "../pages/landing/Templates";
 import Pricing from "../pages/landing/Pricing";
 import About from "../pages/landing/About";
 import HowItWorks from "../pages/landing/HowItWorks";
@@ -67,7 +68,7 @@ import Settings from "../pages/dashboard/Settings";
 import Builder from "../pages/builder/Builder";
 
 /* =========================================================
-   RESUME TEMPLATES
+   ACTUAL RESUME TEMPLATES
 ========================================================= */
 
 import Templates from "../pages/templates/Templates";
@@ -119,26 +120,49 @@ function AppRoutes() {
         ====================================================== */}
 
         <Route element={<PublicLayout />}>
+          {/* HOME */}
           <Route
             path="/"
             element={<Home />}
           />
 
+          {/* =================================================
+              TEMPLATE LANDING PAGE
+
+              /templates
+              Ye landing Templates.jsx hai.
+          ================================================= */}
+
+          <Route
+            path="/templates"
+            element={<LandingTemplates />}
+          />
+
+          {/* Optional same landing page URL */}
+          <Route
+            path="/resume-templates"
+            element={<LandingTemplates />}
+          />
+
+          {/* COVER LETTER LANDING */}
           <Route
             path="/cover-letter"
             element={<CoverLetter />}
           />
 
+          {/* ABOUT */}
           <Route
             path="/about"
             element={<About />}
           />
 
+          {/* HOW IT WORKS */}
           <Route
             path="/how-it-works"
             element={<HowItWorks />}
           />
 
+          {/* PRICING */}
           <Route
             path="/pricing"
             element={<Pricing />}
@@ -170,29 +194,25 @@ function AppRoutes() {
         </Route>
 
         {/* =====================================================
-            SMART TEMPLATE PAGES
-
-            Guest:
-              Public Navbar + Footer
-
-            Logged in:
-              Dashboard Sidebar + Topbar
-
-            Templates remain accessible without login.
+            ACTUAL TEMPLATE LIBRARY
         ====================================================== */}
 
         <Route element={<TemplateRouteLayout />}>
           {/* =================================================
-              RESUME TEMPLATES
+              ACTUAL RESUME TEMPLATE LIBRARY
+
+              /templates/all
           ================================================= */}
 
           <Route
-            path="/templates"
+            path="/templates/all"
             element={<Templates />}
           />
 
           {/* =================================================
-              INDIVIDUAL RESUME TEMPLATE
+              INDIVIDUAL TEMPLATE DETAILS
+
+              /templates/:templateId
           ================================================= */}
 
           <Route
@@ -262,7 +282,6 @@ function AppRoutes() {
 
           {/* =================================================
               COVER LETTER BUILDER
-              LOGIN REQUIRED
           ================================================= */}
 
           <Route

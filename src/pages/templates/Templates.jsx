@@ -1,4 +1,10 @@
 import {
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+
+import {
   ArrowRight,
   Check,
   Eye,
@@ -23,25 +29,74 @@ import {
 ========================================================= */
 
 function ResumeThumbnail({ template }) {
+  const containerRef = useRef(null);
+  const [scale, setScale] = useState(0.4);
+
+  useLayoutEffect(() => {
+    const element = containerRef.current;
+
+    if (!element) {
+      return undefined;
+    }
+
+    const updateScale = () => {
+      const width = element.getBoundingClientRect().width;
+      const A4_WIDTH = 794;
+
+      if (!width) {
+        return;
+      }
+
+      /*
+       * ResumeRenderer ko A4 canvas ke exact CSS dimensions
+       * ke saath scale kiya ja raha hai. Preview hamesha
+       * available card width ke andar fit
+       * karte hain. Isme CSS `zoom` use nahi hota, isliye
+       * browser zoom ya Dashboard sidebar ke saath thumbnail
+       * crop nahi hoga.
+       */
+      setScale(Math.min(width / A4_WIDTH, 1));
+    };
+
+    updateScale();
+
+    const observer = new ResizeObserver(updateScale);
+    observer.observe(element);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   return (
-    <div className="relative h-[330px] w-full overflow-hidden bg-[#efede8] sm:h-[360px] md:h-[390px]">
+    <div
+      ref={containerRef}
+      className="relative w-full overflow-hidden bg-[#efede8]"
+      style={{
+        aspectRatio: "794 / 1123",
+      }}
+    >
       {/* =====================================================
           A4 RESUME CANVAS
+
+          Native A4 preview ko available card width ke hisaab
+          se scale kiya ja raha hai. Browser zoom independent.
+          794 x 1123 = A4 CSS pixel ratio at 96 DPI.
       ====================================================== */}
 
-      <div className="absolute inset-x-0 top-0 flex justify-center overflow-hidden">
-        <div
-          className="shrink-0 origin-top"
-          style={{
-            width: "760px",
-            zoom: 0.42,
-          }}
-        >
-          <ResumeRenderer
-            resume={TEMPLATE_SAMPLE_RESUME}
-            template={template.id}
-          />
-        </div>
+      <div
+        className="pointer-events-none absolute left-1/2 top-0"
+        style={{
+          width: "794px",
+          height: "1123px",
+          transform: `translateX(-50%) scale(${scale})`,
+          transformOrigin: "top center",
+        }}
+      >
+        <ResumeRenderer
+          resume={TEMPLATE_SAMPLE_RESUME}
+          template={template.id}
+        />
       </div>
 
       {/* =====================================================
