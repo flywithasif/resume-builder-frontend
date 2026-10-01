@@ -82,6 +82,30 @@ import CoverLetterTemplates from "../pages/templates/CoverLetterTemplates";
 import CoverLetterBuilder from "../pages/coverLetters/CoverLetterBuilder";
 
 /* =========================================================
+   TEMPLATE ENTRY
+========================================================= */
+
+/*
+  Guest:
+    /templates → TemplateShowcase
+
+  Logged in:
+    /templates → Actual Templates
+*/
+
+function TemplateEntry() {
+  const isAuthenticated = Boolean(
+    localStorage.getItem("resumely_token"),
+  );
+
+  if (isAuthenticated) {
+    return <Templates />;
+  }
+
+  return <TemplateShowcase />;
+}
+
+/* =========================================================
    404
 ========================================================= */
 
@@ -180,11 +204,9 @@ function AppRoutes() {
           />
 
           {/* =================================================
-              LANDING TEMPLATE SHOWCASE
+              PUBLIC TEMPLATE SHOWCASE
 
-              Direct landing URL only.
-
-              /resume-templates
+              This URL always shows the landing showcase.
           ================================================= */}
 
           <Route
@@ -197,32 +219,21 @@ function AppRoutes() {
             SMART TEMPLATE ROUTES
 
             Guest:
-              Public Navbar + Template pages
+              Public Navbar + Template Showcase
 
             Logged in:
               Dashboard Sidebar + Dashboard Topbar
+              + Actual Templates
         ====================================================== */}
 
         <Route element={<TemplateRouteLayout />}>
           {/* =================================================
               TEMPLATE ENTRY
-
-              Guest:
-                /templates → TemplateShowcase
-
-              Logged in:
-                /templates → Actual Templates
           ================================================= */}
 
           <Route
             path="/templates"
-            element={
-              localStorage.getItem("resumely_token") ? (
-                <Templates />
-              ) : (
-                <TemplateShowcase />
-              )
-            }
+            element={<TemplateEntry />}
           />
 
           {/* =================================================
